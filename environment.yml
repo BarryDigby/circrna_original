@@ -6,10 +6,7 @@ channels:
 dependencies:
   - bioconda::fastqc=0.11.9
   - bioconda::multiqc=1.8
-  - bioconda::bedtools==2.29.2
   - bioconda::bwa=0.7.17
-  - bioconda::bedtools=2.29.2
-  - bioconda::hisat2=2.2.1
   - bioconda::samtools=1.10
   - bioconda::circexplorer2=2.3.8
   - bioconda::mapsplice=2.2.1
