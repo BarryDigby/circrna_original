@@ -4,6 +4,7 @@ channels:
   - bioconda
   - defaults
 dependencies:
+  - conda-forge::python=2.7.15
   - bioconda::fastqc=0.11.9
   - bioconda::multiqc=1.8
   - bioconda::bwa=0.7.17
@@ -14,4 +15,3 @@ dependencies:
   - bioconda::star=2.7.5b
   - bioconda::hisat2=2.2.1
   - bioconda::stringtie=2.1.2
-  - conda-forge::python=2.7.15
