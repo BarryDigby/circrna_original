@@ -5,8 +5,3 @@ LABEL authors="Barry Digby" \
 COPY environment.yml /
 RUN conda env create -f /environment.yml python=2.7 && conda clean -a
 ENV PATH /opt/conda/envs/circrna/bin:$PATH
-
-COPY requirements.txt /
-RUN pip install -r requirements.txt
-RUN pip install --ignore-installed PyYAML==5.1.1
-RUN pip install CIRIquant
