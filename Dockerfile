@@ -8,4 +8,4 @@ ENV PATH /opt/conda/envs/circrna/bin:$PATH
 
 COPY requirements.txt /
 RUN pip install -r requirements.txt
-RUN pip install --ignore-installed PyYaml
+RUN pip install --ignore-installed PyYAML==5.1.1
