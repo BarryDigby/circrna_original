@@ -18,14 +18,6 @@ Description:
 --------------------------------------------------------------------------------
 */
 
-if(params.outDir){
-  params.refDir = "${params.outDir}"
-}
-if(!params.outDir){
-  params.refDir = "${workflow.launchDir}/${params.version}"
-}
-
-
 stepList = defineStepList()
 step = params.step ? params.step.toLowerCase().replaceAll('-', '').replaceAll('_', '') : ''
 
@@ -45,7 +37,7 @@ params.readlength = 44
 
 process Download_Genome {
 
-        publishDir "$params.refDir/Reference", mode: 'copy'
+        publishDir "$params.outdir/Reference", mode: 'copy'
 
         output:
         file('*.fa') into genome_ch
@@ -91,7 +83,7 @@ process Download_Genome {
 
 process STAR_Index {
 
-        publishDir "$params.refDir/Index/STAR", mode: 'copy'
+        publishDir "$params.outdir/Index/STAR", mode: 'copy'
         
         input:
         file(a) from genome_ch
