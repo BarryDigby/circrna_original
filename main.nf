@@ -18,6 +18,8 @@ Description:
 --------------------------------------------------------------------------------
 */
 
+params.outdir = ""
+
 stepList = defineStepList()
 step = params.step ? params.step.toLowerCase().replaceAll('-', '').replaceAll('_', '') : ''
 
