@@ -12,3 +12,4 @@ dependencies:
   - bioconda::mapsplice>=2.1.9
   - bioconda::BWA>=0.6.2-r126
   - bioconda::miranda
+  - conda-forge::python=2.7.15
