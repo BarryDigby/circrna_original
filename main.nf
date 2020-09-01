@@ -18,27 +18,3 @@ Description:
 --------------------------------------------------------------------------------
 */
 
-
-/*
-================================================================================
-                                  Testing Environment
-================================================================================
-*/
-
-process test{
-            echo true
-            
-            output:
-            stdout to out
-            
-            script:
-            """
-            python --version
-            STAR
-            bwa
-            python mapsplice.py
-            miranda
-            bbduk.sh
-            CIRCexplorer2
-            """
-}
