@@ -1,0 +1,15 @@
+Bootstrap:library
+From:bruce.moran/default/bases:centos7_conda
+
+%environment
+
+  source /opt/miniconda/etc/profile.d/conda.sh
+  conda activate circrna
+
+%post
+
+  source /opt/miniconda/etc/profile.d/conda.sh
+  git clone https://github.com/barrydigby/circRNA
+  conda env create -f ./circRNA/environment.yml
+  conda clean -y -a
+  export PATH="/opt/miniconda/envs/circrna/bin:$PATH"
