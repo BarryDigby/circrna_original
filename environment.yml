@@ -3,17 +3,12 @@ channels:
   - conda-forge
   - bioconda
   - defaults
+  - agbiome 
 dependencies:
-  - conda-forge::python=2.7.15
+  - agbiome::bbtools
   - bioconda::fastqc=0.11.9
   - bioconda::multiqc=1.8
   - bioconda::circexplorer2=2.3.8
   - bioconda::mapsplice>=2.1.9
-  - bioconda::tophat>=2.0.9
-  - bioconda::cufflinks>=2.1.1
-  - bioconda::ucsc-gtftogenepred
-  - bioconda::ucsc-genepredtogtf
-  - bioconda::star>=2.4.0j
-  - bioconda::mapsplice>=2.1.9
   - bioconda::BWA>=0.6.2-r126
-  
+  - bioconda::miranda
