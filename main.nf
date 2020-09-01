@@ -33,6 +33,7 @@ process test{
             
             script:
             """
+            python --version
             STAR
             bwa
             python mapsplice.py
