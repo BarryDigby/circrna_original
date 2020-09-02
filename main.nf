@@ -227,7 +227,7 @@ ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
  
  process bbduk {
     
-        publishDir "params.outdir/trimmed_reads", mode:'copy'
+        publishDir "$params.outdir/trimmed_reads", mode:'copy'
     
         input:
             tuple val(base), file(fastq) from ch_reads
@@ -267,7 +267,7 @@ process fastqc {
 
 process multiqc {
 
-        publishDir "params.outdir/MultiQC_Report", mode:'copy'
+        publishDir "$params.outdir/MultiQC_Report", mode:'copy'
         
         input:
             file('*') from multiqc_input.collect()
