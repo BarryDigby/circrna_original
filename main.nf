@@ -68,7 +68,7 @@ params.star_index = ''
 params.bwa_index = ''
 params.aigner = 'bwa'
 //Step 3
-params.inputdir = '/data/bdigby/circTCGA/fastq'
+params.inputdir = '/data/bdigby/circTCGA/fastq/'
 params.input_type = 'bam'
 params.fastq_glob = '*_R{1,2}.fq'
 params.bam_glob = '*.bam'
