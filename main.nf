@@ -193,7 +193,7 @@ if(params.aligner == 'star' && !(params.star_index)){
  
  // stage bam files
 bam_files = params.inputdir + params.bam_glob
- 
+
 if(params.input_type == 'bam'){
    ch_bam = Channel.fromPath( bam_files )
                    .map{ file -> [file.baseName, file]}
@@ -231,7 +231,7 @@ ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
     
         input:
             tuple val(base), file(fastq) from ch_reads
-            file(adapters) from Channel.value(params.adapters)
+            path adapters from params.adapters
         output:
             tuple val(base), file('*.fastq.gz') into fastqc_reads
             
