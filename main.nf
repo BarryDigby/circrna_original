@@ -192,11 +192,11 @@ if(params.aligner == 'star' && !(params.star_index)){
  */
  
  // stage bam files
- bam_files = params.inputdir + params.bam_glob
+bam_files = params.inputdir + params.bam_glob
  
- if(params.input_type == 'bam'){
-    Channel.fromPath( bam_files )
-           .set{ ch_bam }
+if(params.input_type == 'bam'){
+   ch_bam = Channel.fromPath( bam_files )
+                   .map{ file -> [file.baseName, file]}
       process bam_to_fq{
 
           input:
