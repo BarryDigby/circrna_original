@@ -244,7 +244,8 @@ ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
         out2=${base}_2.fastq.gz \
         ref=$adapters \
         minlen=30 \
-        ktrim=12 \
+        ktrim=r \
+        k=12 \
         qtrim=r \
         trimq=20
         """
