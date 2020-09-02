@@ -34,13 +34,22 @@ Description:
      params.circexplorer2_ref = 'path/to/genome.txt'
 --------------------------------------------------------------------------------
 2. Create Genome Index
-   Provide option for STAR, BWA, hisat2(single end, TO DO)
+   Provide option for STAR, BWA, hisat2(single end, TO DO list (:)
    
    Parameters:
     params.aligner = star, bwa 
     params.star_idx = 'star_index/path/'
     params.bwa_idx = 'bwa_index/path'
+--------------------------------------------------------------------------------
+3. Pre process Reads
+   Convert bam to fastq
+   Trim the reads (conservatively)
+   run fastqc - multiqc on the reads
+   
+   Parameters:
+    params.input_type = fastq | bam
 */
+
 
 
 //pre-defined functions for render command
@@ -106,15 +115,22 @@ params.star_overhang = '49'
 params.star_index = ''
 params.bwa_index = ''
 params.aigner = 'bwa'
-
+//Step 3
+params.inputdir = ''
+params.input_type = ''
+params.fastq_glob = '/_R{1,2}.fq'
+params.bam_glob = '/*.bam'
+params.reads = '' // leave empty 
+//Step 4
+params.adapters = ''
 
 
 /*
- * Step 1: Downlaod Reference Files
+ * Step 1: Download Reference Files
  */
 
 process download_genome {
-
+        
         publishDir "$params.outdir/reference", mode: 'copy'
 
         output:
@@ -215,3 +231,101 @@ if(params.aligner == 'star' && !(params.star_index)){
         """
         }
  }
+
+ch_bwa_idx = params.bwa_index ? Channel.value(file(params.bwa_index)) : bwa_built
+ch_star_idx = params.star_index ? Channel.value(file(params.star_index)) : star_built
+
+/*
+ * Step3: Stage Fastq files
+ */
+ 
+ // stage bam files
+ bam_files = params.inputdir + params.bam_glob
+ 
+ if(params.input_type == 'bam'){
+    Channel.fromPath( bam_files )
+           .map{ file -> [file.baseName, file] }
+      process bam_to_fq{
+
+          input:
+              tuple val(base), file(bam) from ch_bam
+
+          output:
+              tuple val(base), file('*.fastq.gz') into fastq_built
+
+          script:
+          """
+          picard -Xmx8g \
+          SamToFastq \
+          I=$bam \
+          F=${base}_R1.fastq.gz F2=${base}_R2.fastq.gz \
+          VALIDATION_STRINGENCY=LENIENT
+          """
+        }
+    }else if(params.input_type == 'fastq'){
+          fastq_build = params.inputdir + params.fastq_glob
+          Channel.fromFilePairs( fastq_build )
+                 .set{ fastq_built }
+    }
+    
+ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
+
+/*
+ * Step 4: Trim, fastqc
+ */
+ 
+ process bbduk {
+    
+        publishDir "params.outdir/trimmed_reads", mode:'copy'
+    
+        input:
+            tuple val(base), file(fastq) from ch_fastq
+            file(adapters) from params.adapters
+        output:
+            tuple val(base), file('*.fastq.gz') into fastqc_reads
+            
+        script:
+        """
+        bbduk.sh -Xmx4g \
+        in1=${fastq[0]} \
+        in2=${fastq[1]} \
+        out1=${base}_1.fastq.gz \
+        out2=${base}_2.fastq.gz \
+        ref=$adapters \
+        minlen=30 \
+        ktrim=12 \
+        qtrim=r \
+        trimq=20
+        """
+}
+
+process fastqc {
+        
+        input:
+            tuple val(base), file(fastq) from fastqc_reads
+        
+        output:
+            file('*.{zip,html}') into multiqc_input
+            
+        script:
+        """
+        fastqc -q ${fastq}
+        """
+}
+
+process multiqc {
+
+        publishDir "params.outdir/MultiQC_Report", mode:'copy'
+        
+        input:
+            file('*') from multiqc_input.collect()
+            
+        output:
+            file('multiqc_report.html') 
+            
+        script:
+        """
+        multiqc .
+        """
+}
+            
