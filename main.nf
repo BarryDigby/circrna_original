@@ -229,7 +229,7 @@ ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
         publishDir "params.outdir/trimmed_reads", mode:'copy'
     
         input:
-            tuple val(base), file(fastq) from ch_fastq
+            tuple val(base), file(fastq) from ch_reads
             file(adapters) from params.adapters
         output:
             tuple val(base), file('*.fastq.gz') into fastqc_reads
