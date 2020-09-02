@@ -204,7 +204,7 @@ if(params.aligner == 'star' && !(params.star_index)){
         publishDir "params.outdir/index/bwa", mode:'copy'
         
         input:
-            file(fasta) from fasta_ch
+            file(fasta) from ch_fasta
             
         output:
             file("${fasta}.*") into bwa_built
