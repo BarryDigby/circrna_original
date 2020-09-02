@@ -37,6 +37,7 @@ Description:
    Provide option for STAR, BWA, hisat2(single end, TO DO)
    
    Parameters:
+    params.aligner = star, bwa 
     params.star_idx = 'star_index/path/'
     params.bwa_idx = 'bwa_index/path'
 */
@@ -94,12 +95,20 @@ if (params.help) {
     exit 0
 }
 
-
+//Step 1
 params.version = 'GRCh38'
+//Step 2
+params.star_overhang = '49' 
+
+
+
+/*
+ * Step 1: Downlaod Reference Files
+ */
 
 process download_genome {
 
-        publishDir "$params.outdir/Reference", mode: 'copy'
+        publishDir "$params.outdir/reference", mode: 'copy'
 
         output:
         file('*.fa') into fasta_downloaded
@@ -120,6 +129,19 @@ process download_genome {
           perl -alne '$"="\t";print "@F[11,0..9]"' GRCh37.genepred > GRCh37.txt
           rm GRCh37.fa.tmp
           /$
+          
+        }else if( params.version == 'development' ){
+          $/
+          wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/gencode.v34.primary_assembly.annotation.gtf.gz
+          wget --no-check-certificate ftp://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.20.fa.gz         
+          gunzip gencode.v34.primary_assembly.annotation.gtf.gz
+          gunzip Homo_sapiens.GRCh38.dna.chromosome.20.fa.gz
+          mv gencode.v34.primary_assembly.annotation.gtf GRCh38.gtf
+          mv Homo_sapiens.GRCh38.dna.chromosome.20.fa chr20.fa
+          gtfToGenePred -genePredExt -geneNameAsName2 GRCh38.gtf GRCh38.genepred
+          perl -alne '$"="\t";print "@F[11,0..9]"' GRCh38.genepred > GRCh38.txt          
+          /$
+          
         }else{
           $/
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/gencode.v34.primary_assembly.annotation.gtf.gz
@@ -140,3 +162,49 @@ ch_fasta = params.fasta ? Channel.value(file(params.fasta)) : fasta_downloaded
 ch_gene_annotation = params.gene_annotation ? Channel.value(file(params.gene_annotation)) : gene_annotation_created
 ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : gencode_gtf_downloaded
 
+/*
+ * Step 2: Create Genome Index
+ */ 
+ 
+if(params.aligner == 'star' && params.star_index == false){
+    process star_index {
+    
+          publishDir "params.outdir/index", mode:'copy'
+          
+          input:
+              file(fatsa) from ch_fasta
+              file(gtf) from ch_gencode_gtf
+              
+          output:
+              file("star_index") into star_built
+              
+          script:
+          """
+          mkdir star_index
+          
+          STAR \
+          --runMode genomeGenerate \
+          --runThreadN 8 \
+          --sjdbGTFfile $gtf \
+          --sjdbOverhang $star_overhang \
+          --genomeDir star_index/ \
+          --genomeFastaFiles $fasta
+          """
+          }
+} else if(params.aligner == 'bwa' && params.bwa_index == false){
+    process bwa_index {
+    
+        publishDir "params.outdir/index/bwa", mode:'copy'
+        
+        input:
+            file(fasta) from fasta_ch
+            
+        output:
+            file("${fasta}.*") into bwa_built
+            
+        script:
+        """
+        bwa index ${fasta}
+        """
+        }
+ }
