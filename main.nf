@@ -221,7 +221,6 @@ if(params.input_type == 'bam'){
 }
     
 ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
-
 /*
  * Step 4: Trim, fastqc
  */
@@ -232,7 +231,7 @@ ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
     
         input:
             tuple val(base), file(fastq) from ch_reads
-            file(adapters) from params.adapters
+            file(adapters) from Channel.value(params.adapters)
         output:
             tuple val(base), file('*.fastq.gz') into fastqc_reads
             
