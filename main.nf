@@ -71,6 +71,9 @@ if (params.help) {
     exit 0
 }
 
+
+params.version = 'GRCh38'
+
 process download_genome {
 
         publishDir "$params.outdir/Reference", mode: 'copy'
