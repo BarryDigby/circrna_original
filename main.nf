@@ -173,7 +173,7 @@ ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : 
  * Step 2: Create Genome Index
  */ 
  
-if(params.aligner == 'star' && params.star_index == false){
+if(params.aligner == 'star' && !(params.star_index)){
     process star_index {
     
           publishDir "params.outdir/index", mode:'copy'
@@ -198,7 +198,7 @@ if(params.aligner == 'star' && params.star_index == false){
           --genomeFastaFiles $fasta
           """
           }
-} else if(params.aligner == 'bwa' && params.bwa_index == false){
+} else if(params.aligner == 'bwa' && !(params.bwa_index)){
     process bwa_index {
     
         publishDir "params.outdir/index/bwa", mode:'copy'
