@@ -96,9 +96,12 @@ if (params.help) {
 }
 
 //Step 1
-params.version = 'GRCh38'
+params.version = 'development'
 //Step 2
 params.star_overhang = '49' 
+params.star_index = ''
+params.bwa_index = ''
+params.aigner = 'bwa'
 
 
 
