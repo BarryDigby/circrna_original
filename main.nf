@@ -79,7 +79,7 @@ params.help = null
 if (params.help) {
     log.info ''
     log.info print_purple('------------------------------------------------------------------------')
-    log.info "LncPipe: a Nextflow-based Long non-coding RNA analysis Pipeline v$version"
+    log.info "LncPipe: a Nextflow-based Long non-coding RNA analysis Pipeline"
     log.info "LncPipe integrates several NGS processing tools to identify novel long non-coding RNAs from"
     log.info "un-processed RNA sequencing data. To run this pipeline, users either need to install required tools manually"
     log.info "or use the docker image for LncPipe that comes with all tools pre-installed. (note: docker needs to be installed on your system). More information on usage can be found at https://github.com/likelet/LncPipe ."
