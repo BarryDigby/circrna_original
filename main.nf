@@ -77,21 +77,24 @@ def print_white = {  str -> ANSI_WHITE + str + ANSI_RESET }
 params.help = null
 if (params.help) {
     log.info ''
-    log.info print_purple('-------------------------------------------------------------------------')
+            print_purple('-------------------------------------------------------------------------')
     log.info "circRNA_tool: a Nextflow-based circRNA analysis pipeline"
     log.info "Utilises NGS tools to scan RNA-Seq data for the presence of circRNAs before conducting"
     log.info "differential expression analysis and circRNA - miRNA interaction prediciton." 
     log.info "To run the pipeline, users need only install nextflow and singularity as the tools are"
     log.info "self contained within the Docker container."
-    log.info print_purple('-------------------------------------------------------------------------')
     log.info ''
-    log.info print_yellow('Usage: ')
-    log.info print_yellow('   The typical commands for running the pipeline are as follows:\n') +
+            print_purple('-------------------------------------------------------------------------')
+    log.info ''
+            print_yellow('Usage: ')
+    log.info ''
+            print_yellow('   The typical commands for running the pipeline are as follows:\n') +
             print_purple('       Nextflow run LncRNAanalysisPipe.nf \n') +
 
             print_yellow('    General arguments:             Input and output setting\n') +
-            print_cyan('      --inputdir <path>         ') + print_green('Path to input data(optional), current path default\n') +
-            print_cyan('      --input_file              ') + print_green('Input file type. fasta (default) or bam ') +
+            print_cyan('      --outdir <path>           ') + print_green('Path to output results\n') +
+            print_cyan('      --inputdir <path>         ') + print_green('Path to input data\n') +
+            print_cyan('      --input_type              ') + print_green('Input file type (fasta or bam)\n') +
             '\n' +
             print_yellow('    References:                      If not specified in the configuration file or you wish to overwrite any of the references.\n') +
             print_cyan('      --fasta                       ') + print_green('Path to Fasta reference(required)\n') +
@@ -106,7 +109,7 @@ if (params.help) {
 
 //Step 1
 params.outdir = './'
-params.version = 'development'
+params.version = 'GRCh38'
 params.fasta = ''
 params.gene_annotation = ''
 params.gencode_gtf = ''
@@ -116,13 +119,13 @@ params.star_index = ''
 params.bwa_index = ''
 params.aigner = 'bwa'
 //Step 3
-params.inputdir = ''
-params.input_type = ''
-params.fastq_glob = '/_R{1,2}.fq'
-params.bam_glob = '/*.bam'
+params.inputdir = '/data/bdigby/circTCGA/fastq'
+params.input_type = 'bam'
+params.fastq_glob = '*_R{1,2}.fq'
+params.bam_glob = '*.bam'
 params.reads = '' // leave empty 
 //Step 4
-params.adapters = ''
+params.adapters = '/data/bdigby/grch38/adapters.fa'
 
 
 /*
