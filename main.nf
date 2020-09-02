@@ -151,7 +151,7 @@ if(params.aligner == 'star' && !(params.star_index)){
               file(gtf) from ch_gencode_gtf
               
           output:
-              file("star_index") into star_index
+              file("star_index") into star_built
               
           script:
           """
@@ -166,6 +166,7 @@ if(params.aligner == 'star' && !(params.star_index)){
           --genomeFastaFiles $fasta
           """
           }
+          ch_star_idx = params.star_idx ? Channel.value(file(params.star_idx)) : star_built
 } else if(params.aligner == 'bwa' && !(params.bwa_index)){
     process bwa_index {
     
@@ -175,13 +176,14 @@ if(params.aligner == 'star' && !(params.star_index)){
             file(fasta) from ch_fasta
             
         output:
-            file("${fasta}.*") into bwa_index
+            file("${fasta}.*") into bwa_built
             
         script:
         """
         bwa index ${fasta}
         """
         }
+        ch_bwa_index = params.bwa_idx ? Channel.value(file(params.bwa_idx)) : bwa_built
  }
 
 
@@ -193,8 +195,8 @@ if(params.aligner == 'star' && !(params.star_index)){
  bam_files = params.inputdir + params.bam_glob
  
  if(params.input_type == 'bam'){
-    ch_bam = Channel.fromPath( bam_files )
-                    .map{ file -> [file.baseName, file] }
+    Channel.fromPath( bam_files )
+           .set{ ch_bam }
       process bam_to_fq{
 
           input:
@@ -216,7 +218,7 @@ if(params.aligner == 'star' && !(params.star_index)){
           fastq_build = params.inputdir + params.fastq_glob
           Channel.fromFilePairs( fastq_build )
                  .set{ fastq_built }
-    }
+}
     
 ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
 
