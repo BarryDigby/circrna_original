@@ -97,6 +97,9 @@ if (params.help) {
 
 //Step 1
 params.version = 'development'
+params.fasta = ''
+params.gene_annotation = ''
+params.gencode_gtf = ''
 //Step 2
 params.star_overhang = '49' 
 params.star_index = ''
