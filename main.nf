@@ -116,7 +116,7 @@ process download_genome {
         file('*.gtf') into gencode_gtf_downloaded
         
         shell:
-        if( params.version == 'GRCh37' ){
+        if(params.version == 'GRCh37'){
           $/
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh37_mapping/gencode.v34lift37.annotation.gtf.gz
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh37_mapping/GRCh37.primary_assembly.genome.fa.gz
@@ -130,7 +130,7 @@ process download_genome {
           rm GRCh37.fa.tmp
           /$
           
-        }else if( params.version == 'development' ){
+        }else if(params.version == 'development'){
           $/
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/gencode.v34.primary_assembly.annotation.gtf.gz
           wget --no-check-certificate ftp://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.20.fa.gz         
@@ -142,7 +142,7 @@ process download_genome {
           perl -alne '$"="\t";print "@F[11,0..9]"' GRCh38.genepred > GRCh38.txt          
           /$
           
-        }else{
+        }else if(params.version == 'GRCh38'){
           $/
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/gencode.v34.primary_assembly.annotation.gtf.gz
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh38.primary_assembly.genome.fa.gz
