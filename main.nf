@@ -70,7 +70,7 @@ if (params.help) {
     log.info print_purple('-------------------------------------------------------------------------')
     log.info "circRNA_tool: a Nextflow-based circRNA analysis pipeline"
     log.info "Utilises NGS tools to scan RNA-Seq data for the presence of circRNAs before conducting"
-    log.info "differential expression analysis and circRNA - miRNA interaction prediciton. 
+    log.info "differential expression analysis and circRNA - miRNA interaction prediciton." 
     log.info "To run the pipeline, users need only install nextflow and singularity as the tools are"
     log.info "self contained within the Docker container."
     log.info print_purple('-------------------------------------------------------------------------')
