@@ -74,15 +74,6 @@ def print_cyan = {  str -> ANSI_CYAN + str + ANSI_RESET }
 def print_purple = {  str -> ANSI_PURPLE + str + ANSI_RESET }
 def print_white = {  str -> ANSI_WHITE + str + ANSI_RESET }
 
-//Help information
-// Nextflow  version
-version="v0.2.44"
-//=======================================================================================
-// Nextflow Version check
-if( !nextflow.version.matches('0.30+') ) {
-    println print_yellow("This workflow requires Nextflow version 0.26 or greater -- You are running version ")+ print_red(nextflow.version)
-
-}
 //help information
 params.help = null
 if (params.help) {
