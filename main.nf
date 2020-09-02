@@ -151,7 +151,7 @@ if(params.aligner == 'star' && !(params.star_index)){
               file(gtf) from ch_gencode_gtf
               
           output:
-              file("star_index") into star_built
+              file("star_index") into star_index
               
           script:
           """
@@ -175,7 +175,7 @@ if(params.aligner == 'star' && !(params.star_index)){
             file(fasta) from ch_fasta
             
         output:
-            file("${fasta}.*") into bwa_built
+            file("${fasta}.*") into bwa_index
             
         script:
         """
@@ -184,8 +184,6 @@ if(params.aligner == 'star' && !(params.star_index)){
         }
  }
 
-ch_bwa_idx = params.bwa_index ? Channel.value(file(params.bwa_index)) : bwa_built
-ch_star_idx = params.star_index ? Channel.value(file(params.star_index)) : star_built
 
 /*
  * Step3: Stage Fastq files
