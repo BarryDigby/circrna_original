@@ -147,7 +147,7 @@ if(params.aligner == 'star' && !(params.star_index)){
           publishDir "$params.outdir/index", mode:'copy'
           
           input:
-              file(fatsa) from ch_fasta
+              file(fasta) from ch_fasta
               file(gtf) from ch_gencode_gtf
               
           output:
