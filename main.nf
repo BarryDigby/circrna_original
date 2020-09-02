@@ -33,6 +33,12 @@ Description:
      params.gencode_annotation_gtf = 'path/to/genome.gtf'
      params.circexplorer2_ref = 'path/to/genome.txt'
 --------------------------------------------------------------------------------
+2. Create Genome Index
+   Provide option for STAR, BWA, hisat2(single end, TO DO)
+   
+   Parameters:
+    params.star_idx = 'star_index/path/'
+    params.bwa_idx = 'bwa_index/path'
 */
 
 
@@ -61,26 +67,21 @@ def print_white = {  str -> ANSI_WHITE + str + ANSI_RESET }
 params.help = null
 if (params.help) {
     log.info ''
-    log.info print_purple('------------------------------------------------------------------------')
+    log.info print_purple('-------------------------------------------------------------------------')
     log.info "circRNA_tool: a Nextflow-based circRNA analysis pipeline"
-    log.info "circRNA_tool utilises NGS tools to scan RNA-Seq data for the presence of circRNAs before conducting differential"
-    log.info "expression analysis and circRNA - miRNA interaction prediciton. To run the pipeline, users need only install nextflow and "
-    log.info "singularity as the tools are self contained within the container."
-    log.info print_purple('------------------------------------------------------------------------')
+    log.info "Utilises NGS tools to scan RNA-Seq data for the presence of circRNAs before conducting"
+    log.info "differential expression analysis and circRNA - miRNA interaction prediciton. 
+    log.info "To run the pipeline, users need only install nextflow and singularity as the tools are"
+    log.info "self contained within the Docker container."
+    log.info print_purple('-------------------------------------------------------------------------')
     log.info ''
     log.info print_yellow('Usage: ')
-    log.info print_yellow('    The typical command for running the pipeline is as follows (we do not recommend users passing configuration parameters through command line, please modify the config.file instead):\n') +
+    log.info print_yellow('   The typical commands for running the pipeline are as follows:\n') +
             print_purple('       Nextflow run LncRNAanalysisPipe.nf \n') +
 
             print_yellow('    General arguments:             Input and output setting\n') +
             print_cyan('      --inputdir <path>         ') + print_green('Path to input data(optional), current path default\n') +
             print_cyan('      --input_file              ') + print_green('Input file type. fasta (default) or bam ') +
-            '\n' +
-            print_yellow('    Options:                         General options for run this pipeline\n') +
-            print_cyan('      --merged_gtf <gtffile>        ') + print_green('Start analysis with assemblies already produced and skip fastqc/alignment step, DEFAOUL NULL\n') +
-            print_cyan('      --design <file>               ') + print_green('A flat file stored the experimental design information ( required when perform differential expression analysis)\n') +
-            print_cyan('      --singleEnd                   ') + print_green('Reads type, True for single ended \n') +
-            print_cyan('      --unstrand                    ') + print_green('RNA library construction strategy, specified for \'unstranded\' library \n') +
             '\n' +
             print_yellow('    References:                      If not specified in the configuration file or you wish to overwrite any of the references.\n') +
             print_cyan('      --fasta                       ') + print_green('Path to Fasta reference(required)\n') +
@@ -101,9 +102,9 @@ process download_genome {
         publishDir "$params.outdir/Reference", mode: 'copy'
 
         output:
-        file('*.fa') into genome_ch
-        file('*.txt') into txt_ref_ch
-        file('*.gtf') into gtf_ch
+        file('*.fa') into fasta_downloaded
+        file('*.txt') into gene_annotation_created
+        file('*.gtf') into gencode_gtf_downloaded
         
         shell:
         if( params.version == 'GRCh37' ){
@@ -134,4 +135,8 @@ process download_genome {
           /$
           }
 }
+
+ch_fasta = params.fasta ? Channel.value(file(params.fasta)) : fasta_downloaded
+ch_gene_annotation = params.gene_annotation ? Channel.value(file(params.gene_annotation)) : gene_annotation_created
+ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : gencode_gtf_downloaded
 
