@@ -166,7 +166,7 @@ if(params.aligner == 'star' && !(params.star_index)){
           --genomeFastaFiles $fasta
           """
           }
-          ch_star_idx = params.star_idx ? Channel.value(file(params.star_idx)) : star_built
+          ch_star_index = params.star_index ? Channel.value(file(params.star_index)) : star_built
 } else if(params.aligner == 'bwa' && !(params.bwa_index)){
     process bwa_index {
     
@@ -183,7 +183,7 @@ if(params.aligner == 'star' && !(params.star_index)){
         bwa index ${fasta}
         """
         }
-        ch_bwa_index = params.bwa_idx ? Channel.value(file(params.bwa_idx)) : bwa_built
+        ch_bwa_index = params.bwa_index ? Channel.value(file(params.bwa_index)) : bwa_built
  }
 
 
