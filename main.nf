@@ -96,6 +96,7 @@ if (params.help) {
 }
 
 //Step 1
+params.outdir = './'
 params.version = 'development'
 params.fasta = ''
 params.gene_annotation = ''
