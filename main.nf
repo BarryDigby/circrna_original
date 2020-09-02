@@ -176,7 +176,7 @@ ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : 
 if(params.aligner == 'star' && !(params.star_index)){
     process star_index {
     
-          publishDir "params.outdir/index", mode:'copy'
+          publishDir "$params.outdir/index", mode:'copy'
           
           input:
               file(fatsa) from ch_fasta
@@ -201,7 +201,7 @@ if(params.aligner == 'star' && !(params.star_index)){
 } else if(params.aligner == 'bwa' && !(params.bwa_index)){
     process bwa_index {
     
-        publishDir "params.outdir/index/bwa", mode:'copy'
+        publishDir "$params.outdir/index/bwa", mode:'copy'
         
         input:
             file(fasta) from ch_fasta
