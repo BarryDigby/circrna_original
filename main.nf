@@ -191,11 +191,10 @@ if(params.aligner == 'star' && !(params.star_index)){
  * Step3: Stage Fastq files
  */
  
-if(params.input_type == 'fastq'){
-    fastq_built =  Channel.fromFilePairs( "$params.inputdir/$params.fastq_glob" ) // empty channel if there are no fastq in that folder
-} else if(params.input_type == 'bam'){
-    ch_bam = Channel.fromFilePairs( "$params.inputdir/$params.bam_glob", size: 1 ) // empty if no bam in the folder
-      process bam_to_fq {
+ch_fastq =  Channel.fromFilePairs( "$params.inputdir/$params.fastq_glob" ) // empty channel if there are no fastq in that folder
+ch_bam = Channel.fromFilePairs( "$params.inputdir/$params.bam_glob", size: 1 ) // empty if no bam in the folder
+
+process bam_to_fq {
           input:
           tuple val(base), file(bam) from ch_bam
 
@@ -213,8 +212,9 @@ if(params.input_type == 'fastq'){
           """
       }
 }
-//fastq_ch = fastq_built.mix(ch_reads)
-ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
+
+//ch_reads = fastq_built.mix(ch_fastq)
+ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built.mix(ch_fastq)
  
 
 /*
