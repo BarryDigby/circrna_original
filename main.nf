@@ -363,14 +363,13 @@ if(params.aligner == 'bwa'){
           input:
               tuple val(base), file(fastq) from trim_reads_built
               file(index) from ch_bwa_index.collect()
-              file(fasta) from ch_fasta
               
           output:
               tuple val(base), file(sam) into circexplorer2_input
               
           script:
           """
-          bwa mem -T 19 -t 8 $fasta $fastq > ${base}.sam
+          bwa mem -T 19 -t 8 $fasta $index.baseName > ${base}.sam
           """
           }
 } else if(params.aligner == 'star'){
