@@ -210,7 +210,6 @@ process bam_to_fq {
           F2=${base}_R2.fastq.gz \
           VALIDATION_STRINGENCY=LENIENT
           """
-      }
 }
 
 //ch_reads = fastq_built.mix(ch_fastq)
