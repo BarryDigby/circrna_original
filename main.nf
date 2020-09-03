@@ -371,7 +371,7 @@ if(params.aligner == 'bwa'){
               file(fasta) from ch_fasta
               
           output:
-              tuple val(base), file(sam) into circexplorer2_input
+              tuple val(base), file('${base}.sam') into circexplorer2_input
               
           script:
           """
