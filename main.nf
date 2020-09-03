@@ -127,15 +127,15 @@ if (params.help) {
 
 //Step 1
 params.outdir = './'
-params.version = 'GRCh38'
-params.fasta = '/data/bdigby/grch38/reference/GRCh38.fa'
-params.gene_annotation = '/data/bdigby/grch38/reference/GRCh38.txt'
-params.gencode_gtf = '/data/bdigby/grch38/reference/GRCh38.gtf'
+params.version = ''
+params.fasta = ''
+params.gene_annotation = ''
+params.gencode_gtf = ''
 //Step 2
 params.star_overhang = '49' 
-params.star_index = '/data/bdigby/grch38/index/star_index'
+params.star_index = ''
 params.bwa_index = ''
-params.aligner = 'bwa'
+params.aligner = ''
 //Step 3
 params.inputdir = '/data/bdigby/circTCGA/fastq/'
 params.input_type = 'bam'
