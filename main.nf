@@ -283,9 +283,8 @@ if(params.aligner == 'star' && !(params.star_index)){
  
  } else if(params.aligner == 'bwa' && params.bwa_index){
  
-        ch_bwa_index = Channel.fromPath(params.bwa_index)
-                              .collect()
-
+        ch_bwa_index = Channel.value(file(params.bwa_index))
+                              
 }
 
 
