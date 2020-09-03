@@ -285,7 +285,7 @@ if(params.aligner == 'star' && !(params.star_index)){
  
         ch_bwa_index_1 = Channel.fromPath(params.bwa_index) 
         (ch_bwa_index_test, ch_bwa_index) = ch_bwa_index_1.into(2)
-        ch_bwa_index_test.view()                     
+        ch_bwa_index_test.println()                     
 }
 
 
