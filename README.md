@@ -16,6 +16,9 @@ go back and add customised memory options to steps that need it (STAR).
 do this at intervals so it doesnt pile up on you 
 
 ## Gotchas
-
+These fuckers took years off your life. 
 ```
---params.star_index 
+*--params.star_index:* Must put provide full path 
+
+*--params.bwa_index:*  Must put in quotes! probaby because of the glob pattern, safe to put both these paths in "" 
+```
