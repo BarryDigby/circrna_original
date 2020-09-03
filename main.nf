@@ -284,7 +284,7 @@ if(params.aligner == 'star' && !(params.star_index)){
  } else if(params.aligner == 'bwa' && params.bwa_index){
  
         ch_bwa_index_1 = Channel.fromPath(params.bwa_index)
-        ch_bwa_index.into(ch_bwa_index_test, ch_bwa_index)
+        ch_bwa_index_1.into(ch_bwa_index_test, ch_bwa_index)
                               
 }
 
