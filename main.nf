@@ -128,9 +128,9 @@ if (params.help) {
 //Step 1
 params.outdir = './'
 params.version = 'GRCh38'
-params.fasta = ''
-params.gene_annotation = ''
-params.gencode_gtf = ''
+params.fasta = '/data/bdigby/grch38/reference/GRCh38.fa'
+params.gene_annotation = '/data/bdigby/grch38/reference/GRCh38.txt'
+params.gencode_gtf = '/data/bdigby/grch38/reference/GRCh38.gtf'
 //Step 2
 params.star_overhang = '49' 
 params.star_index = ''
