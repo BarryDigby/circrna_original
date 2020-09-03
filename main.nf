@@ -370,7 +370,7 @@ if(params.aligner == 'bwa'){
           input:
               tuple val(base), file(fastq) from trim_reads_built
               file(index) from ch_bwa_index.collect()
-              file(fasta) from fasta_ch
+              file(fasta) from ch_fasta
               
           output:
               tuple val(base), file('${base}.sam') into circexplorer2_input
