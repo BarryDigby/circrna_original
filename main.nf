@@ -56,9 +56,9 @@ if (params.help) {
             print_yellow('    General arguments:             Input and output setting\n') +
             print_cyan('      --inputdir <path>         ') + print_green('Path to input data\n') +
             print_cyan('      --input_type <str>         ') + print_green('Input data type. Supported: 'fastq', 'bam'\n') +
-            print_cyan('      --fastq_glob <str>           ') + print_green('Glob pattern of fastq files e.g: '_R{1,2}.fastq.gz'\n') +
-            print_cyan('      --bam_glob <hisat>             ') + print_green('Glob pattern of bam files expected: '*.bam'\n') +
-            print_cyan('      --aligner <fastp>            ') + print_green('Aligner to use for analysis. Supported: 'bwa', 'star'\n') +
+            print_cyan('      --fastq_glob <str>           ') + print_green('Glob pattern of fastq files e.g: \'_R{1,2}.fastq.gz\'\n') +
+            print_cyan('      --bam_glob <hisat>             ') + print_green('Glob pattern of bam files expected: \'*.bam\'\n') +
+            print_cyan('      --aligner <fastp>            ') + print_green('Aligner to use for analysis. Supported: \'bwa\', \'star\'\n') +
 
             print_yellow('    Input Files:\n') +
             print_cyan('      --fasta <path>            ') + print_green('Path to genome fasta if generated in prior run\n') +
