@@ -176,7 +176,7 @@ if(params.aligner == 'star' && !(params.star_index)){
           """
           }
           ch_star_index = params.star_index ? Channel.value(file(params.star_index)) : star_built
-}else if(params.aligner == 'star'){
+}else if(params.aligner == 'star' && params.star_index){
           ch_star_index = params.star_index
           }else if(params.aligner == 'bwa' && !(params.bwa_index)){
     process bwa_index {
