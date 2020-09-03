@@ -63,10 +63,10 @@ if (params.help) {
             print_cyan('      --detools <edger>             ') + print_green('Tools for differential analysis, edger(default)/deseq/noiseq\n') +
             print_cyan('      --quant <kallisto>            ') + print_green('Tools for estimating abundance of transcript, kallisto(default)/htseq\n') +
 
-            log.info '------------------------------------------------------------------------'
+            log.info ('------------------------------------------------------------------------')
     log.info print_yellow('Contact information: zhaoqi@sysucc.org.cn')
     log.info print_yellow('Copyright (c) 2013-2017, Sun Yat-sen University Cancer Center.')
-    log.info '------------------------------------------------------------------------'
+    log.info ('------------------------------------------------------------------------')
     exit 0
 }
 
