@@ -195,25 +195,24 @@ if(params.input_type == 'fastq'){
     ch_fastq =  Channel.fromFilePairs( "$params.inputdir/$params.fastq_glob" ) // empty channel if there are no fastq in that folder
 } else if(params.input_type == 'bam'){
     ch_bam = Channel.fromFilePairs( "$params.inputdir/$params.bam_glob", size: 1 ) // empty if no bam in the folder
-}
+      process bam_to_fq {
+          input:
+          tuple val(base), file(bam) from ch_bam
 
-process bam_to_fq {
-    input:
-    tuple val(base), file(bam) from ch_bam
+          output:
+          tuple val(base), file('*.fastq.gz') into fastq_built
 
-    output:
-    tuple val(base), file('*.fastq.gz') into fastq_built
-
-    script:
-    """
-    picard -Xmx8g \
+          script:
+          """
+          picard -Xmx8g \
           SamToFastq \
           I=$bam \
-          F=${base}_R1.fastq.gz F2=${base}_R2.fastq.gz \
+          F=${base}_R1.fastq.gz \
+          F2=${base}_R2.fastq.gz \
           VALIDATION_STRINGENCY=LENIENT
-    """
+          """
+      }
 }
-
 //fastq_ch = fastq_built.mix(ch_reads)
 ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built.mix(ch_fastq) 
  
