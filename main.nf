@@ -150,8 +150,8 @@ process download_genome {
           ch_fasta = Channel.value(file(params.fasta)) 
           ch_gene_annotation = Channel.value(file(params.gene_annotation))
           ch_gencode_gtf =Channel.value(file(params.gencode_gtf)) 
-          }
 }
+
 
 
 /*
