@@ -283,10 +283,11 @@ if(params.aligner == 'star' && !(params.star_index)){
  
  } else if(params.aligner == 'bwa' && params.bwa_index){
  
-        ch_bwa_index = Channel.value(file(params.bwa_index))
+        ch_bwa_index = Channel.fromPath(params.bwa_index)
                               
 }
 
+ch_bwa_index.view()
 
 /*
  * Step3: Stage Fastq files
@@ -368,7 +369,7 @@ if(params.aligner == 'bwa'){
           input:
               tuple val(base), file(fastq) from trim_reads_built
               file(index) from ch_bwa_index.collect()
-              file(fasta) from ch_fasta
+              file(fasta) from fasta_ch
               
           output:
               tuple val(base), file('${base}.sam') into circexplorer2_input
