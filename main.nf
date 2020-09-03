@@ -71,7 +71,7 @@ if (params.help) {
 
             log.info ('------------------------------------------------------------------------')
     log.info print_yellow('Contact information: b.digby237@gmail.com')
-    log.info print_yellow('O'Broin Lab, National University of Ireland Galway')
+    log.info print_yellow('O\'Broin Lab, National University of Ireland Galway')
     log.info ('------------------------------------------------------------------------')
     exit 0
 }
