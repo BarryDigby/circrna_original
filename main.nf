@@ -88,6 +88,9 @@ params.adapters = '/data/bdigby/grch38/adapters.fa'
 
 /*
  * Step 1: Download Reference Files
+ * LOGIC:
+ * If no reference files provided, download them
+ * If provided, assign to channel 
  */
 
 if(!(params.fasta) && !(params.gencode_gtf) && !(params.gene_annotation)){
@@ -156,6 +159,9 @@ process download_genome {
 
 /*
  * Step 2: Create Genome Index
+ * LOGIC
+ * if not made, make them
+ * if made, assign to channel
  */ 
  
 if(params.aligner == 'star' && !(params.star_index)){
@@ -183,10 +189,14 @@ if(params.aligner == 'star' && !(params.star_index)){
           --genomeFastaFiles $fasta
           """
           }
+          
           ch_star_index = params.star_index ? Channel.value(file(params.star_index)) : star_built
-}else if(params.aligner == 'star' && params.star_index){
-          ch_star_index = params.star_index
-          }else if(params.aligner == 'bwa' && !(params.bwa_index)){
+
+} else if(params.aligner == 'star' && params.star_index){
+          
+              ch_star_index = params.star_index
+          
+}else if(params.aligner == 'bwa' && !(params.bwa_index)){
     process bwa_index {
     
         publishDir "$params.outdir/index/bwa", mode:'copy'
@@ -202,9 +212,12 @@ if(params.aligner == 'star' && !(params.star_index)){
         bwa index ${fasta}
         """
         }
+        
         ch_bwa_index = params.bwa_index ? Channel.value(file(params.bwa_index)) : bwa_built
- }
-
+ } else if(params.aligner == 'bwa' && params.bwa_index){
+ 
+            ch_bwa_index = params.bwa_index
+}
 
 
 /*
