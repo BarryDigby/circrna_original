@@ -369,7 +369,7 @@ if(params.aligner == 'bwa'){
               
           script:
           """
-          bwa mem -T 19 -t 8 $fasta $index.baseName > ${base}.sam
+          bwa mem -T 19 -t 8 $index.baseName $fastq > ${base}.sam
           """
           }
 } else if(params.aligner == 'star'){
