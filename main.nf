@@ -70,7 +70,7 @@ params.aligner = 'bwa'
 //Step 3
 params.inputdir = '/data/bdigby/circTCGA/fastq/'
 params.input_type = 'bam'
-params.fastq_glob = '*_R{1,2}.fq'
+params.fastq_glob = '*_R{1,2}.fastq.gz'
 params.bam_glob = '*.bam'
 params.reads = '' // leave empty 
 //Step 4
@@ -191,29 +191,36 @@ if(params.aligner == 'star' && !(params.star_index)){
  * Step3: Stage Fastq files
  */
  
-ch_fastq =  Channel.fromFilePairs( "$params.inputdir/$params.fastq_glob" ) // empty channel if there are no fastq in that folder
-ch_bam = Channel.fromFilePairs( "$params.inputdir/$params.bam_glob", size: 1 ) // empty if no bam in the folder
+ // stage bam files
+bam_files = params.inputdir + params.bam_glob
 
-process bam_to_fq {
+if(params.input_type == 'bam'){
+   ch_bam = Channel.fromPath( bam_files )
+                   .map{ file -> [file.baseName, file]}
+      process bam_to_fq{
+
           input:
-          tuple val(base), file(bam) from ch_bam
+              tuple val(base), file(bam) from ch_bam
 
           output:
-          tuple val(base), file('*.fastq.gz') into fastq_built
+              tuple val(base), file('*.fastq.gz') into fastq_built
 
           script:
           """
           picard -Xmx8g \
           SamToFastq \
           I=$bam \
-          F=${base}_R1.fastq.gz \
-          F2=${base}_R2.fastq.gz \
+          F=${base}_R1.fastq.gz F2=${base}_R2.fastq.gz \
           VALIDATION_STRINGENCY=LENIENT
           """
+        }
+    }else if(params.input_type == 'fastq'){
+          fastq_build = params.inputdir + params.fastq_glob
+          Channel.fromFilePairs( fastq_build )
+                 .set{ fastq_built }
 }
-
-ch_tmp = fastq_built.mix(ch_fastq)
-ch_reads = params.reads ? Channel.value(file(params.reads)) : ch_tmp
+    
+ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
  
 
 /*
