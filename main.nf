@@ -48,6 +48,14 @@ Description:
    
    Parameters:
     params.input_type = fastq | bam
+--------------------------------------------------------------------------------
+4. Align Reads
+   Align using BWA 
+   Align using STAR
+   Align using hisat2 (TO DO)
+   
+   Parameters
+    aligner (alread init)
 */
 
 
@@ -75,6 +83,7 @@ params.bam_glob = '*.bam'
 params.reads = '' // leave empty 
 //Step 4
 params.adapters = '/data/bdigby/grch38/adapters.fa'
+//Step 5
 
 
 /*
@@ -224,7 +233,7 @@ ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
  
 
 /*
- * Step 4: Trim, fastqc
+ * Step 4: Trim
  */
  
  process bbduk {
@@ -235,7 +244,7 @@ ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
             tuple val(base), file(fastq) from ch_reads
             path adapters from params.adapters
         output:
-            tuple val(base), file('*.fastq.gz') into fastqc_reads
+            tuple val(base), file('*.fastq.gz') into trim_reads_built
             
         script:
         """
@@ -253,33 +262,75 @@ ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
         """
 }
 
-process fastqc {
-        
+
+// QC left out for now. collect as you go for QC and run at the end
+// MultiQC does not work with python 2.7, will have to think of workaround. 
+
+
+if(params.aligner == 'bwa'){
+    process bwa_align{
+    
+        publishDir "$params.outdir/bwa_alignment", mode:'copy', overwrite: true
+    
+          input:
+              tuple val(base), file(fastq) from trim_reads_built
+              file(index) from ch_bwa_index.collect()
+              
+          output:
+              tuple val(base), file(sam) into circexplorer2_input
+              
+          script:
+          """
+          bwa mem -T 19 -t 8 $index ${fastq[0]} ${fastq[1]} > ${base}.sam
+          """
+          }
+} else if(params.aligner == 'star'){
+    process star_align{
+    
+        publishDir "$params.outdir/star_alignment", mode:'copy', overwrite: true
+    
         input:
-            tuple val(base), file(fastq) from fastqc_reads
-        
+            tuple val(base), file(fastq) from trim_reads_built
+            file(gtf) from ch_gencode_gtf
+            val(star_idx) from ch_star_idx 
+            
         output:
-            file('*.{zip,html}') into multiqc_input
+            tuple val(base), file("${base}.Chimeric.out.junction") into circexplorer2_input
             
         script:
         """
-        fastqc -q ${fastq}
+        STAR    \
+        --runThreadN 8 \
+        --twopassMode Basic \
+        --twopass1readsN -1 \
+        --genomeLoad NoSharedMemory \
+        --genomeDir $star_idx \
+        --readFilesIn ${fastq[0]},${fastq[1]} \
+        --readFilesCommand zcat \
+        --outFileNamePrefix ${base}. \
+        --outSJfilterOverhangMin 15 15 15 15 \
+        --outFilterMultimapNmax 1 \
+        --outFilterMultimapScoreRange 1 \
+        --outFilterScoreMin 1 \
+        --outFilterMatchNminOverLread 0.33 \
+        --outFilterMismatchNmax 10 \
+        --outFilterMismatchNoverLmax 0.05 \
+        --alignIntronMin 20 \
+        --alignIntronMax 1000000 \
+        --alignMatesGapMax 1000000 \
+        --alignSJoverhangMin 1 \
+        --alignSJDBoverhangMin 1 \
+        --alignSoftClipAtReferenceEnds No \
+        --chimSegmentMin 10 \
+        --chimScoreMin 15 \
+        --chimScoreSeparation 10 \
+        --chimJunctionOverhangMin 15 \
+        --sjdbGTFfile $gtf  \
+        --sjdbOverhang $params.star_overhang \
+        --sjdbScore 2 \
+        --chimOutType Junctions \
+        --outSAMtype BAM SortedByCoordinate
         """
-}
-
-process multiqc {
-
-        publishDir "$params.outdir/MultiQC_Report", mode:'copy'
-        
-        input:
-            file('*') from multiqc_input.collect()
-            
-        output:
-            file('multiqc_report.html') 
-            
-        script:
-        """
-        multiqc .
-        """
+        }
 }
             
