@@ -43,29 +43,35 @@ params.help = null
 if (params.help) {
     log.info ''
     log.info print_purple('------------------------------------------------------------------------')
-    log.info "LncPipe: a Nextflow-based Long non-coding RNA analysis Pipeline"
-    log.info "LncPipe integrates several NGS processing tools to identify novel long non-coding RNAs from"
-    log.info "un-processed RNA sequencing data. To run this pipeline, users either need to install required tools manually"
-    log.info "or use the docker image for LncPipe that comes with all tools pre-installed. (note: docker needs to be installed on your system). More information on usage can be found at https://github.com/likelet/LncPipe ."
-    log.info "Bugs or new feature requests can be reported by opening issues in our github repository."
+    log.info "tool_name: A Nextflow based circular RNA analsis pipeline"
+    log.info "tool_name integrates several NGS processing tools to identify novel circRNAs from "
+    log.info "un-processed RNA sequencing data. To run this pipeline users need to install nextflow"
+    log.info "and singularity. "
     log.info print_purple('------------------------------------------------------------------------')
     log.info ''
     log.info print_yellow('Usage: ')
-    log.info print_yellow('    The typical command for running the pipeline is as follows (we do not recommend users passing configuration parameters through command line, please modify the config.file instead):\n') +
-            print_purple('       Nextflow run LncRNAanalysisPipe.nf \n') +
+    
+            print_purple('       Nextflow run BarryDigby/circRNA <options> \n') +
 
             print_yellow('    General arguments:             Input and output setting\n') +
-            print_cyan('      --inputdir <path>         ') + print_green('Path to input data(optional), current path default\n') +
-            print_cyan('      --reads <*_fq.gz>         ') + print_green('Filename pattern for pairing raw reads, e.g: *_{1,2}.fastq.gz for paired reads\n') +
-            print_cyan('      --out_folder <path>           ') + print_green('The output directory where the results will be saved(optional), current path is default\n') +
-            print_cyan('      --aligner <hisat>             ') + print_green('Aligner for reads mapping (optional),"hisat"(defalt)/"star"/"tophat"\n') +
-            print_cyan('      --qctools <fastp>            ') + print_green('Tools for assess reads quality, fastp(default)/afterqc/fastqc/none(skip QC step)\n') +
-            print_cyan('      --detools <edger>             ') + print_green('Tools for differential analysis, edger(default)/deseq/noiseq\n') +
-            print_cyan('      --quant <kallisto>            ') + print_green('Tools for estimating abundance of transcript, kallisto(default)/htseq\n') +
+            print_cyan('      --inputdir <path>         ') + print_green('Path to input data\n') +
+            print_cyan('      --input_type <str>         ') + print_green('Input data type. Supported: 'fastq', 'bam'\n') +
+            print_cyan('      --fastq_glob <str>           ') + print_green('Glob pattern of fastq files e.g: '_R{1,2}.fastq.gz'\n') +
+            print_cyan('      --bam_glob <hisat>             ') + print_green('Glob pattern of bam files expected: '*.bam'\n') +
+            print_cyan('      --aligner <fastp>            ') + print_green('Aligner to use for analysis. Supported: 'bwa', 'star'\n') +
+
+            print_yellow('    Input Files:\n') +
+            print_cyan('      --fasta <path>            ') + print_green('Path to genome fasta if generated in prior run\n') +
+            print_cyan('      --gencode_gtf <path>      ') + print_green('Path to genocde gtf if generated in prior run\n') + 
+            print_cyan('      --gene_annotation <path>  ') + print_green('Path to gene annotation file if generated in prior run\n') + 
+            print_cyan('      --star_index <str>       ') + print_green('Path to STAR index if generated in prior run\n') +
+            print_cyan('      --bwa_index <path>       ') + print_green('Path to BWA index if generated in prior run\n') +
+            print_cyan('      --adapters <path>        ') + print_green('Fasta file containing adapters to trim\n') +
+            print_cyan('      --star_overhang <int>    ') + print_green('Parameter for STAR: Read length - 1\n') +
 
             log.info ('------------------------------------------------------------------------')
-    log.info print_yellow('Contact information: zhaoqi@sysucc.org.cn')
-    log.info print_yellow('Copyright (c) 2013-2017, Sun Yat-sen University Cancer Center.')
+    log.info print_yellow('Contact information: b.digby237@gmail.com')
+    log.info print_yellow('O'Broin Lab, National University of Ireland Galway')
     log.info ('------------------------------------------------------------------------')
     exit 0
 }
