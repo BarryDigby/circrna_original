@@ -134,7 +134,7 @@ params.gencode_gtf = '/data/bdigby/grch38/reference/GRCh38.gtf'
 //Step 2
 params.star_overhang = '49' 
 params.star_index = '/data/bdigby/grch38/index/star_index'
-params.bwa_index = '/data/bdigby/grch38/index/BWA'
+params.bwa_index = '/data/bdigby/grch38/index/BWA/*'
 params.aligner = 'bwa'
 //Step 3
 params.inputdir = '/data/bdigby/circTCGA/fastq/'
@@ -278,7 +278,7 @@ if(params.aligner == 'star' && !(params.star_index)){
  
  } else if(params.aligner == 'bwa' && params.bwa_index){
  
-        ch_bwa_index = params.bwa_index
+        ch_bwa_index = fromPath(params.bwa_index)
 
 }
 
