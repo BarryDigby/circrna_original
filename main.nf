@@ -18,6 +18,83 @@ Description:
 --------------------------------------------------------------------------------
 */
 
+ANSI_RESET = "\u001B[0m";
+ANSI_BLACK = "\u001B[30m";
+ANSI_RED = "\u001B[31m";
+ANSI_GREEN = "\u001B[32m";
+ANSI_YELLOW = "\u001B[33m";
+ANSI_BLUE = "\u001B[34m";
+ANSI_PURPLE = "\u001B[35m";
+ANSI_CYAN = "\u001B[36m";
+ANSI_WHITE = "\u001B[37m";
+
+
+def print_red = {  str -> ANSI_RED + str + ANSI_RESET }
+def print_black = {  str -> ANSI_BLACK + str + ANSI_RESET }
+def print_green = {  str -> ANSI_GREEN + str + ANSI_RESET }
+def print_yellow = {  str -> ANSI_YELLOW + str + ANSI_RESET }
+def print_blue = {  str -> ANSI_BLUE + str + ANSI_RESET }
+def print_cyan = {  str -> ANSI_CYAN + str + ANSI_RESET }
+def print_purple = {  str -> ANSI_PURPLE + str + ANSI_RESET }
+def print_white = {  str -> ANSI_WHITE + str + ANSI_RESET }
+
+//help information
+params.help = null
+if (params.help) {
+    log.info ''
+    log.info print_purple('------------------------------------------------------------------------')
+    log.info "LncPipe: a Nextflow-based Long non-coding RNA analysis Pipeline"
+    log.info "LncPipe integrates several NGS processing tools to identify novel long non-coding RNAs from"
+    log.info "un-processed RNA sequencing data. To run this pipeline, users either need to install required tools manually"
+    log.info "or use the docker image for LncPipe that comes with all tools pre-installed. (note: docker needs to be installed on your system). More information on usage can be found at https://github.com/likelet/LncPipe ."
+    log.info "Bugs or new feature requests can be reported by opening issues in our github repository."
+    log.info print_purple('------------------------------------------------------------------------')
+    log.info ''
+    log.info print_yellow('Usage: ')
+    log.info print_yellow('    The typical command for running the pipeline is as follows (we do not recommend users passing configuration parameters through command line, please modify the config.file instead):\n') +
+            print_purple('       Nextflow run LncRNAanalysisPipe.nf \n') +
+
+            print_yellow('    General arguments:             Input and output setting\n') +
+            print_cyan('      --inputdir <path>         ') + print_green('Path to input data(optional), current path default\n') +
+            print_cyan('      --reads <*_fq.gz>         ') + print_green('Filename pattern for pairing raw reads, e.g: *_{1,2}.fastq.gz for paired reads\n') +
+            print_cyan('      --out_folder <path>           ') + print_green('The output directory where the results will be saved(optional), current path is default\n') +
+            print_cyan('      --aligner <hisat>             ') + print_green('Aligner for reads mapping (optional),"hisat"(defalt)/"star"/"tophat"\n') +
+            print_cyan('      --qctools <fastp>            ') + print_green('Tools for assess reads quality, fastp(default)/afterqc/fastqc/none(skip QC step)\n') +
+            print_cyan('      --detools <edger>             ') + print_green('Tools for differential analysis, edger(default)/deseq/noiseq\n') +
+            print_cyan('      --quant <kallisto>            ') + print_green('Tools for estimating abundance of transcript, kallisto(default)/htseq\n') +
+            '\n' +
+            print_yellow('    Options:                         General options for run this pipeline\n') +
+            print_cyan('      --merged_gtf <gtffile>        ') + print_green('Start analysis with assemblies already produced and skip fastqc/alignment step, DEFAOUL NULL\n') +
+            print_cyan('      --design <file>               ') + print_green('A flat file stored the experimental design information ( required when perform differential expression analysis)\n') +
+            print_cyan('      --singleEnd                   ') + print_green('Reads type, True for single ended \n') +
+            print_cyan('      --unstrand                    ') + print_green('RNA library construction strategy, specified for \'unstranded\' library \n') +
+            '\n' +
+            print_yellow('    References:                      If not specified in the configuration file or you wish to overwrite any of the references.\n') +
+            print_cyan('      --fasta                       ') + print_green('Path to Fasta reference(required)\n') +
+            print_cyan('      --gencode_annotation_gtf      ') + print_green('An annotation file from GENCODE database in GTF format (required)\n') +
+            print_cyan('      --lncipedia_gtf               ') + print_green('An annotation file from LNCipedia database in GTF format (required)\n') +
+            '\n' +
+            print_yellow('    LncPipeReporter Options:         LncPipeReporter setting  \n') +
+            print_cyan('      --lncRep_Output                ') + print_green('Specify report file name, \"report.html\" default.\n') +
+            print_cyan('      --lncRep_theme                 ') + print_green('Plot theme setting in interactive plot, \"npg\" default.\n') +
+            print_cyan('      --lncRep_min_expressed_sample  ') + print_green('Minimum expressed gene allowed in each sample, 50 default.\n') +
+            '\n' +
+            print_yellow('    Other options:                   Specify the email and \n') +
+            print_cyan('      --sam_processor                ') + print_green('program to process samfile generated by hisat2 if aligner is hisat2. Default \"sambamba\". \n') +
+            print_cyan('      --mail                         ') + print_green('email info for reporting status of your LncPipe execution  \n') +
+
+
+
+            log.info '------------------------------------------------------------------------'
+    log.info print_yellow('Contact information: zhaoqi@sysucc.org.cn')
+    log.info print_yellow('Copyright (c) 2013-2017, Sun Yat-sen University Cancer Center.')
+    log.info '------------------------------------------------------------------------'
+    exit 0
+}
+
+
+
+
 /* 
 ================================================================================
                                 Workflow Plan
@@ -94,7 +171,7 @@ params.adapters = '/data/bdigby/grch38/adapters.fa'
  */
 
 if(!(params.fasta) && !(params.gencode_gtf) && !(params.gene_annotation)){
-process download_genome {
+    process download_genome {
         
         publishDir "$params.outdir/reference", mode: 'copy'
 
@@ -149,7 +226,7 @@ process download_genome {
           ch_gene_annotation = params.gene_annotation ? Channel.value(file(params.gene_annotation)) : gene_annotation_created
           ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : gencode_gtf_downloaded
           }
-} else {
+}else{
           ch_fasta = Channel.value(file(params.fasta)) 
           ch_gene_annotation = Channel.value(file(params.gene_annotation))
           ch_gencode_gtf =Channel.value(file(params.gencode_gtf)) 
@@ -167,34 +244,34 @@ process download_genome {
 if(params.aligner == 'star' && !(params.star_index)){
     process star_index {
     
-          publishDir "$params.outdir/index", mode:'copy'
+        publishDir "$params.outdir/index", mode:'copy'
           
-          input:
-              file(fasta) from ch_fasta
-              file(gtf) from ch_gencode_gtf
+        input:
+            file(fasta) from ch_fasta
+            file(gtf) from ch_gencode_gtf
               
-          output:
-              file("star_index") into star_built
+        output:
+            file("star_index") into star_built
               
-          script:
-          """
-          mkdir star_index
+        script:
+        """
+        mkdir star_index
           
-          STAR \
-          --runMode genomeGenerate \
-          --runThreadN 8 \
-          --sjdbGTFfile $gtf \
-          --sjdbOverhang $params.star_overhang \
-          --genomeDir star_index/ \
-          --genomeFastaFiles $fasta
-          """
-          }
+        STAR \
+        --runMode genomeGenerate \
+        --runThreadN 8 \
+        --sjdbGTFfile $gtf \
+        --sjdbOverhang $params.star_overhang \
+        --genomeDir star_index/ \
+        --genomeFastaFiles $fasta
+        """
+        }
           
-          ch_star_index = params.star_index ? Channel.value(file(params.star_index)) : star_built
+        ch_star_index = params.star_index ? Channel.value(file(params.star_index)) : star_built
 
-} else if(params.aligner == 'star' && params.star_index){
+}else if(params.aligner == 'star' && params.star_index){
           
-              ch_star_index = params.star_index
+        ch_star_index = params.star_index
           
 }else if(params.aligner == 'bwa' && !(params.bwa_index)){
     process bwa_index {
@@ -214,9 +291,11 @@ if(params.aligner == 'star' && !(params.star_index)){
         }
         
         ch_bwa_index = params.bwa_index ? Channel.value(file(params.bwa_index)) : bwa_built
+ 
  } else if(params.aligner == 'bwa' && params.bwa_index){
  
-            ch_bwa_index = params.bwa_index
+        ch_bwa_index = params.bwa_index
+
 }
 
 
@@ -230,27 +309,28 @@ bam_files = params.inputdir + params.bam_glob
 if(params.input_type == 'bam'){
    ch_bam = Channel.fromPath( bam_files )
                    .map{ file -> [file.baseName, file]}
-      process bam_to_fq{
+   process bam_to_fq{
 
-          input:
-              tuple val(base), file(bam) from ch_bam
+        input:
+            tuple val(base), file(bam) from ch_bam
 
-          output:
-              tuple val(base), file('*.fastq.gz') into fastq_built
+        output:
+            tuple val(base), file('*.fastq.gz') into fastq_built
 
-          script:
-          """
-          picard -Xmx8g \
-          SamToFastq \
-          I=$bam \
-          F=${base}_R1.fastq.gz F2=${base}_R2.fastq.gz \
-          VALIDATION_STRINGENCY=LENIENT
-          """
+        script:
+        """
+        picard -Xmx8g \
+        SamToFastq \
+        I=$bam \
+        F=${base}_R1.fastq.gz \
+        F2=${base}_R2.fastq.gz \
+        VALIDATION_STRINGENCY=LENIENT
+        """
         }
-    }else if(params.input_type == 'fastq'){
-          fastq_build = params.inputdir + params.fastq_glob
-          Channel.fromFilePairs( fastq_build )
-                 .set{ fastq_built }
+}else if(params.input_type == 'fastq'){
+         fastq_build = params.inputdir + params.fastq_glob
+         Channel.fromFilePairs( fastq_build )
+                .set{ fastq_built }
 }
     
 ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
