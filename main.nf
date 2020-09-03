@@ -133,7 +133,7 @@ params.gene_annotation = '/data/bdigby/grch38/reference/GRCh38.txt'
 params.gencode_gtf = '/data/bdigby/grch38/reference/GRCh38.gtf'
 //Step 2
 params.star_overhang = '49' 
-params.star_index = ''
+params.star_index = '/data/bdigby/grch38/index/star_index'
 params.bwa_index = ''
 params.aligner = 'bwa'
 //Step 3
