@@ -191,8 +191,11 @@ if(params.aligner == 'star' && !(params.star_index)){
  * Step3: Stage Fastq files
  */
  
-ch_fastq =  Channel.fromFilePairs( "$params.inputdir/$params.fastq_glob" ) // empty channel if there are no fastq in that folder
-ch_bam = Channel.fromFilePairs( "$params.inputdir/$params.bam_glob", size: 1 ) // empty if no bam in the folder
+if(params.input_type == 'fastq'){
+    ch_fastq =  Channel.fromFilePairs( "$params.inputdir/$params.fastq_glob" ) // empty channel if there are no fastq in that folder
+} else if(params.input_type == 'bam'){
+    ch_bam = Channel.fromFilePairs( "$params.inputdir/$params.bam_glob", size: 1 ) // empty if no bam in the folder
+}
 
 process bam_to_fq {
     input:
