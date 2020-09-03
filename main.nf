@@ -195,6 +195,9 @@ if(params.aligner == 'star' && !(params.star_index)){
         ch_bwa_index = params.bwa_index ? Channel.value(file(params.bwa_index)) : bwa_built
  }
 
+// if paths provided to index (skips above step) then must assign to ch
+ch_star_index = params.star_index ? Channel.value(file(params.star_index))
+ch_bwa_index = params.bwa_index ? Channel.value(file(params.bwa_index))
 
 /*
  * Step3: Stage Fastq files
