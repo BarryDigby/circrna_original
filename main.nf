@@ -292,7 +292,7 @@ if(params.aligner == 'bwa'){
         input:
             tuple val(base), file(fastq) from trim_reads_built
             file(gtf) from ch_gencode_gtf
-            val(star_idx) from ch_star_idx 
+            val(star_idx) from ch_star_index
             
         output:
             tuple val(base), file("${base}.Chimeric.out.junction") into circexplorer2_input
