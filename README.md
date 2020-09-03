@@ -14,3 +14,8 @@ have scripts to pull sequences and make circRNA files.
 Once you have the script at the stage where it conducts every step up to circRNA prediction, 
 go back and add customised memory options to steps that need it (STAR). 
 do this at intervals so it doesnt pile up on you 
+
+## Gotchas
+
+```
+--params.star_index 
