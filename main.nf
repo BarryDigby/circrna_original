@@ -49,7 +49,7 @@ if (params.help) {
     log.info "and singularity. "
     log.info print_purple('------------------------------------------------------------------------')
     log.info ''
-    log.info print_yellow('Usage: ')
+    log.info print_yellow('Usage: ') +
     
             print_purple('       Nextflow run BarryDigby/circRNA <options> \n') +
 
