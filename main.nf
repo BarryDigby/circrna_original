@@ -212,8 +212,8 @@ process bam_to_fq {
           """
 }
 
-//ch_reads = fastq_built.mix(ch_fastq)
-ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built.mix(ch_fastq)
+ch_tmp = fastq_built.mix(ch_fastq)
+ch_reads = params.reads ? Channel.value(file(params.reads)) : ch_tmp
  
 
 /*
