@@ -90,6 +90,7 @@ params.adapters = '/data/bdigby/grch38/adapters.fa'
  * Step 1: Download Reference Files
  */
 
+if(!(params.fasta) && !(params.gencode_gtf) && !(params.gene_annotation)){
 process download_genome {
         
         publishDir "$params.outdir/reference", mode: 'copy'
@@ -100,7 +101,7 @@ process download_genome {
         file('*.gtf') into gencode_gtf_downloaded
         
         shell:
-        if(params.version == 'GRCh37' && !(params.fasta) && !(params.gencode_gtf) && !(params.gene_annotation)){
+        if(params.version == 'GRCh37'){
           $/
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh37_mapping/gencode.v34lift37.annotation.gtf.gz
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh37_mapping/GRCh37.primary_assembly.genome.fa.gz
@@ -114,7 +115,7 @@ process download_genome {
           rm GRCh37.fa.tmp
           /$
           
-        }else if(params.version == 'development' && !(params.fasta) && !(params.gencode_gtf) && !(params.gene_annotation)){
+        }else if(params.version == 'development'){
           $/
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/gencode.v34.primary_assembly.annotation.gtf.gz
           wget --no-check-certificate ftp://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.20.fa.gz         
@@ -126,7 +127,7 @@ process download_genome {
           perl -alne '$"="\t";print "@F[11,0..9]"' GRCh38.genepred > GRCh38.txt          
           /$
           
-        }else if(params.version == 'GRCh38' && !(params.fasta) && !(params.gencode_gtf) && !(params.gene_annotation)){
+        }else if(params.version == 'GRCh38'){
           $/
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/gencode.v34.primary_assembly.annotation.gtf.gz
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh38.primary_assembly.genome.fa.gz
@@ -140,11 +141,18 @@ process download_genome {
           rm GRCh38.fa.tmp
           /$
           }
+          
+          ch_fasta = params.fasta ? Channel.value(file(params.fasta)) : fasta_downloaded
+          ch_gene_annotation = params.gene_annotation ? Channel.value(file(params.gene_annotation)) : gene_annotation_created
+          ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : gencode_gtf_downloaded
+          
+} else {
+          ch_fasta = Channel.value(file(params.fasta)) 
+          ch_gene_annotation = Channel.value(file(params.gene_annotation))
+          ch_gencode_gtf =Channel.value(file(params.gencode_gtf)) 
+          }
 }
 
-ch_fasta = params.fasta ? Channel.value(file(params.fasta)) : fasta_downloaded
-ch_gene_annotation = params.gene_annotation ? Channel.value(file(params.gene_annotation)) : gene_annotation_created
-ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : gencode_gtf_downloaded
 
 /*
  * Step 2: Create Genome Index
