@@ -117,6 +117,14 @@ if (params.help) {
    
    Parameters
     aligner (alread init)
+--------------------------------------------------------------------------------
+5. circRNA Discovery
+   CIRCexplorer2 
+   Need to configure container(s) for more tools. 
+   
+   Parameters
+    even though only 1 for now, 
+    code if else options. 
 */
 
 
@@ -145,7 +153,7 @@ params.reads = '' // leave empty
 //Step 4
 params.adapters = '/data/bdigby/grch38/adapters.fa'
 //Step 5
-
+params.circRNA_tool = ''
 
 /*
  * Step 1: Download Reference Files
@@ -428,3 +436,49 @@ if(params.aligner == 'bwa'){
         }
 }
             
+
+/*
+ * Step 5 circRNA discovery
+*/
+
+if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
+    process circexplorer2_bwa{
+    
+        publishDir "$params.outdir/circexplorer2", mode:'copy'
+        
+        input:
+            tuple val(base) file(sam) from circexplorer2_input
+            file(fasta) from ch_fasta
+            file(gene_annotation) from ch_gene_annotation
+            
+        output:
+            tuple val(base), file("${base}.BWA.circRNA.txt") into circexplorer2_bwa_outfile
+            
+        script:
+        """
+        CIRCexplorer2 parse -t BWA $sam -b ${base}.BWA.junction.bed
+
+        CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.BWA.junction.bed -o ${base}.BWA.circRNA.txt
+        """
+        }
+}else if(params.circrna_tool == 'circexplorer2' && params.aligner == 'star'){
+    process circexplorer2_star{
+    
+        publishDir "$params.outdir/circexplorer2", mode:'copy'
+        
+        input:
+            tuple val(base), file(chimeric_reads) from circexplorer2_input
+            file(fasta) from ch_fasta
+            file(gene_annotation) from ch_gene_annotation
+            
+        output:
+            tuple val(base), file("${base}.STAR.circRNA.txt") into circexplorer2_star_outfile
+            
+        script:
+        """
+        CIRCexplorer2 parse -t STAR $chimeric_reads -b ${base}.STAR.junction.bed
+
+        CIRCexplorer2 annotate -r $ref_txt -g $genome -b ${base}.STAR.junction.bed -o ${base}.STAR.circRNA.txt
+        """
+        }
+}
