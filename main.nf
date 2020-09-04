@@ -65,8 +65,8 @@ if (params.help) {
             print_cyan('      --fasta_fai <path>           ') + print_green('Path to genome fasta fai file\n') +
             print_cyan('      --gencode_gtf <path>         ') + print_green('Path to genocde gtf file\n') + 
             print_cyan('      --gene_annotation <path>     ') + print_green('Path to gene annotation file \n') + 
-            print_cyan('      --star_index <\"path\">      ') + print_green('Path to STAR index\n') +
-            print_cyan('      --bwa_index <\"path/*glob\"> ') + print_green('Path to BWA index\n') +
+            print_cyan('      --star_index <\"str\">      ') + print_green('Path to STAR index\n') +
+            print_cyan('      --bwa_index <\"str/*glob\"> ') + print_green('Path to BWA index\n') +
             print_cyan('      --adapters <path>            ') + print_green('Fasta file containing adapters to trim\n') +
             print_cyan('      --mirna_database <path>      ') + print_green('Fasta file containing mature miRNA sequences\n') +
             '\n' + 
@@ -74,8 +74,8 @@ if (params.help) {
             print_cyan('      --star_overhang <int>        ') + print_green('Parameter for STAR (Read length - 1)\n') +
 
             log.info ('------------------------------------------------------------------------')
-    log.info print_yellow('Contact information: b.digby237@gmail.com')
-    log.info print_yellow('O\'Broin Lab, National University of Ireland Galway')
+            print_yellow('Contact information: b.digby237@gmail.com\n') +
+            print_yellow('O\'Broin Lab, National University of Ireland Galway')
     log.info ('------------------------------------------------------------------------')
     exit 0
 }
