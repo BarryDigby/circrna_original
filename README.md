@@ -16,7 +16,7 @@ go back and add customised memory options to steps that need it (STAR).
 do this at intervals so it doesnt pile up on you 
 
 ## Gotchas
-These fuckers took years off your life. 
+Thank you Simone Coughlan for the catch :) 
 ```
 *--params.star_index:* Must put provide full path 
 
