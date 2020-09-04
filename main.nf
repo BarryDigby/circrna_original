@@ -522,6 +522,24 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
 /*
  * Step 6
  * Filter low count circRNAs
+ * Generate fasta file of sequences
  */
  
  
+process get_sequences{
+    
+        publishDir "$params.outdir/circexplorer2", mode:'copy'
+        
+        input:
+            tuple val(base), file(circrna_discovered) from circrna_discovered
+            file(fasta) from ch_fasta
+            file(faidx) from ch_samtools_index
+            
+        output:
+            tuple val(base), file(circrna_fasta) into circrna_fasta
+            
+        script:
+        """
+        bash filter_circexplorer2.sh $fasta $circrna_discovered
+        """
+}
