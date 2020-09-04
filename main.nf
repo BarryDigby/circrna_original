@@ -62,11 +62,15 @@ if (params.help) {
             '\n' +
             print_yellow('    Input Files:\n') +
             print_cyan('      --fasta <path>            ') + print_green('Path to genome fasta if generated in prior run\n') +
+            print_cyan('      --fasta_fai <path>        ') + print_green('Path to samtools fasta.fai\n') +
             print_cyan('      --gencode_gtf <path>      ') + print_green('Path to genocde gtf if generated in prior run\n') + 
             print_cyan('      --gene_annotation <path>  ') + print_green('Path to gene annotation file if generated in prior run\n') + 
             print_cyan('      --star_index <str>       ') + print_green('Path to STAR index if generated in prior run\n') +
             print_cyan('      --bwa_index <path>       ') + print_green('Path to BWA index if generated in prior run\n') +
             print_cyan('      --adapters <path>        ') + print_green('Fasta file containing adapters to trim\n') +
+            print_cyan('      --mirna_database <path>  ') + print_green('Mature miRNA sequences fasta file\n') +
+            '\n' + 
+            print_yellow('    Paramters
             print_cyan('      --star_overhang <int>    ') + print_green('Parameter for STAR: Read length - 1\n') +
 
             log.info ('------------------------------------------------------------------------')
