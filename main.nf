@@ -167,6 +167,7 @@ params.circrna_tool = ''
 // samtools_index
 //Step 7
 params.mirna_database = ''
+params.circrna_discovered = '' // leave empty
 
 /*
  * Step 1: Download Reference Files
@@ -491,7 +492,7 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
             file(gene_annotation) from ch_gene_annotation
             
         output:
-            tuple val(base), file("${base}.BWA.circRNA.txt") into circrna_discovered
+            tuple val(base), file("${base}.BWA.circRNA.txt") into circrna_discovered_out
             
         script:
         """
@@ -511,7 +512,7 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
             file(gene_annotation) from ch_gene_annotation
             
         output:
-            tuple val(base), file("${base}.STAR.circRNA.txt") into circrna_discovered
+            tuple val(base), file("${base}.STAR.circRNA.txt") into circrna_discovered_out
             
         script:
         """
@@ -522,7 +523,7 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
         }
 }
 
-
+ch_circrna_discovered = params.circrna_discovered ? Channel.value(file(params.circrna_discovered)) : circrna_discovered_out
 
 /*
  * Step 6
@@ -548,7 +549,6 @@ process get_sequences{
         bash filter_circexplorer2.sh $fasta $circrna_discovered
         """
 }
-
 
 /*
  * Step 7 
