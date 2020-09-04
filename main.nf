@@ -57,7 +57,7 @@ if (params.help) {
             print_cyan('      --inputdir <path>            ') + print_green('Path to input data\n') +
             print_cyan('      --input_type <str>           ') + print_green('Input data type. Supported: \'fastq\', \'bam\'\n') +
             print_cyan('      --fastq_glob <str>           ') + print_green('Glob pattern of fastq files e.g: \'_R{1,2}.fastq.gz\'\n') +
-            print_cyan('      --bam_glob <hisat>            ') + print_green('Glob pattern of bam files expected: \'*.bam\'\n') +
+            print_cyan('      --bam_glob <hisat>           ') + print_green('Glob pattern of bam files expected: \'*.bam\'\n') +
             print_cyan('      --aligner <fastp>            ') + print_green('Aligner to use for analysis. Supported: \'bwa\', \'star\'\n') +
             '\n' +
             print_yellow('    Input Files:\n') +
@@ -68,7 +68,7 @@ if (params.help) {
             print_cyan('      --star_index <str>           ') + print_green('Path to STAR index if generated in prior run\n') +
             print_cyan('      --bwa_index <path>           ') + print_green('Path to BWA index if generated in prior run\n') +
             print_cyan('      --adapters <path>            ') + print_green('Fasta file containing adapters to trim\n') +
-            print_cyan('      --mirna_database <path>  ') + print_green('Mature miRNA sequences fasta file\n') +
+            print_cyan('      --mirna_database <path>      ') + print_green('Mature miRNA sequences fasta file\n') +
             '\n' + 
             print_yellow('    Paramters:\n') +
             print_cyan('      --star_overhang <int>        ') + print_green('Parameter for STAR: Read length - 1\n') +
