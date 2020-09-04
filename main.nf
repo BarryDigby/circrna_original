@@ -56,22 +56,22 @@ if (params.help) {
             print_yellow('    General arguments:             Input and output setting\n') +
             print_cyan('      --inputdir <path>            ') + print_green('Path to input data\n') +
             print_cyan('      --input_type <str>           ') + print_green('Input data type. Supported: \'fastq\', \'bam\'\n') +
-            print_cyan('      --fastq_glob <str>           ') + print_green('Glob pattern of fastq files e.g: \'_R{1,2}.fastq.gz\'\n') +
-            print_cyan('      --bam_glob <hisat>           ') + print_green('Glob pattern of bam files expected: \'*.bam\'\n') +
-            print_cyan('      --aligner <fastp>            ') + print_green('Aligner to use for analysis. Supported: \'bwa\', \'star\'\n') +
+            print_cyan('      --fastq_glob <\"str\">           ') + print_green('Glob pattern of fastq files e.g: \'_R{1,2}.fastq.gz\'\n') +
+            print_cyan('      --bam_glob <\"str\">           ') + print_green('Glob pattern of bam files expected: \'*.bam\'\n') +
+            print_cyan('      --aligner <str>            ') + print_green('Aligner to use for analysis. Supported: \'bwa\', \'star\'\n') +
             '\n' +
             print_yellow('    Input Files:\n') +
-            print_cyan('      --fasta <path>               ') + print_green('Path to genome fasta if generated in prior run\n') +
-            print_cyan('      --fasta_fai <path>           ') + print_green('Path to samtools fasta.fai\n') +
-            print_cyan('      --gencode_gtf <path>         ') + print_green('Path to genocde gtf if generated in prior run\n') + 
-            print_cyan('      --gene_annotation <path>     ') + print_green('Path to gene annotation file if generated in prior run\n') + 
-            print_cyan('      --star_index <str>           ') + print_green('Path to STAR index if generated in prior run\n') +
-            print_cyan('      --bwa_index <path>           ') + print_green('Path to BWA index if generated in prior run\n') +
+            print_cyan('      --fasta <path>               ') + print_green('Path to genome fasta file\n') +
+            print_cyan('      --fasta_fai <path>           ') + print_green('Path to genome fasta fai file\n') +
+            print_cyan('      --gencode_gtf <path>         ') + print_green('Path to genocde gtf file\n') + 
+            print_cyan('      --gene_annotation <path>     ') + print_green('Path to gene annotation file \n') + 
+            print_cyan('      --star_index <\"path\">      ') + print_green('Path to STAR index\n') +
+            print_cyan('      --bwa_index <\"path/*glob\"> ') + print_green('Path to BWA index\n') +
             print_cyan('      --adapters <path>            ') + print_green('Fasta file containing adapters to trim\n') +
-            print_cyan('      --mirna_database <path>      ') + print_green('Mature miRNA sequences fasta file\n') +
+            print_cyan('      --mirna_database <path>      ') + print_green('Fasta file containing mature miRNA sequences\n') +
             '\n' + 
             print_yellow('    Paramters:\n') +
-            print_cyan('      --star_overhang <int>        ') + print_green('Parameter for STAR: Read length - 1\n') +
+            print_cyan('      --star_overhang <int>        ') + print_green('Parameter for STAR (Read length - 1)\n') +
 
             log.info ('------------------------------------------------------------------------')
     log.info print_yellow('Contact information: b.digby237@gmail.com')
