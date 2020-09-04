@@ -22,7 +22,7 @@ counter=0
                 strand=$(echo $line | awk '{ print $6 }')
                 sam_out=$(samtools faidx $fasta "$chr:$start-$stop")
                 header=">${chr}:${start}-${stop}_${strand}"
-                echo $header >> $outdir/${base}.fa
+                echo $header >> ${base}.fa
                 if [ $strand == "+" ]; then
                         sequence=$(echo "$sam_out" 2>&1 | tail -n +2 )
                 elif [ $strand == "-" ]; then
