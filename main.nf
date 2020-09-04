@@ -523,7 +523,7 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
         }
 }
 
-ch_circrna_discovered = params.circrna_discovered ? Channel.value(file(params.circrna_discovered)) : circrna_discovered_out
+circrna_discovered = circrna_discovered_out.into(1)
 
 /*
  * Step 6
