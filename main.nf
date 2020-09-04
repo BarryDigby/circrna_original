@@ -151,6 +151,7 @@ params.gencode_gtf = ''
 params.star_overhang = '49' 
 params.star_index = ''
 params.bwa_index = ''
+params.samtools_index = ''
 params.aligner = ''
 //Step 3
 params.inputdir = '/data/bdigby/circTCGA/fastq/'
@@ -244,7 +245,33 @@ ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : 
  * LOGIC
  * if not made, make them
  * if made, assign to channel
+ * need samtools index for generating
+ * inputs to miRNA
  */ 
+ 
+if(!(params.samtools_index)){
+  process samtools_index{
+
+        publishDir "$params.outdir/reference", mode:'copy'
+        
+        input:
+            file(fasta) from ch_fasta
+            
+        output:
+            file("${fasta}.fai") into samtools_index_built
+            
+        script:
+        """
+        samtools faidx $fasta
+        """
+        }
+        
+        ch_samtools_index = params.samtools_index ? Channel.value(file(params.samtools_index)) : samtools_index_built
+} else{
+
+        ch_samtools_index = Channel.value(file(params.samtools_index))
+}
+ 
  
 if(params.aligner == 'star' && !(params.star_index)){
     process star_index {
