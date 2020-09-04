@@ -125,6 +125,14 @@ if (params.help) {
    Parameters
     even though only 1 for now, 
     code if else options. 
+--------------------------------------------------------------------------------
+6. Filter circRNA results
+   remove low read counts
+--------------------------------------------------------------------------------
+7. predict circRNA - miRNA interactions
+   make sure each circRNA in each sample is 
+   done in parallel! might have to stage
+   circRNAs in script prior. 
 */
 
 
@@ -452,7 +460,7 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
             file(gene_annotation) from ch_gene_annotation
             
         output:
-            tuple val(base), file("${base}.BWA.circRNA.txt") into circexplorer2_bwa_outfile
+            tuple val(base), file("${base}.BWA.circRNA.txt") into circrna_discovered
             
         script:
         """
@@ -472,7 +480,7 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
             file(gene_annotation) from ch_gene_annotation
             
         output:
-            tuple val(base), file("${base}.STAR.circRNA.txt") into circexplorer2_star_outfile
+            tuple val(base), file("${base}.STAR.circRNA.txt") into circrna_discovered
             
         script:
         """
@@ -482,3 +490,11 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
         """
         }
 }
+
+
+/*
+ * Step 6
+ * Filter low count circRNAs
+ */
+ 
+ 
