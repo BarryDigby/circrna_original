@@ -70,7 +70,7 @@ if (params.help) {
             print_cyan('      --adapters <path>        ') + print_green('Fasta file containing adapters to trim\n') +
             print_cyan('      --mirna_database <path>  ') + print_green('Mature miRNA sequences fasta file\n') +
             '\n' + 
-            print_yellow('    Paramters
+            print_yellow('    Paramters:\n') +
             print_cyan('      --star_overhang <int>    ') + print_green('Parameter for STAR: Read length - 1\n') +
 
             log.info ('------------------------------------------------------------------------')
