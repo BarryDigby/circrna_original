@@ -163,6 +163,10 @@ params.reads = '' // leave empty
 params.adapters = '/data/bdigby/grch38/adapters.fa'
 //Step 5
 params.circRNA_tool = ''
+//Step 6
+// samtools_index
+//Step 7
+params.mirna_database = 'hsa_mature.fa'
 
 /*
  * Step 1: Download Reference Files
@@ -557,7 +561,7 @@ process miRanda{
         
         input:
             tuple val(base), file(circrna_fasta) from circrna_fasta
-            file(miRs) from params.miR_database
+            path(miRs) from params.mirna_database
             
         ouput:
             tuple val(base), file(mirna_predictions) into mirna_predictions
