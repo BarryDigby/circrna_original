@@ -543,3 +543,31 @@ process get_sequences{
         bash filter_circexplorer2.sh $fasta $circrna_discovered
         """
 }
+
+
+/*
+ * Step 7 
+ * miRanda analysis
+ *
+ */
+ 
+process miRanda{
+ 
+        publishDir "$params.outdir/mirna_predictions", mode:'copy'
+        
+        input:
+            tuple val(base), file(circrna_fasta) from circrna_fasta
+            file(miRs) from params.miR_database
+            
+        ouput:
+            tuple val(base), file(mirna_predictions) into mirna_predictions
+            
+        script:
+        """
+        miranda $miRs $circrna_fasta -out ${base}.circrna.bindsites.out -quiet
+        
+        echo "miRNA Target  Score Energy-Kcal/Mol Query-Aln(start-end) Subject-Al(Start-End) Al-Len Subject-Identity Query-Identity" > ${base}.circrna.bindsites.txt
+        
+        grep -A 1 "Scores for this hit:" ${base}.circrna.bindsites.out | sort | grep ">" | cut -c 2- >> ${base}.circrna.bindsites.txt
+        """
+  }
