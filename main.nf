@@ -145,13 +145,13 @@ if (params.help) {
 params.outdir = './'
 params.version = ''
 params.fasta = ''
+params.fasta_fai = ''
 params.gene_annotation = ''
 params.gencode_gtf = ''
 //Step 2
 params.star_overhang = '49' 
 params.star_index = ''
 params.bwa_index = ''
-params.samtools_index = ''
 params.aligner = ''
 //Step 3
 params.inputdir = '/data/bdigby/circTCGA/fastq/'
@@ -250,7 +250,7 @@ ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : 
  * inputs to miRNA
  */ 
  
-if(!(params.samtools_index)){
+if(!(params.fasta_fai)){
   process samtools_index{
 
         publishDir "$params.outdir/reference", mode:'copy'
@@ -259,7 +259,7 @@ if(!(params.samtools_index)){
             file(fasta) from ch_fasta
             
         output:
-            file("${fasta}.fai") into samtools_index_built
+            file("${fasta}.fai") into fasta_fai_built
             
         script:
         """
@@ -267,10 +267,10 @@ if(!(params.samtools_index)){
         """
         }
         
-        ch_samtools_index = params.samtools_index ? Channel.value(file(params.samtools_index)) : samtools_index_built
+        ch_fai = params.fasta_fai ? Channel.value(file(params.fasta_fai)) : fasta_fai_built
 } else{
 
-        ch_samtools_index = Channel.value(file(params.samtools_index))
+        ch_fai = Channel.value(file(params.fasta_fai))
 }
  
  
@@ -488,7 +488,7 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
             file(gene_annotation) from ch_gene_annotation
             
         output:
-            tuple val(base), file("${base}.BWA.circRNA.txt") into circrna_discovered_out
+            tuple val(base), file("${base}.BWA.circRNA.txt") into circrna_discovered
             
         script:
         """
@@ -508,7 +508,7 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
             file(gene_annotation) from ch_gene_annotation
             
         output:
-            tuple val(base), file("${base}.STAR.circRNA.txt") into circrna_discovered_out
+            tuple val(base), file("${base}.STAR.circRNA.txt") into circrna_discovered
             
         script:
         """
@@ -519,3 +519,28 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
         }
 }
 
+
+/*
+ * Step 6
+ * Filter low count circRNAs
+ * Generate fasta file of sequences
+ */
+ 
+ 
+process get_sequences{
+    
+        publishDir "$params.outdir/circexplorer2", mode:'copy'
+        
+        input:
+            tuple val(base), file(circrna_discovered) from circrna_discovered
+            file(fasta) from ch_fasta
+            file(fai) from ch_fai
+            
+        output:
+            tuple val(base), file(circrna_fasta) into circrna_fasta
+            
+        script:
+        """
+        bash filter_circexplorer2.sh $fasta $circrna_discovered
+        """
+}
