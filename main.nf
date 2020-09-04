@@ -47,11 +47,11 @@ if (params.help) {
     log.info "tool_name integrates several NGS processing tools to identify novel circRNAs from "
     log.info "un-processed RNA sequencing data. To run this pipeline users need to install nextflow"
     log.info "and singularity. "
-    log.info print_purple('------------------------------------------------------------------------')
+    print_purple('------------------------------------------------------------------------')
     log.info ''
     log.info print_yellow('Usage: ') +
     
-            print_purple('       Nextflow run BarryDigby/circRNA <options> \n') +
+            print_purple('Nextflow run BarryDigby/circRNA --profile singularity, standard <options> \n') +
 
             print_yellow('    General arguments:             Input and output setting\n') +
             print_cyan('      --inputdir <path>            ') + print_green('Path to input data\n') +
