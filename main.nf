@@ -500,6 +500,9 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
         CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.BWA.junction.bed -o ${base}.BWA.circRNA.txt
         """
         }
+        
+        (ch_circrna_discovered) = circrna_discovered.into(1)
+        
 }else if(params.circrna_tool == 'circexplorer2' && params.aligner == 'star'){
     process circexplorer2_star{
     
@@ -520,10 +523,10 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
         CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.STAR.junction.bed -o ${base}.STAR.circRNA.txt
         """
         }
+        
+        (ch_circrna_discovered) = circrna_discovered.into(1)
 }
 
-params.circrna_discovered = ''
-ch_circrna_discovered = params.circrna_discovered ? Channel.value(file(params.circrna_discovered)) : circrna_discovered
 
 
 /*
