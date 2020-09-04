@@ -478,7 +478,7 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
         """
         CIRCexplorer2 parse -t STAR $chimeric_reads -b ${base}.STAR.junction.bed
 
-        CIRCexplorer2 annotate -r $ref_txt -g $genome -b ${base}.STAR.junction.bed -o ${base}.STAR.circRNA.txt
+        CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.STAR.junction.bed -o ${base}.STAR.circRNA.txt
         """
         }
 }
