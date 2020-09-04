@@ -166,7 +166,7 @@ params.circRNA_tool = ''
 //Step 6
 // samtools_index
 //Step 7
-params.mirna_database = 'hsa_mature.fa'
+params.mirna_database = ''
 
 /*
  * Step 1: Download Reference Files
