@@ -565,7 +565,7 @@ process miRanda{
             path(miRs) from params.mirna_database
             
         output:
-            tuple val(base), file("${base}.mirna.bindsites.txt) into mirna_predictions
+            tuple val(base), file("${base}.mirna.bindsites.txt") into mirna_predictions
             
         script:
         """
