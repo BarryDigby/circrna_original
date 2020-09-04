@@ -501,7 +501,7 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
         """
         }
         
-        (ch_circrna_discovered) = circrna_discovered.into(1)
+        ch_circrna_discovered = circrna_discovered
         
 }else if(params.circrna_tool == 'circexplorer2' && params.aligner == 'star'){
     process circexplorer2_star{
@@ -524,7 +524,7 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
         """
         }
         
-        (ch_circrna_discovered) = circrna_discovered.into(1)
+        ch_circrna_discovered = circrna_discovered
 }
 
 
