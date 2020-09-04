@@ -162,7 +162,7 @@ params.reads = '' // leave empty
 //Step 4
 params.adapters = '/data/bdigby/grch38/adapters.fa'
 //Step 5
-params.circRNA_tool = ''
+params.circrna_tool = ''
 //Step 6
 // samtools_index
 //Step 7
@@ -563,7 +563,7 @@ process miRanda{
             tuple val(base), file(circrna_fasta) from circrna_fasta
             path(miRs) from params.mirna_database
             
-        ouput:
+        output:
             tuple val(base), file(mirna_predictions) into mirna_predictions
             
         script:
