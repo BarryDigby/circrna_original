@@ -158,7 +158,6 @@ params.inputdir = '/data/bdigby/circTCGA/fastq/'
 params.input_type = 'bam'
 params.fastq_glob = '*_R{1,2}.fastq.gz'
 params.bam_glob = '*.bam'
-params.reads = '' // leave empty 
 //Step 4
 params.adapters = '/data/bdigby/grch38/adapters.fa'
 //Step 5
