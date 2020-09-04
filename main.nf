@@ -537,7 +537,7 @@ process get_sequences{
             file(fai) from ch_fai
             
         output:
-            tuple val(base), file(circrna_fasta) into circrna_fasta
+            tuple val(base), file("${base}.fa") into circrna_fasta
             
         script:
         """
