@@ -370,7 +370,7 @@ if(params.input_type == 'bam'){
                 .set{ fastq_built }
 }
     
-ch_reads = params.reads ? Channel.value(file(params.reads)) : fastq_built
+ch_reads = fastq_built
  
 
 /*
@@ -523,56 +523,3 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
         }
 }
 
-circrna_discovered = circrna_discovered_out.into(1)
-
-/*
- * Step 6
- * Filter low count circRNAs
- * Generate fasta file of sequences
- */
- 
- 
-process get_sequences{
-    
-        publishDir "$params.outdir/circexplorer2", mode:'copy'
-        
-        input:
-            tuple val(base), file(circrna_discovered) from circrna_discovered
-            file(fasta) from ch_fasta
-            file(faidx) from ch_samtools_index
-            
-        output:
-            tuple val(base), file(circrna_fasta) into circrna_fasta
-            
-        script:
-        """
-        bash filter_circexplorer2.sh $fasta $circrna_discovered
-        """
-}
-
-/*
- * Step 7 
- * miRanda analysis
- *
- */
- 
-process miRanda{
- 
-        publishDir "$params.outdir/mirna_predictions", mode:'copy'
-        
-        input:
-            tuple val(base), file(circrna_fasta) from circrna_fasta
-            path(miRs) from params.mirna_database
-            
-        output:
-            tuple val(base), file(mirna_predictions) into mirna_predictions
-            
-        script:
-        """
-        miranda $miRs $circrna_fasta -out ${base}.circrna.bindsites.out -quiet
-        
-        echo "miRNA Target  Score Energy-Kcal/Mol Query-Aln(start-end) Subject-Al(Start-End) Al-Len Subject-Identity Query-Identity" > ${base}.circrna.bindsites.txt
-        
-        grep -A 1 "Scores for this hit:" ${base}.circrna.bindsites.out | sort | grep ">" | cut -c 2- >> ${base}.circrna.bindsites.txt
-        """
-  }
