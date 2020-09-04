@@ -3,7 +3,7 @@
 ## Stage files 
 
 fasta=$1
-input_file=$2 
+input_file=$2
 
 ## Remove circRNA with BSJ reads < 1
 
@@ -17,21 +17,21 @@ counter=0
         while read line
         do
                 chr=$(echo $line | awk '{ print $1 }')
-                from=$(echo $line | awk '{ print $2 }')
-                to=$(echo $line | awk '{ print $3 }')
-                strand=$(echo $line | awk '{ print $4 }')
-                sam_out=$(samtools faidx $fasta "$chr:$from-$to")
-                header=">${chr}:${from}-${to}_${strand}"
+                start=$(echo $line | awk '{ print $2 }')
+                stop=$(echo $line | awk '{ print $3 }')
+                strand=$(echo $line | awk '{ print $6 }')
+                sam_out=$(samtools faidx $fasta "$chr:$start-$stop")
+                header=">${chr}:${start}-${stop}_${strand}"
                 echo $header >> $outdir/${base}.fa
                 if [ $strand == "+" ]; then
                         sequence=$(echo "$sam_out" 2>&1 | tail -n +2 )
                 elif [ $strand == "-" ]; then
                         sequence=$(echo "$sam_out" 2>&1 | tail -n +2 | rev | tr {AGTCagtc} {TCAGtcag})
                 fi
-                        echo "$sequence" >> $outdir/${base}.fa
+                        echo "$sequence" >> ${base}.fa
                 counter=$(($counter+1))
                 if [ $(($counter%100)) -eq 0 ]; then
                         echo $counter
                 fi
 
-        done < tmp/common_circs.bed
+        done < filtered.circrna.txt
