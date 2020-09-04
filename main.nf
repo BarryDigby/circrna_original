@@ -228,17 +228,14 @@ if(!(params.fasta) && !(params.gencode_gtf) && !(params.gene_annotation)){
           /$
           }
     
-          //ch_fasta = params.fasta ? Channel.value(file(params.fasta)) : fasta_downloaded
-          //ch_gene_annotation = params.gene_annotation ? Channel.value(file(params.gene_annotation)) : gene_annotation_created
-          //ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : gencode_gtf_downloaded
-          }
+      }
 }else{
           ch_fasta = Channel.value(file(params.fasta)) 
           ch_gene_annotation = Channel.value(file(params.gene_annotation))
           ch_gencode_gtf =Channel.value(file(params.gencode_gtf)) 
 }
 
-
+// ternary operators: result = condition ? value_if_true : value_if_false
 ch_fasta = params.fasta ? Channel.value(file(params.fasta)) : fasta_downloaded
 ch_gene_annotation = params.gene_annotation ? Channel.value(file(params.gene_annotation)) : gene_annotation_created
 ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : gencode_gtf_downloaded
