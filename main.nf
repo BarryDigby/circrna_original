@@ -499,10 +499,7 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
 
         CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.BWA.junction.bed -o ${base}.BWA.circRNA.txt
         """
-        }
-        
-        ch_circrna_discovered = circrna_discovered
-        
+        }  
 }else if(params.circrna_tool == 'circexplorer2' && params.aligner == 'star'){
     process circexplorer2_star{
     
@@ -523,8 +520,6 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
         CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.STAR.junction.bed -o ${base}.STAR.circRNA.txt
         """
         }
-        
-        ch_circrna_discovered = circrna_discovered
 }
 
 
@@ -541,7 +536,7 @@ process get_sequences{
         publishDir "$params.outdir/circexplorer2", mode:'copy'
         
         input:
-            tuple val(base), file(circrna_discovered) from ch_circrna_discovered
+            tuple val(base), file(circrna_discovered) from circrna_discovered
             file(fasta) from ch_fasta
             file(faidx) from ch_samtools_index
             
