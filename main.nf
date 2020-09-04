@@ -562,7 +562,7 @@ process miRanda{
         
         input:
             tuple val(base), file(circrna_fasta) from circrna_fasta
-            path(miRs) from params.mirna_database
+            file(miRs) from params.mirna_database
             
         output:
             tuple val(base), file("${base}.mirna.bindsites.txt") into mirna_predictions
