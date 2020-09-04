@@ -522,6 +522,8 @@ if(params.circrna_tool == 'circexplorer2' && params.aligner == 'bwa'){
         }
 }
 
+(ch_circrna_discovered) = circrna_discovered.into(1)
+
 
 /*
  * Step 6
@@ -535,7 +537,7 @@ process get_sequences{
         publishDir "$params.outdir/circexplorer2", mode:'copy'
         
         input:
-            tuple val(base), file(circrna_discovered) from circrna_discovered
+            tuple val(base), file(circrna_discovered) from ch_circrna_discovered
             file(fasta) from ch_fasta
             file(faidx) from ch_samtools_index
             
