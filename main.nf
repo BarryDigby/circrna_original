@@ -170,7 +170,7 @@ params.circrna_tool = ''
 // samtools_index
 //Step 7
 params.mirna_database = ''
-params.circrna_discovered = '' // leave empty
+
 
 /*
  * Step 1: Download Reference Files
@@ -556,13 +556,15 @@ process get_sequences{
  *
  */
  
+ch_miR = Channel.value(file(params.mirna_database)) 
+
 process miRanda{
  
         publishDir "$params.outdir/mirna_bindsites", mode:'copy'
         
         input:
             tuple val(base), file(circrna_fasta) from circrna_fasta
-            file(miRs) from params.mirna_database
+            file(miRs) from ch_miR
             
         output:
             tuple val(base), file("${base}.mirna.bindsites.txt") into mirna_predictions
