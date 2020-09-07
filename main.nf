@@ -28,6 +28,7 @@ params.gene_annotation = ''
 params.version = ''
 params.step = ''
 params.fasta.fai = ''
+params.bwa_index = ''
 
 stepList = defineStepList()
 step = params.step ? params.step.toLowerCase().replaceAll('-', '').replaceAll('_', '') : ''
