@@ -27,7 +27,8 @@ params.gencode_gtf = ''
 params.gene_annotation = ''
 params.version = ''
 
-
+stepList = defineStepList()
+step = params.step ? params.step.toLowerCase().replaceAll('-', '').replaceAll('_', '') : ''
 
 /*
  * Step 1:
@@ -89,6 +90,64 @@ ch_gencode_gtf.view()
 /*
  * Step 2:
  * Create Genome Index files
+ * Samtools needed for miRNA prediction - must be made
  */
- 
- 
+
+process samtools_index{
+
+        publishDir "$params.outdir/reference", mode:'copy'
+        
+        input:
+            file(fasta) from ch_fasta
+            
+        output:
+            file("${fasta}.fai") into fasta_fai_built
+        
+        when: !(params.fasta_fai)
+        
+        script:
+        """
+        samtools faidx $fasta
+        """
+}
+        
+ch_fai = params.fasta_fai ? Channel.value(file(params.fasta_fai)) : fasta_fai_built
+
+process bwa_index{
+
+        publishDir "$params.outdir/index/bwa", mode:'copy'
+        
+        input:
+            file(fasta) from ch_fasta
+            
+        output:
+            file("${fasta.baseName}.*") into bwa_built
+            val("$params.outdir/index/bwa") into bwa_path
+        
+        when: 'ciriquant' in tool 
+        
+        script:
+        """
+        bwa index ${fasta} -p ${fasta.baseName}
+        """
+}
+
+ch_bwa_index = params.bwa_index ? Channel.value(params.bwa_index) : bwa_path 
+
+ch_bwa_index.view()
+
+
+
+
+
+
+// Define list of available tools
+def defineStepList() {
+    return [
+        'ciriquant',
+        'circexplorer2',
+        'find_circ',
+        'mapsplice',
+        'uroborus'
+        ]
+}
