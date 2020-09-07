@@ -282,18 +282,19 @@ process ciriquant_yml{
       when: !(params.ciriquant_yml) && 'ciriquant' in tool
       
       script:
-      bwa=$(whereis bwa | cut -f2 -d':')
-      hisat2=$(whereis hisat2 | cut -f2 -d':')
-      stringtie=$(whereis stringtie | cut -f2 -d':')
-      samtools=$(whereis samtools | cut -f2 -d':')
       """
+      export bwa=`whereis bwa | cut -f2 -d':'`
+      export hisat2=`whereis hisat2 | cut -f2 -d':'`
+      export stringtie=`whereis stringtie | cut -f2 -d':'`
+      export samtools=`whereis samtools | cut -f2 -d':'`
+
       touch travis.yml
       printf "name:ciriquant\n\
       tools:\n\
-      bwa: $bwa\n\
-      hisat2: $hisat2\n\
-      stringtie: $stringtie\n\
-      samtools: $samtools\n\
+      bwa: \$bwa\n\
+      hisat2: \$hisat2\n\
+      stringtie: \$stringtie\n\
+      samtools: \$samtools\n\
       reference:\n\
       fasta: ${fasta_path}\n\
       gtf: ${gencode_gtf_path}\n\
