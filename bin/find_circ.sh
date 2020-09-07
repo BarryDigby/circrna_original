@@ -1,18 +1,19 @@
 #!/bin/bash
 
 # nextflow usage
-# find_circ/find_circ.sh $genome $index <prefix.*.bwt2> $fastq[0] $fastq[1]
+# find_circ/find_circ.sh $genome $index <prefix.*.bwt2> $fastq_baseName $fastq[0] $fastq[1]
 
 genome=$1
 index=$2
-R1=$3
-R2=$4
-base=$(echo $R1 | cut -f 1 -d'.')
+base=$3
+R1=$4
+R2=$5
+
 
 
         bowtie2 -p 8 --very-sensitive --mm -D 20 --score-min=C,15,0 \
         -x $index -q -1 $R1 -2 $R2 \
-        | samtools view -hbuS - | samtools sort - ${base}.bam
+        | samtools view -hbuS - | samtools sort - > ${base}.bam
 
         samtools view -hf 4 ${base}.bam | samtools view -Sb - > ${base}_unmapped.bam
 
