@@ -21,7 +21,7 @@ Description:
 /*
  * Parameters
  */
-params.outdir ='./'
+params.outdir ='.'
 params.fasta = ''
 params.gencode_gtf = ''
 params.gene_annotation = ''
@@ -480,6 +480,8 @@ process find_circ{
         
         script:
         """
+        chmod 777 ~/.nextflow/assets/BarryDigby/circrna/bin/*
+        
         bash find_circ.sh $fasta ${fasta.baseName} ${base} ${fastq[0]} ${fastq[1]}
         """
 }
