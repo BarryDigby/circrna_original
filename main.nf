@@ -289,17 +289,17 @@ process ciriquant_yml{
       export samtools=`whereis samtools | cut -f2 -d':'`
 
       touch travis.yml
-      printf "name:ciriquant\n\
+      printf "name: ciriquant\n\
       tools:\n\
-      bwa: \$bwa\n\
-      hisat2: \$hisat2\n\
-      stringtie: \$stringtie\n\
-      samtools: \$samtools\n\
+       bwa: \$bwa\n\
+       hisat2: \$hisat2\n\
+       stringtie: \$stringtie\n\
+       samtools: \$samtools\n\n\
       reference:\n\
-      fasta: ${fasta_path}\n\
-      gtf: ${gencode_gtf_path}\n\
-      bwa_index: ${bwa_path}\n\
-      hisat_index: ${hisat2_path}" >> travis.yml
+       fasta: ${fasta_path}\n\
+       gtf: ${gencode_gtf_path}\n\
+       bwa_index: ${bwa_path}\n\
+       hisat_index: ${hisat2_path}" >> travis.yml
       """
 }
 
