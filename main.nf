@@ -33,7 +33,7 @@ params.star_index = ''
 params.hisat2_index = ''
 params.bowtie_index = ''
 params.bowtie2_index = ''
-
+params.mapsplice_ref = ''
 
 toolList = defineToolList()
 tool = params.tool ? params.tool.toLowerCase().replaceAll('-', '').replaceAll('_', '') : ''
@@ -236,6 +236,37 @@ process bowtie2_index{
 
 ch_bowtie2_index = params.bowtie2_index ? Channel.value(file(params.bowtie2_index)) : bowtie2_built
 ch_bowtie2_index.view()
+
+
+/*
+ * Step 3:
+ * miscellaneous circRNA tool requirements
+ */
+ 
+ 
+process split_fasta{
+
+        publishDir "$params.outdir/index/mapsplice", mode:'copy'
+        
+        input:
+            file(fasta) from ch_fasta
+            
+        output:
+             file("*.fa") into split_fasta
+             
+        when 'mapsplice' in tool
+        
+        shell:
+        '''
+        awk '$0 ~ "^>" { match($1, /^>([^:]+)/, id); filename=id[1]} {print >> filename".fa"}' !{fasta}
+        '''
+}
+
+ch_mapsplice_ref = params.mapsplice_ref ? Channel.value(params.mapsplice_ref) : split_fasta
+ch_mapsplice_ref.view()
+
+
+
 
 // Define list of available tools
 def defineToolList() {
