@@ -30,6 +30,9 @@ params.tool = ''
 params.fasta_fai = ''
 params.bwa_index = ''
 params.star_index = ''
+params.hisat2_index = ''
+params.bowtie_index = ''
+params.bowtie2_index = ''
 
 
 toolList = defineToolList()
@@ -133,13 +136,35 @@ process bwa_index{
         
         script:
         """
-        bwa index ${fasta} -p ${fasta.baseName}
+        bwa index -a bwtsw $fasta -p ${fasta.baseName}
         """
 }
 
 ch_bwa_index = params.bwa_index ? Channel.value(params.bwa_index) : bwa_path 
 
 ch_bwa_index.view()
+
+process hisat2_index{
+
+        publishDir "$params.outdir/index/hisat2", mode: 'copy'
+        
+        input:
+            file(fasta) from ch_fasta
+         
+        output:
+            file("${fasta.baseName}.*.ht2") into hisat2_built
+            val("$params.outdir/index/hisat2") into hisat2_path
+            
+        when: !(params.hisat2_index) && 'ciriquant' in tool
+        
+        script:
+        """
+        hisat2-build $fasta ${fasta.baseName}
+        """
+}
+
+ch_hisat2_index = params.hisat2_index ? Channel.value(params.hisat2_index) : hisat2_path
+ch_hisat2_index.view()
 
 process star_index{
 
@@ -170,11 +195,47 @@ process star_index{
 ch_star_index = params.star_index ? Channel.value(file(params.star_index)) : star_built
 ch_star_index.view()
 
+process bowtie_index{
 
+        publishDir "$params.outdir/index/bowtie", mode:'copy'
+        
+        input:
+            file(fasta) from ch_fasta
+            
+        output:
+            file ('"${fasta.baseName.*') into bowtie_built
+        
+        when: !(params.bowtie_index) && 'mapsplice' in tool
 
+        script:
+        """
+        bowtie-build $fasta ${fasta.baseName}
+        """
+}
 
+ch_bowtie_index = params.bowtie_index ? Channel.value(file(params.bowtie_index)) : bowtie_built
+ch_bowtie_index.view() 
+ 
+process bowtie2_index{
 
+        publishDir "$params.outdir/index/bowtie2", mode:'copy'
+        
+        input:
+            file(fasta) from ch_fasta
+            
+        output:
+            file ('"${fasta.baseName.*') into bowtie2_built
+        
+        when: !(params.bowtie2_index) && ('find_circ' in tool || 'uroborus' in tool)
 
+        script:
+        """
+        bowtie2-build $fasta ${fasta.baseName}
+        """
+}
+
+ch_bowtie2_index = params.bowtie2_index ? Channel.value(file(params.bowtie2_index)) : bowtie2_built
+ch_bowtie2_index.view()
 
 // Define list of available tools
 def defineToolList() {
