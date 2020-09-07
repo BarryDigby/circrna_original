@@ -277,6 +277,7 @@ process ciriquant_yml{
         publishDir "$params.outdir", mode:'copy'
       
         input:
+            file(fasta) from ch_fasta
             val(gencode_gtf_path) from ch_gencode_gtf
             val(fasta_path) from ch_fasta
             val(bwa_path) from ch_bwa_index
@@ -288,6 +289,7 @@ process ciriquant_yml{
         when: !(params.ciriquant_yml) && 'ciriquant' in tool
 
         script:
+        index_prefix = fasta.toString() - ~/.fa/
         """
         export bwa=`whereis bwa | cut -f2 -d':'`
         export hisat2=`whereis hisat2 | cut -f2 -d':'`
@@ -304,8 +306,8 @@ process ciriquant_yml{
         reference:\n\
          fasta: ${fasta_path}\n\
          gtf: ${gencode_gtf_path}\n\
-         bwa_index: ${bwa_path}\n\
-         hisat_index: ${hisat2_path}" >> travis.yml
+         bwa_index: ${bwa_path}/${index_prefix}\n\
+         hisat_index: ${hisat2_path}/${index_prefix}" >> travis.yml
         """
 }
 
