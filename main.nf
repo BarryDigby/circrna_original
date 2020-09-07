@@ -221,7 +221,7 @@ process bowtie_index{
         """
 }
 
-ch_bowtie_index = params.bowtie_index ? Channel.value(file(params.bowtie_index)) : bowtie_path
+ch_bowtie_index = params.bowtie_index ? Channel.value(params.bowtie_index) : bowtie_path
 ch_bowtie_index.view() 
  
 process bowtie2_index{
