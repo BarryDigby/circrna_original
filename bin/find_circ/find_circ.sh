@@ -1,13 +1,14 @@
 #!/bin/bash
 
 # nextflow usage
-# find_circ/find_circ.sh $genome <path/to/genome/> $index <path/to/bowtie2/> $fastq[0] $fastq[1]
+# find_circ/find_circ.sh $genome $index <prefix.*.bwt2> $fastq[0] $fastq[1]
 
-R1=$4
-R2=$5
+genome=$1
+index=$2
+R1=$3
+R2=$4
 base=$(echo $R1 | cut -f 1 -d'.')
-index=/data/bdigby/circTCGA/index/bowtie2/hg19
-genome=/data/bdigby/circTCGA/reference/
+
 
         bowtie2 -p 8 --very-sensitive --mm -D 20 --score-min=C,15,0 \
         -x $index -q -1 $R1 -2 $R2 \
