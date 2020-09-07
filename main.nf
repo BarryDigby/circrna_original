@@ -272,7 +272,7 @@ process split_fasta{
         '''
 }
 
-ch_mapsplice_ref = params.mapsplice_ref ? Channel.value(params.mapsplice_ref) : split_fasta
+ch_mapsplice_ref = params.mapsplice_ref ? Channel.value(params.mapsplice_ref) : mapsplice_ref_path
 ch_mapsplice_ref.view()
 
 process ciriquant_yml{
