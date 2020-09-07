@@ -26,12 +26,14 @@ params.fasta = ''
 params.gencode_gtf = ''
 params.gene_annotation = ''
 params.version = ''
-params.step = ''
+params.tool = ''
 params.fasta_fai = ''
 params.bwa_index = ''
+params.star_index = ''
 
-stepList = defineStepList()
-step = params.step ? params.step.toLowerCase().replaceAll('-', '').replaceAll('_', '') : ''
+
+toolList = defineToolList()
+tool = params.tool ? params.tool.toLowerCase().replaceAll('-', '').replaceAll('_', '') : ''
 
 /*
  * Step 1:
@@ -139,13 +141,43 @@ ch_bwa_index = params.bwa_index ? Channel.value(params.bwa_index) : bwa_path
 
 ch_bwa_index.view()
 
+process star_index{
+
+        publishDir "$params.outdir/index", mode:'copy'
+          
+        input:
+            file(fasta) from ch_fasta
+            file(gtf) from ch_gencode_gtf
+              
+        output:
+            file("star_index") into star_built
+              
+        when: !(params.star_index) && 'circexplorer2' in tool
+        
+        script:
+        """
+        mkdir star_index
+          
+        STAR \
+        --runMode genomeGenerate \
+        --runThreadN 8 \
+        --sjdbGTFfile $gtf \
+        --genomeDir star_index/ \
+        --genomeFastaFiles $fasta
+        """
+}
+
+ch_star_index = params.star_index ? Channel.value(file(params.star_index)) : star_built
+ch_star_index.view()
+
+
 
 
 
 
 
 // Define list of available tools
-def defineStepList() {
+def defineToolList() {
     return [
         'ciriquant',
         'circexplorer2',
