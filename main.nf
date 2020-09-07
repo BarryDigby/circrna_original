@@ -281,13 +281,12 @@ process ciriquant_yml{
           
       when: !(params.ciriquant_yml) && 'ciriquant' in tool
       
-      shell:
-      $/
+      script:
       bwa=$(whereis bwa | cut -f2 -d':')
       hisat2=$(whereis hisat2 | cut -f2 -d':')
       stringtie=$(whereis stringtie | cut -f2 -d':')
       samtools=$(whereis samtools | cut -f2 -d':')
-      
+      """
       touch travis.yml
       printf "name:ciriquant\n\
       tools:\n\
@@ -296,11 +295,11 @@ process ciriquant_yml{
       stringtie: $stringtie\n\
       samtools: $samtools\n\
       reference:\n\
-      fasta: !{fasta_path}\n\
-      gtf: !{gencode_gtf_path}\n\
-      bwa_index: !{bwa_path}\n\
-      hisat_index: !{hisat2_path}" >> travis.yml
-      /$
+      fasta: ${fasta_path}\n\
+      gtf: ${gencode_gtf_path}\n\
+      bwa_index: ${bwa_path}\n\
+      hisat_index: ${hisat2_path}" >> travis.yml
+      """
 }
 
 ch_ciriquant_yml = params.ciriquant_yml ? Channel.value(file(params.ciriquant_yml)) : travis_built
