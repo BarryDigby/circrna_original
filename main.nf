@@ -34,7 +34,7 @@ params.hisat2_index = ''
 params.bowtie_index = ''
 params.bowtie2_index = ''
 params.mapsplice_ref = ''
-params.travis_yml = ''
+params.ciriquant_yml = ''
 
 toolList = defineToolList()
 tool = params.tool ? params.tool.toLowerCase().replaceAll('-', '').replaceAll('_', '') : ''
@@ -303,7 +303,7 @@ process ciriquant_yml{
       """
 }
 
-ch_travis_yml = params.travis_yml ? Channel.value(file(params.travis_yml)) : travis_built
+ch_ciriquant_yml = params.ciriquant_yml ? Channel.value(file(params.ciriquant_yml)) : travis_built
       
       
 
