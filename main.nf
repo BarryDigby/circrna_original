@@ -281,7 +281,7 @@ process ciriquant_yml{
           
       when: !(params.ciriquant_yml) && 'ciriquant' in tool
       
-      shell
+      shell:
       $/
       bwa=$(whereis bwa | cut -f2 -d':')
       hisat2=$(whereis hisat2 | cut -f2 -d':')
