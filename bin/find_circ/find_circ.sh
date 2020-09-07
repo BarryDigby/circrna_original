@@ -1,14 +1,12 @@
 #!/bin/bash
 
 # nextflow usage
-# find_circ/find_circ.sh $genome $index $params.outdir $fastq[0] $fastq[1]
+# find_circ/find_circ.sh $genome <path/to/genome/> $index <path/to/bowtie2/> $fastq[0] $fastq[1]
 
 R1=$4
 R2=$5
-base=$(echo $4 | cut -f 1 -d'.')
-outdir=/data/bdigby/circTCGA/results/find_circ/
+base=$(echo $R1 | cut -f 1 -d'.')
 index=/data/bdigby/circTCGA/index/bowtie2/hg19
-bin=/data/bdigby/circTCGA/bin/find_circ
 genome=/data/bdigby/circTCGA/reference/
 
         bowtie2 -p 8 --very-sensitive --mm -D 20 --score-min=C,15,0 \
