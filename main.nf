@@ -27,7 +27,7 @@ params.gencode_gtf = ''
 params.gene_annotation = ''
 params.version = ''
 params.step = ''
-params.fasta.fai = ''
+params.fasta_fai = ''
 params.bwa_index = ''
 
 stepList = defineStepList()
