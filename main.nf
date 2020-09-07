@@ -286,7 +286,7 @@ process ciriquant_yml{
       export bwa=`whereis bwa | cut -f2 -d':'`
       export hisat2=`whereis hisat2 | cut -f2 -d':'`
       export stringtie=`whereis stringtie | cut -f2 -d':'`
-      export samtools=`whereis samtools | cut -f2 -d':'`
+      export samtools=`whereis samtools | cut -f2 -d':' | cut -f1 -d' '`
 
       touch travis.yml
       printf "name: ciriquant\n\
