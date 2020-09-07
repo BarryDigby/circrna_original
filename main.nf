@@ -474,7 +474,7 @@ process find_circ{
         
         script:
         """
-        /opt/conda/envs/circrna/bin/find_circ/find_circ.sh $fasta ${fasta.baseName} ${fastq[0]} ${fastq[1]}
+        /bin/find_circ/find_circ.sh $fasta ${fasta.baseName} ${fastq[0]} ${fastq[1]}
         """
 }
 
