@@ -90,8 +90,12 @@ if (params.help) {
 
 
 /*
- * Parameters
- */
+================================================================================
+                                  Paramaters
+================================================================================
+*/
+
+
 params.outdir ='.'
 params.fasta = ''
 params.gencode_gtf = ''
@@ -116,11 +120,12 @@ toolList = defineToolList()
 tool = params.tool ? params.tool.split(',').collect{it.trim().toLowerCase()} : []
 if (!checkParameterList(tool, toolList)) exit 1, 'Unknown tool, see --help for more information'
 
+
 /*
- * Step 1:
- * Download Gencode Reference Files
- */
- 
+================================================================================
+                          Download Reference Files
+================================================================================
+*/
  
 process download_genome {
         
@@ -174,10 +179,10 @@ ch_gene_annotation.view()
 ch_gencode_gtf.view()
 
 /*
- * Step 2:
- * Create Genome Index files
- * Samtools needed for miRNA prediction - must be made
- */
+================================================================================
+                          Create Genome Index
+================================================================================
+*/
 
 process samtools_index{
 
@@ -318,9 +323,10 @@ ch_bowtie2_index.view()
 
 
 /*
- * Step 3:
- * miscellaneous circRNA tool requirements
- */
+================================================================================
+                       Misc. circRNA requirements
+================================================================================
+*/
  
  
 process split_fasta{
@@ -388,9 +394,10 @@ process ciriquant_yml{
 ch_ciriquant_yml = params.ciriquant_yml ? Channel.value(file(params.ciriquant_yml)) : travis_built
       
 /*
- * Step 4:
- * Process reads
- */
+================================================================================
+                          Process Input Data
+================================================================================
+*/
  
 // stage bam files
 bam_files = params.inputdir + params.bam_glob
@@ -454,9 +461,10 @@ process bbduk {
 (circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads) = trim_reads_built.into(5)
 
 /*
- * Step 5:
- * circRNA discovery
- */
+================================================================================
+                             circRNA Discovery
+================================================================================
+*/
  
 // CIRCexplorer2
 
