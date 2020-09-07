@@ -33,7 +33,6 @@ params.star_index = ''
 params.hisat2_index = ''
 params.bowtie_index = ''
 params.bowtie2_index = ''
-params.mapsplice_ref = ''
 params.ciriquant_yml = ''
 params.inputdir = '/data/bdigby/circTCGA/fastq/'
 params.input_type = 'fastq'
@@ -271,9 +270,6 @@ process split_fasta{
         rm !{fasta}
         '''
 }
-
-ch_mapsplice_ref = params.mapsplice_ref ? Channel.value(params.mapsplice_ref) : mapsplice_ref_path
-ch_mapsplice_ref.view()
 
 process ciriquant_yml{
         
