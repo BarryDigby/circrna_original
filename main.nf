@@ -265,7 +265,46 @@ process split_fasta{
 ch_mapsplice_ref = params.mapsplice_ref ? Channel.value(params.mapsplice_ref) : split_fasta
 ch_mapsplice_ref.view()
 
+process ciriquant_yml{
 
+      publishDir "$params.outdir", mode:'copy'
+      
+      input:
+          val(gencode_gtf_path) from ch_gencode_gtf
+          val(fasta_path) from ch_fasta
+          val(bwa_path) from ch_bwa_index
+          val(hisat2_path) from ch_hisat2_index
+          
+      output:
+          file("travis.yml") into travis_built
+          
+      when: !(params.ciriquant_yml) && 'ciriquant' in tool
+      
+      script:
+      """
+      bwa=$(whereis bwa | cut -f2 -d':')
+      hisat2=$(whereis hisat2 | cut -f2 -d':')
+      stringtie=$(whereis stringtie | cut -f2 -d':')
+      samtools=$(whereis samtools | cut -f2 -d':')
+      
+      touch travis.yml
+      printf "name:ciriquant\n\
+      tools:\n\
+      bwa: $bwa\n\
+      hisat2: $hisat2\n\
+      stringtie: $stringtie\n\
+      samtools: $samtools\n\
+      reference:\n\
+      fasta: ${fasta_path}\n\
+      gtf: ${gencode_gtf_path}\n\
+      bwa_index: ${bwa_path}\n\
+      hisat_index: ${hisat2_path}" >> travis.yml
+      """
+}
+
+ch_travis_yml = params.travis_yml ? Channel.value(file(params.travis_yml)) : travis_built
+      
+      
 
 
 // Define list of available tools
