@@ -42,7 +42,7 @@ params.bam_glob = '*.bam'
 params.adapters = '/data/bdigby/grch38/adapters.fa'
 
 toolList = defineToolList()
-tool = params.tool ? params.tool.split(',').collect{it.trim().toLowerCase().replaceAll('-', '').replaceAll('_', '')} : []
+tool = params.tool ? params.tool.split(',').collect{it.trim().toLowerCase()} : []
 if (!checkParameterList(tool, toolList)) exit 1, 'Unknown tool, see --help for more information'
 
 /*
