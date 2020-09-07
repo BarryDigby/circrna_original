@@ -211,6 +211,7 @@ process bowtie_index{
             
         output:
             file ("${fasta.baseName}.*") into bowtie_built
+            val("$params.outdir/index/bowtie") into bowtie_path
             
         when: !(params.bowtie_index) && 'mapsplice' in tool
 
@@ -220,7 +221,7 @@ process bowtie_index{
         """
 }
 
-ch_bowtie_index = params.bowtie_index ? Channel.value(file(params.bowtie_index)) : bowtie_built
+ch_bowtie_index = params.bowtie_index ? Channel.value(file(params.bowtie_index)) : bowtie_path
 ch_bowtie_index.view() 
  
 process bowtie2_index{
@@ -259,13 +260,16 @@ process split_fasta{
             file(fasta) from ch_fasta
             
         output:
-             file("*.fa") into split_fasta
+             file("mapsplice_ref") into split_fasta
              
         when 'mapsplice' in tool
         
         shell:
         '''
         awk '$0 ~ "^>" { match($1, /^>([^:]+)/, id); filename=id[1]} {print >> filename".fa"}' !{fasta}
+        mkdir mapsplice_ref
+        rm !{fasta}
+        mv *.fa mapsplice_ref/
         '''
 }
 
@@ -446,14 +450,14 @@ process circexplorer2_star{
             file(gene_annotation) from ch_gene_annotation
             
         output:
-            tuple val(base), file("${base}.STAR.circRNA.txt") into circexplorer2_results
+            tuple val(base), file("${base}.txt") into circexplorer2_results
         
         when: 'circexplorer2' in tool
         
         script:
         """
         CIRCexplorer2 parse -t STAR $chimeric_reads -b ${base}.STAR.junction.bed
-        CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.STAR.junction.bed -o ${base}.STAR.circRNA.txt
+        CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.STAR.junction.bed -o ${base}.txt
         """
 }
 
@@ -509,6 +513,64 @@ process ciriquant{
         """
 }
       
+      
+// mapsplice
+
+process mapsplice_align{
+
+        publishDir "$params.outdir/mapsplice", mode:'copy'
+        
+        input:
+            tuple val(base), file(fastq) from mapsplice_reads
+            val(mapsplice_ref) from split_fasta
+            val(bowtie_index) from ch_bowtie_index
+            file(gtf) from ch_gencode_gtf
+
+        output:
+        tuple val(base), file("${base}/fusions_raw.txt") into mapsplice_fusion
+
+        script:
+        prefix = gtf.toString() - ~/.gtf/
+        """
+        mapsplice.py \
+        -c $mapsplice_ref \
+        -x $bowtie_index/$prefix \
+        -1 ${base}_1.fastq \
+        -2 ${base}_2.fastq \
+        -p 8 \
+        --bam \
+        --seglen 20 \
+        --min-map-len 40 \
+        --fusion-non-canonical \
+        --min-fusion-distance 200 \
+        --gene-gtf $gtf \
+        -o $base
+        """
+}
+
+
+process mapsplice_parse{
+
+        publishDir "$params.outdir/circrna_discovery/mapsplice", mode:'copy'
+        
+        input:
+            tuple val(base), file(raw_fusion) from mapsplice_fusion
+            file(fasta) from ch_fasta
+            file(gene_annotation) from ch_gene_annotation
+            
+        output:
+             tuple val(base), file("${base}.txt") into mapsplice_results
+        
+        when: 'mapsplice' in tool
+        
+        script:
+        """
+        CIRCexplorer2 parse -t MapSplice $raw_fusion -b ${base}.mapsplice.junction.bed
+
+        CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.mapsplice.junction.bed -o ${base}.txt
+        """
+}
+
 
 // Check parameter existence
 def checkParameterExistence(it, list) {
