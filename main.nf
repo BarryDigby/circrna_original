@@ -260,17 +260,16 @@ process split_fasta{
             file(fasta) from ch_fasta
             
         output:
-             file("mapsplice_ref") into split_fasta
+             file("*.fa") into split_fasta
+             val("$params.outdir/index/mapsplice") into mapsplice_ref_path
              
         when 'mapsplice' in tool
         
         script:
-        """
-        awk '$0 ~ "^>" { match($1, /^>([^:]+)/, id); filename=id[1]} {print >> filename".fa"}' $fasta
-        mkdir mapsplice_ref
-        rm $fasta
-        mv *.fa mapsplice_ref/
-        """
+        '''
+        awk '$0 ~ "^>" { match($1, /^>([^:]+)/, id); filename=id[1]} {print >> filename".fa"}' !{fasta}
+        rm !{fasta}
+        '''
 }
 
 ch_mapsplice_ref = params.mapsplice_ref ? Channel.value(params.mapsplice_ref) : split_fasta
@@ -524,7 +523,7 @@ process mapsplice_align{
         
         input:
             tuple val(base), file(fastq) from mapsplice_reads
-            val(mapsplice_ref) from split_fasta
+            val(mapsplice_ref) from mapsplice_ref_path
             val(bowtie_index) from ch_bowtie_index
             file(gtf) from ch_gencode_gtf
 
