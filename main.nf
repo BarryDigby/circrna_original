@@ -124,7 +124,7 @@ process bwa_index{
             file("${fasta.baseName}.*") into bwa_built
             val("$params.outdir/index/bwa") into bwa_path
         
-        when: 'ciriquant' in tool 
+        when: !(params.bwa_index) && 'ciriquant' in tool 
         
         script:
         """
