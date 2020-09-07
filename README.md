@@ -15,5 +15,9 @@ Thank you Simone Coughlan for the catch :)
 ```
 *--params.star_index:* Must put provide full path 
 
-*--params.bwa_index:*  Must put in quotes! probaby because of the glob pattern, safe to put both these paths in "" 
+*--params.bwa_index:* "/data/bdigby/grch38/index/bwa"
+
+*--params.hisat2_index:* "/data/bdigby/grch38/index/hisat2"
+
+*--params
 ```
