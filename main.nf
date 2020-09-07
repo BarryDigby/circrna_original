@@ -305,7 +305,69 @@ process ciriquant_yml{
 
 ch_ciriquant_yml = params.ciriquant_yml ? Channel.value(file(params.ciriquant_yml)) : travis_built
       
-       
+/*
+ * Step 4:
+ * Process reads
+ /*
+ 
+  // stage bam files
+bam_files = params.inputdir + params.bam_glob
+
+if(params.input_type == 'bam'){
+   ch_bam = Channel.fromPath( bam_files )
+                   .map{ file -> [file.baseName, file]}
+   process bam_to_fq{
+
+        input:
+            tuple val(base), file(bam) from ch_bam
+
+        output:
+            tuple val(base), file('*.fastq.gz') into fastq_built
+
+        script:
+        """
+        picard -Xmx8g \
+        SamToFastq \
+        I=$bam \
+        F=${base}_R1.fastq.gz \
+        F2=${base}_R2.fastq.gz \
+        VALIDATION_STRINGENCY=LENIENT
+        """
+        }
+}else if(params.input_type == 'fastq'){
+         fastq_build = params.inputdir + params.fastq_glob
+         Channel.fromFilePairs( fastq_build )
+                .set{ fastq_built }
+}
+    
+ch_reads = fastq_built
+
+ process bbduk {
+    
+        publishDir "$params.outdir/trimmed_reads", mode:'copy'
+    
+        input:
+            tuple val(base), file(fastq) from ch_reads
+            path adapters from params.adapters
+            
+        output:
+            tuple val(base), file('*.fastq.gz') into trim_reads_built
+            
+        script:
+        """
+        bbduk.sh -Xmx4g \
+        in1=${fastq[0]} \
+        in2=${fastq[1]} \
+        out1=${base}_1.fastq.gz \
+        out2=${base}_2.fastq.gz \
+        ref=$adapters \
+        minlen=30 \
+        ktrim=r \
+        k=12 \
+        qtrim=r \
+        trimq=20
+        """
+}
 
 
 // Define list of available tools
