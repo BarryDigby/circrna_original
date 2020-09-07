@@ -305,7 +305,7 @@ process ciriquant_yml{
 
 ch_ciriquant_yml = params.ciriquant_yml ? Channel.value(file(params.ciriquant_yml)) : travis_built
       
-      
+       
 
 
 // Define list of available tools
