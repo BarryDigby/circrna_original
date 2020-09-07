@@ -137,7 +137,7 @@ process bwa_index{
             
         output:
             file("${fasta.baseName}.*") into bwa_built
-            val("$params.outdir/index/bwa") into bwa_path
+            val("$projectDir/index/bwa") into bwa_path
         
         when: !(params.bwa_index) && 'ciriquant' in tool 
         
@@ -160,7 +160,7 @@ process hisat2_index{
          
         output:
             file("${fasta.baseName}.*.ht2") into hisat2_built
-            val("$params.outdir/index/hisat2") into hisat2_path
+            val("$projectDir/index/hisat2") into hisat2_path
             
         when: !(params.hisat2_index) && 'ciriquant' in tool
         
@@ -211,7 +211,7 @@ process bowtie_index{
             
         output:
             file ("${fasta.baseName}.*") into bowtie_built
-            val("$params.outdir/index/bowtie") into bowtie_path
+            val("$projectDir/index/bowtie") into bowtie_path
             
         when: !(params.bowtie_index) && 'mapsplice' in tool
 
@@ -261,7 +261,7 @@ process split_fasta{
             
         output:
              file("*.fa") into split_fasta
-             val("$params.outdir/index/mapsplice") into mapsplice_ref_path
+             val("$projectDir/index/mapsplice") into mapsplice_ref_path
              
         when 'mapsplice' in tool
         
@@ -528,7 +528,7 @@ process mapsplice_align{
             file(gtf) from ch_gencode_gtf
 
         output:
-        tuple val(base), file("${base}/fusions_raw.txt") into mapsplice_fusion
+            tuple val(base), file("${base}/fusions_raw.txt") into mapsplice_fusion
 
         script:
         prefix = gtf.toString() - ~/.gtf/
@@ -560,7 +560,7 @@ process mapsplice_parse{
             file(gene_annotation) from ch_gene_annotation
             
         output:
-             tuple val(base), file("${base}.txt") into mapsplice_results
+            tuple val(base), file("${base}.txt") into mapsplice_results
         
         when: 'mapsplice' in tool
         
