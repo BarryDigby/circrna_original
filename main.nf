@@ -12,11 +12,82 @@ Description:
 --------------------------------------------------------------------------------
  @Homepage
  https://github.com/BarryDigby/circRNA
- --------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------
  @Documentation
  Work in progress
 --------------------------------------------------------------------------------
 */
+
+/*
+================================================================================
+                                  Help Flags
+================================================================================
+*/
+
+ANSI_RESET = "\u001B[0m";
+ANSI_BLACK = "\u001B[30m";
+ANSI_RED = "\u001B[31m";
+ANSI_GREEN = "\u001B[32m";
+ANSI_YELLOW = "\u001B[33m";
+ANSI_BLUE = "\u001B[34m";
+ANSI_PURPLE = "\u001B[35m";
+ANSI_CYAN = "\u001B[36m";
+ANSI_WHITE = "\u001B[37m";
+
+
+def print_red = {  str -> ANSI_RED + str + ANSI_RESET }
+def print_black = {  str -> ANSI_BLACK + str + ANSI_RESET }
+def print_green = {  str -> ANSI_GREEN + str + ANSI_RESET }
+def print_yellow = {  str -> ANSI_YELLOW + str + ANSI_RESET }
+def print_blue = {  str -> ANSI_BLUE + str + ANSI_RESET }
+def print_cyan = {  str -> ANSI_CYAN + str + ANSI_RESET }
+def print_purple = {  str -> ANSI_PURPLE + str + ANSI_RESET }
+def print_white = {  str -> ANSI_WHITE + str + ANSI_RESET }
+
+//help information
+params.help = null
+if (params.help) {
+    log.info ''
+    log.info print_purple('------------------------------------------------------------------------')
+    log.info "tool_name: A Nextflow based circular RNA analsis pipeline"
+    log.info "tool_name integrates several NGS processing tools to identify novel circRNAs from "
+    log.info "un-processed RNA sequencing data. To run this pipeline users need to install nextflow"
+    log.info "and singularity. "
+    print_purple('------------------------------------------------------------------------')
+    log.info ''
+    log.info print_yellow('Usage: ') +
+    
+            print_purple('Nextflow run BarryDigby/circRNA --profile singularity, standard <options> \n') +
+
+            print_yellow('    Mandatory arguments:\n') +
+            print_cyan('      --inputdir <path>            ') + print_green('Path to input data\n') +
+            print_cyan('      --input_type <str>           ') + print_green('Input data type. Supported: \'fastq\', \'bam\'\n') +
+            print_cyan('      --fastq_glob <str>         ') + print_green('Glob pattern of fastq files e.g: \'_R{1,2}.fastq.gz\'\n') +
+            print_cyan('      --bam_glob <str>           ') + print_green('Glob pattern of bam files expected: \'*.bam\'\n') +
+            print_cyan('      --tool <str>              ') + print_green('circRNA tool to use for analysis. Supported: \'CIRCexplorer2\', \'CIRIquant\', \'find_circ\', \'UROBORUS\', \'mapsplice\'\n') +
+            '\n' +
+            print_yellow('    Input Files:            if left empty will be generated\n') +
+            print_cyan('      --fasta <path>               ') + print_green('Path to genome fasta file\n') +
+            print_cyan('      --fasta_fai <path>           ') + print_green('Path to genome fasta fai file\n') +
+            print_cyan('      --gencode_gtf <path>         ') + print_green('Path to genocde gtf file\n') + 
+            print_cyan('      --gene_annotation <path>     ') + print_green('Path to gene annotation file \n') + 
+            print_cyan('      --star_index <str>         ') + print_green('Path to STAR index\n') +
+            print_cyan('      --bwa_index <str>    ') + print_green('Path to BWA index\n') +
+            print_cyan('      --bowtie_index <str>    ') + print_green('Path to Bowtie index\n') +
+            print_cyan('      --bowtie2_index <str>    ') + print_green('Path to Bowtie2 index (must include glob for files)\n') +
+            print_cyan('      --hisat2_index <str>    ') + print_green('Path to Hisat2 index\n') +
+            print_cyan('      --ciriquant_yml <str>    ') + print_green('Path to CIRIquant yml configuration file\n') +
+            print_cyan('      --adapters <path>            ') + print_green('Fasta file containing adapters to trim\n') +
+            print_cyan('      --mirna_database <path>      ') + print_green('Fasta file containing mature miRNA sequences\n') +
+
+
+            log.info ('------------------------------------------------------------------------')
+            log.info print_yellow('Contact information: b.digby237@gmail.com') 
+            log.info print_yellow('O\'Broin Lab, National University of Ireland Galway')
+    log.info ('------------------------------------------------------------------------')
+    exit 0
+}
+
 
 /*
  * Parameters
@@ -33,6 +104,7 @@ params.star_index = ''
 params.hisat2_index = ''
 params.bowtie_index = ''
 params.bowtie2_index = ''
+params.mapsplice_ref = ''
 params.ciriquant_yml = ''
 params.inputdir = '/data/bdigby/circTCGA/fastq/'
 params.input_type = 'fastq'
@@ -270,6 +342,9 @@ process split_fasta{
         rm !{fasta}
         '''
 }
+
+ch_mapsplice_ref = params.mapsplice_ref ? Channel.value(params.mapsplice_ref) : mapsplice_ref_path
+ch_mapsplice_ref.view()
 
 process ciriquant_yml{
         
