@@ -204,7 +204,7 @@ process bowtie_index{
             file(fasta) from ch_fasta
             
         output:
-            file ('"${fasta.baseName.*') into bowtie_built
+            file ("${fasta.baseName}.*") into bowtie_built
         
         when: !(params.bowtie_index) && 'mapsplice' in tool
 
@@ -225,7 +225,7 @@ process bowtie2_index{
             file(fasta) from ch_fasta
             
         output:
-            file ('"${fasta.baseName.*') into bowtie2_built
+            file ("${fasta.baseName}.*") into bowtie2_built
         
         when: !(params.bowtie2_index) && ('find_circ' in tool || 'uroborus' in tool)
 
@@ -286,7 +286,7 @@ process ciriquant_yml{
       export bwa=`whereis bwa | cut -f2 -d':'`
       export hisat2=`whereis hisat2 | cut -f2 -d':'`
       export stringtie=`whereis stringtie | cut -f2 -d':'`
-      export samtools=`whereis samtools | cut -f2 -d':' | cut -f1 -d' '`
+      export samtools=`whereis samtools | cut -f2 -d':' | awk '{print $1}'`
 
       touch travis.yml
       printf "name: ciriquant\n\
