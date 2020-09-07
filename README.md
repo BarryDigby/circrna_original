@@ -19,5 +19,5 @@ Thank you Simone Coughlan for the catch :)
 
 *--params.hisat2_index:* "/data/bdigby/grch38/index/hisat2"
 
-*--params
+*--params.bowtie2_index:* "/data/bdigby/grch38/index/bowtie2/*" (need to point to files to collect for find_circ)
 ```
