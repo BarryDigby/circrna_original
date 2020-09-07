@@ -34,6 +34,7 @@ params.hisat2_index = ''
 params.bowtie_index = ''
 params.bowtie2_index = ''
 params.mapsplice_ref = ''
+params.travis_yml = ''
 
 toolList = defineToolList()
 tool = params.tool ? params.tool.toLowerCase().replaceAll('-', '').replaceAll('_', '') : ''
