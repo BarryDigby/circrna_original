@@ -479,11 +479,34 @@ process find_circ{
 }
 
 
+// CIRIquant
 
 
+process ciriquant{
 
+        publishDir "$params.outdir/circrna_discovery/ciriquant", mode:'copy'
+        
+        input:
+            tuple val(base), file(fastq) from ciriquant_reads
+            file(ciriquant_yml) from ch_ciriquant_yml
 
-
+        output:
+            tuple val(base), file("${base}/${base}.gtf") into ciriquant_results
+            
+        when: 'ciriquant' in tool
+        
+        script:
+        """
+        CIRIquant -t 8 \
+        -1 ${fastq[0]} \
+        -2 ${fastq[1]} \
+        --config $ciriquant_yml \
+        --no-gene \
+        -o ${base} \
+        -p ${base}
+        """
+}
+      
 
 // Check parameter existence
 def checkParameterExistence(it, list) {
