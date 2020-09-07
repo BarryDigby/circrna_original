@@ -60,8 +60,7 @@ process download_genome {
           perl -alne '$"="\t";print "@F[11,0..9]"' GRCh37.genepred > GRCh37.txt
           rm GRCh37.fa.tmp
           /$
-          
-          }else if(params.version == 'GRCh38'){
+        }else if(params.version == 'GRCh38'){
           $/
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/gencode.v34.primary_assembly.annotation.gtf.gz
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh38.primary_assembly.genome.fa.gz
@@ -74,10 +73,22 @@ process download_genome {
           perl -alne '$"="\t";print "@F[11,0..9]"' GRCh38.genepred > GRCh38.txt
           rm GRCh38.fa.tmp
           /$
-          }
+       }
 }
 
 // ternary operators: result = condition ? value_if_true : value_if_false
 ch_fasta = params.fasta ? Channel.value(file(params.fasta)) : fasta_downloaded
 ch_gene_annotation = params.gene_annotation ? Channel.value(file(params.gene_annotation)) : gene_annotation_created
 ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : gencode_gtf_downloaded
+
+
+ch_fasta.view()
+ch_gene_annotation.view()
+ch_gencode_gtf.view()
+
+/*
+ * Step 2:
+ * Create Genome Index files
+ */
+ 
+ 
