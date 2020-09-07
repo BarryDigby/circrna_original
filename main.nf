@@ -21,6 +21,7 @@ Description:
 /*
  * Parameters
  */
+params.outdir ='./'
 params.fasta = ''
 params.gencode_gtf = ''
 params.gene_annotation = ''
