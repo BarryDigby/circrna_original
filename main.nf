@@ -35,6 +35,11 @@ params.bowtie_index = ''
 params.bowtie2_index = ''
 params.mapsplice_ref = ''
 params.ciriquant_yml = ''
+params.inputdir = '/data/bdigby/circTCGA/fastq/'
+params.input_type = 'fastq'
+params.fastq_glob = '*_R{1,2}.fastq.gz'
+params.bam_glob = '*.bam'
+params.adapters = '/data/bdigby/grch38/adapters.fa'
 
 toolList = defineToolList()
 tool = params.tool ? params.tool.toLowerCase().replaceAll('-', '').replaceAll('_', '') : ''
@@ -205,7 +210,7 @@ process bowtie_index{
             
         output:
             file ("${fasta.baseName}.*") into bowtie_built
-        
+            
         when: !(params.bowtie_index) && 'mapsplice' in tool
 
         script:
@@ -226,7 +231,7 @@ process bowtie2_index{
             
         output:
             file ("${fasta.baseName}.*") into bowtie2_built
-        
+            
         when: !(params.bowtie2_index) && ('find_circ' in tool || 'uroborus' in tool)
 
         script:
@@ -267,40 +272,40 @@ ch_mapsplice_ref = params.mapsplice_ref ? Channel.value(params.mapsplice_ref) : 
 ch_mapsplice_ref.view()
 
 process ciriquant_yml{
-
-      publishDir "$params.outdir", mode:'copy'
+        
+        publishDir "$params.outdir", mode:'copy'
       
-      input:
-          val(gencode_gtf_path) from ch_gencode_gtf
-          val(fasta_path) from ch_fasta
-          val(bwa_path) from ch_bwa_index
-          val(hisat2_path) from ch_hisat2_index
-          
-      output:
-          file("travis.yml") into travis_built
-          
-      when: !(params.ciriquant_yml) && 'ciriquant' in tool
-      
-      script:
-      """
-      export bwa=`whereis bwa | cut -f2 -d':'`
-      export hisat2=`whereis hisat2 | cut -f2 -d':'`
-      export stringtie=`whereis stringtie | cut -f2 -d':'`
-      export samtools=`whereis samtools | cut -f2 -d':' | awk '{print \$1}'`
+        input:
+            val(gencode_gtf_path) from ch_gencode_gtf
+            val(fasta_path) from ch_fasta
+            val(bwa_path) from ch_bwa_index
+            val(hisat2_path) from ch_hisat2_index
 
-      touch travis.yml
-      printf "name: ciriquant\n\
-      tools:\n\
-       bwa: \$bwa\n\
-       hisat2: \$hisat2\n\
-       stringtie: \$stringtie\n\
-       samtools: \$samtools\n\n\
-      reference:\n\
-       fasta: ${fasta_path}\n\
-       gtf: ${gencode_gtf_path}\n\
-       bwa_index: ${bwa_path}\n\
-       hisat_index: ${hisat2_path}" >> travis.yml
-      """
+        output:
+            file("travis.yml") into travis_built
+
+        when: !(params.ciriquant_yml) && 'ciriquant' in tool
+
+        script:
+        """
+        export bwa=`whereis bwa | cut -f2 -d':'`
+        export hisat2=`whereis hisat2 | cut -f2 -d':'`
+        export stringtie=`whereis stringtie | cut -f2 -d':'`
+        export samtools=`whereis samtools | cut -f2 -d':' | awk '{print \$1}'`
+
+        touch travis.yml
+        printf "name: ciriquant\n\
+        tools:\n\
+         bwa: \$bwa\n\
+         hisat2: \$hisat2\n\
+         stringtie: \$stringtie\n\
+         samtools: \$samtools\n\n\
+        reference:\n\
+         fasta: ${fasta_path}\n\
+         gtf: ${gencode_gtf_path}\n\
+         bwa_index: ${bwa_path}\n\
+         hisat_index: ${hisat2_path}" >> travis.yml
+        """
 }
 
 ch_ciriquant_yml = params.ciriquant_yml ? Channel.value(file(params.ciriquant_yml)) : travis_built
@@ -310,7 +315,7 @@ ch_ciriquant_yml = params.ciriquant_yml ? Channel.value(file(params.ciriquant_ym
  * Process reads
  /*
  
-  // stage bam files
+// stage bam files
 bam_files = params.inputdir + params.bam_glob
 
 if(params.input_type == 'bam'){
@@ -333,7 +338,7 @@ if(params.input_type == 'bam'){
         F2=${base}_R2.fastq.gz \
         VALIDATION_STRINGENCY=LENIENT
         """
-        }
+      }
 }else if(params.input_type == 'fastq'){
          fastq_build = params.inputdir + params.fastq_glob
          Channel.fromFilePairs( fastq_build )
@@ -342,7 +347,7 @@ if(params.input_type == 'bam'){
     
 ch_reads = fastq_built
 
- process bbduk {
+process bbduk {
     
         publishDir "$params.outdir/trimmed_reads", mode:'copy'
     
@@ -368,6 +373,110 @@ ch_reads = fastq_built
         trimq=20
         """
 }
+
+(circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads) = trim_reads_built.into(5)
+
+/*
+ * Step 5:
+ * circRNA discovery
+ */
+ 
+// CIRCexplorer2
+
+process star_align{
+
+        publishDir "$params.outdir/star_alignment", mode:'copy', overwrite: true
+    
+        input:
+            tuple val(base), file(fastq) from circexplorer2_reads
+            file(gtf) from ch_gencode_gtf
+            val(star_idx) from ch_star_index
+            
+        output:
+            tuple val(base), file("${base}.Chimeric.out.junction") into circexplorer2_input
+         
+        when: 'circexplorer2' in tool
+        
+        script:
+        """
+        STAR    \
+        --runThreadN 8 \
+        --twopassMode Basic \
+        --twopass1readsN -1 \
+        --genomeLoad NoSharedMemory \
+        --genomeDir $star_idx \
+        --readFilesIn ${fastq[0]},${fastq[1]} \
+        --readFilesCommand zcat \
+        --outFileNamePrefix ${base}. \
+        --outSJfilterOverhangMin 15 15 15 15 \
+        --outFilterMultimapNmax 1 \
+        --outFilterMultimapScoreRange 1 \
+        --outFilterScoreMin 1 \
+        --outFilterMatchNminOverLread 0.33 \
+        --outFilterMismatchNmax 10 \
+        --outFilterMismatchNoverLmax 0.05 \
+        --alignIntronMin 20 \
+        --alignIntronMax 1000000 \
+        --alignMatesGapMax 1000000 \
+        --alignSJoverhangMin 1 \
+        --alignSJDBoverhangMin 1 \
+        --alignSoftClipAtReferenceEnds No \
+        --chimSegmentMin 10 \
+        --chimScoreMin 15 \
+        --chimScoreSeparation 10 \
+        --chimJunctionOverhangMin 15 \
+        --sjdbGTFfile $gtf  \
+        --sjdbScore 2 \
+        --chimOutType Junctions \
+        --outSAMtype BAM SortedByCoordinate
+        """
+}
+
+
+process circexplorer2_star{
+    
+        publishDir "$params.outdir/circrna_discovery/circexplorer2", mode:'copy'
+        
+        input:
+            tuple val(base), file(chimeric_reads) from circexplorer2_input
+            file(fasta) from ch_fasta
+            file(gene_annotation) from ch_gene_annotation
+            
+        output:
+            tuple val(base), file("${base}.STAR.circRNA.txt") into circexplorer2_results
+        
+        when: 'circexplorer2' in tool
+        
+        script:
+        """
+        CIRCexplorer2 parse -t STAR $chimeric_reads -b ${base}.STAR.junction.bed
+        CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.STAR.junction.bed -o ${base}.STAR.circRNA.txt
+        """
+}
+
+
+// find_circ
+
+process find_circ{
+
+        publishDir "$params.outdir/circrna_discovery/find_circ", mode:'copy'
+        
+        input:
+            tuple val(base), file(fastq) from find_circ_reads
+            file(fasta) from ch_fasta
+            file(bowtie2_index) from ch_bowtie2_index.collect()
+      
+        output:
+            tuple val(base), file("${base}.circ_candidates.bed") into find_circ_results
+            
+        when: 'find_circ' in tool
+        
+        script:
+        """
+        find_circ/find_circ.sh $fasta ${fasta.baseName} $fastq[0] $fastq[1]
+        """
+}
+
 
 
 // Define list of available tools
