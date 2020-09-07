@@ -474,7 +474,7 @@ process find_circ{
         
         script:
         """
-        bash find_circ/find_circ.sh $fasta ${fasta.baseName} ${fastq[0]} ${fastq[1]}
+        bash find_circ.sh $fasta ${fasta.baseName} ${fastq[0]} ${fastq[1]}
         """
 }
 
