@@ -264,13 +264,13 @@ process split_fasta{
              
         when 'mapsplice' in tool
         
-        shell:
-        '''
-        awk '$0 ~ "^>" { match($1, /^>([^:]+)/, id); filename=id[1]} {print >> filename".fa"}' !{fasta}
+        script:
+        """
+        awk '$0 ~ "^>" { match($1, /^>([^:]+)/, id); filename=id[1]} {print >> filename".fa"}' $fasta
         mkdir mapsplice_ref
-        rm !{fasta}
+        rm $fasta
         mv *.fa mapsplice_ref/
-        '''
+        """
 }
 
 ch_mapsplice_ref = params.mapsplice_ref ? Channel.value(params.mapsplice_ref) : split_fasta
