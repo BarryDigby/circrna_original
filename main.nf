@@ -313,7 +313,7 @@ ch_ciriquant_yml = params.ciriquant_yml ? Channel.value(file(params.ciriquant_ym
 /*
  * Step 4:
  * Process reads
- /*
+ */
  
 // stage bam files
 bam_files = params.inputdir + params.bam_glob
