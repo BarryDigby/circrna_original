@@ -26,6 +26,8 @@ params.fasta = ''
 params.gencode_gtf = ''
 params.gene_annotation = ''
 params.version = ''
+params.step = ''
+params.fasta.fai = ''
 
 stepList = defineStepList()
 step = params.step ? params.step.toLowerCase().replaceAll('-', '').replaceAll('_', '') : ''
