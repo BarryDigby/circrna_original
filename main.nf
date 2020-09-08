@@ -698,17 +698,29 @@ process tophat_align{
             file(fasta) from ch_fasta
             
         output:
-        
+            tuple val(base), file("${base}/unmapped.bam") into tophat_bam
         
         when 'uroborus' in tool
         
         script:
         """
-        tophat -p 8 ${fasta.baseName} ${fastq[0]}, ${fastq[1]} -o ${base}
+        tophat -p 8 -o ${base} ${fasta.baseName} ${fastq[0]}, ${fastq[1]}
         """
 }
             
             
+process uroborus{
+
+        publishDir "$params.outdir/circrna_discovery/uroborus", mode:'copy'
+        
+        input:
+            tuple val(base), file(bam) from tophat_bam
+            val(bowtie_index) from ch_bowtie_index
+            file(gtf) from ch_gencode_gtf
+            file(uroborus_ref) from ch_fasta_chr
+            
+        output:
+        
             
             
 
