@@ -645,11 +645,14 @@ process mapsplice_align{
         script:
         prefix = gtf.toString() - ~/.gtf/
         """
+        gzip -d --force ${fastq[0]}
+        gzip -d --force ${fastq[1]}
+        
         mapsplice.py \
         -c $mapsplice_ref \
         -x $bowtie_index/$prefix \
-        -1 ${base}_1.fastq.gz \
-        -2 ${base}_2.fastq.gz \
+        -1 ${base}_1.fastq \
+        -2 ${base}_2.fastq \
         -p 8 \
         --bam \
         --seglen 20 \
