@@ -58,7 +58,6 @@ dependencies:
   - jpeg=9d=h516909a_0
   - krb5=1.16.4=h2fd8d38_0
   - lcms2=2.11=hbd6801e_0
-  - ld_impl_linux-64=2.34=h53a641e_7
   - libblas=3.8.0=17_openblas
   - libcblas=3.8.0=17_openblas
   - libcurl=7.68.0=hda55be3_0
