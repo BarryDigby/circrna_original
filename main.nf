@@ -344,7 +344,7 @@ process split_fasta{
         
         shell:
         '''
-        awk '$0 ~ "^>" { match($1, /^>([^:]+)/, id); filename=id[1]} {print >> filename".fa"}' !{fasta}
+        awk '/^>/ {F=substr($0, 2, length($0))".fasta"; print >F;next;} {print >> F;}' < !{fasta}
         rm !{fasta}
         '''
 }
