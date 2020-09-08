@@ -344,7 +344,7 @@ process split_fasta{
         
         shell:
         '''
-        awk '/^>/ {F=substr($0, 2, length($0))".fasta"; print >F;next;} {print >> F;}' < !{fasta}
+        awk '/^>/ {F=substr($0, 2, length($0))".fa"; print >F;next;} {print >> F;}' < !{fasta}
         rm !{fasta}
         '''
 }
