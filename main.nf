@@ -364,7 +364,7 @@ process ciriquant_yml{
             val(hisat2_path) from ch_hisat2_index
 
         output:
-            file("travis.yml") into travis_built
+            file("travis.yml") into yml_built
 
         when: !(params.ciriquant_yml) && 'ciriquant' in tool
 
@@ -391,7 +391,7 @@ process ciriquant_yml{
         """
 }
 
-ch_ciriquant_yml = params.ciriquant_yml ? Channel.value(file(params.ciriquant_yml)) : travis_built
+ch_ciriquant_yml = params.ciriquant_yml ? Channel.value(file(params.ciriquant_yml)) : yml_built
       
 /*
 ================================================================================
@@ -698,13 +698,14 @@ process tophat_align{
             file(fasta) from ch_fasta
             
         output:
-            tuple val(base), file("${base}/unmapped.bam") into tophat_bam
+            tuple val(base), file("${base}/unmapped.bam") into tophat_unmapped_bam
+            tuple val(base), file("${base}/accepted_hits.bam") into tophat_accepted_hits
         
         when 'uroborus' in tool
         
         script:
         """
-        tophat -p 8 -o ${base} ${fasta.baseName} ${fastq[0]}, ${fastq[1]}
+        tophat -p 8 -o ${base} ./${fasta.baseName} ${fastq[0]}, ${fastq[1]}
         """
 }
             
@@ -714,16 +715,28 @@ process uroborus{
         publishDir "$params.outdir/circrna_discovery/uroborus", mode:'copy'
         
         input:
-            tuple val(base), file(bam) from tophat_bam
-            val(bowtie_index) from ch_bowtie_index
+            tuple val(base), file(unmapped_bam) from tophat_unmapped_bam
+            tuple val(base), file(accepted_hits) from tophat_accepted_hits
+            file(bowtie_index) from ch_bowtie_index.collect()
             file(gtf) from ch_gencode_gtf
             file(uroborus_ref) from ch_fasta_chr
             file(fasta) from ch_fasta
             
         output:
+            file(*) into uroborus_results
+            
+        when: 'uroborus' in tool
         
-            
-            
+        script:
+        """
+        samtools view $unmaped_bam > unmapped.sam
+        
+        perl ${baseDir}/bin/UROBORUS.pl -index ./${fasta.baseName} -fasta $uroborus_ref unmapped.sam $accepted_hits
+        """
+}
+
+
+
 
 // Check parameter existence
 def checkParameterExistence(it, list) {
