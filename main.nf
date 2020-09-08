@@ -562,7 +562,7 @@ process find_anchors{
 
         samtools view -hf 4 ${base}.bam | samtools view -Sb - > ${base}_unmapped.bam
 
-        unmapped2anchors.py ${base}_unmapped.bam | gzip > ${base}_anchors.qfa.gz
+        python unmapped2anchors.py ${base}_unmapped.bam | gzip > ${base}_anchors.qfa.gz
         """
 }
 
@@ -585,13 +585,13 @@ process find_circ{
         script:
         """
         bowtie2 -p 8 --reorder --mm -D 20 --score-min=C,-15,0 -q -x ${fasta.baseName} \
-        -U $anchors | find_circ.py -G $fasta_chr_path -p ${base} -s ${base}.sites.log > ${base}.sites.bed 2> ${base}.sites.reads
+        -U $anchors | python find_circ.py -G $fasta_chr_path -p ${base} -s ${base}.sites.log > ${base}.sites.bed 2> ${base}.sites.reads
 
         echo "#chrom:start:end:name:n_reads:strand:n_uniq:best_qual_A:best_qual_B:spliced_at_begin:spliced_at_end:tissues:tiss_counts:edits:anchor_overlap:breakpoints" > tmp.txt
 
         cat tmp.txt | tr ':' '\t' > ${base}.bed
 
-        grep circ ${base}.sites.bed | grep -v chrM | sum.py -2,3 | scorethresh.py -16 1 | scorethresh.py -15 2 | scorethresh.py -14 2 | scorethresh.py 7 2 | scorethresh.py 8,9 35 | scorethresh.py -17 100000 >> ${base}.bed
+        grep circ ${base}.sites.bed | grep -v chrM | python sum.py -2,3 | python scorethresh.py -16 1 | python scorethresh.py -15 2 | python scorethresh.py -14 2 | python scorethresh.py 7 2 | python scorethresh.py 8,9 35 | python scorethresh.py -17 100000 >> ${base}.bed
         """
 }
 
