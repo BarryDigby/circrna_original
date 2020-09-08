@@ -700,7 +700,7 @@ process tophat_align{
         output:
         
         
-        when 'uroborus' in tools
+        when 'uroborus' in tool
         
         script:
         """
