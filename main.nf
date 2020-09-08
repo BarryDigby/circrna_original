@@ -688,6 +688,30 @@ process mapsplice_parse{
 }
 
 
+// UROBORUS
+
+process tophat_align{
+
+        input:
+            tuple val(base), file(fastq) from uroborus_reads
+            file(bowtie2_index) from ch_bowtie2_index.collect()
+            file(fasta) from ch_fasta
+            
+        output:
+        
+        
+        when 'uroborus' in tools
+        
+        script:
+        """
+        tophat -p 8 ${fasta.baseName} ${fastq[0]}, ${fastq[1]} -o ${base}
+        """
+}
+            
+            
+            
+            
+
 // Check parameter existence
 def checkParameterExistence(it, list) {
     if (!list.contains(it)) {
