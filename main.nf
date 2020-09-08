@@ -108,7 +108,7 @@ params.star_index = ''
 params.hisat2_index = ''
 params.bowtie_index = ''
 params.bowtie2_index = ''
-params.mapsplice_ref = ''
+params.fasta_chr = ''
 params.ciriquant_yml = ''
 params.inputdir = '/data/bdigby/circTCGA/fastq/'
 params.input_type = 'fastq'
@@ -331,16 +331,16 @@ ch_bowtie2_index.view()
  
 process split_fasta{
 
-        publishDir "$params.outdir/index/mapsplice", mode:'copy'
+        publishDir "$params.outdir/index/chromosomes", mode:'copy'
         
         input:
             file(fasta) from ch_fasta
             
         output:
              file("*.fa") into split_fasta
-             val("$projectDir/index/mapsplice") into mapsplice_ref_path
+             val("$projectDir/index/chromosomes") into split_fasta_path
              
-        when 'mapsplice' in tool
+        when ('mapsplice' in tool || 'find_circ' in tool)
         
         shell:
         '''
@@ -349,8 +349,8 @@ process split_fasta{
         '''
 }
 
-ch_mapsplice_ref = params.mapsplice_ref ? Channel.value(params.mapsplice_ref) : mapsplice_ref_path
-ch_mapsplice_ref.view()
+ch_fasta_chr = params.fasta_chr ? Channel.value(params.fasta_chr) : split_fasta_path
+ch_fasta_chr.view()
 
 process ciriquant_yml{
         
@@ -542,29 +542,57 @@ process circexplorer2_star{
 
 // find_circ
 
-process find_circ{
+process find_anchors{
 
-        publishDir "$params.outdir/circrna_discovery/find_circ", mode:'copy'
-        
         input:
             tuple val(base), file(fastq) from find_circ_reads
             file(fasta) from ch_fasta
             file(bowtie2_index) from ch_bowtie2_index.collect()
-      
+        
         output:
-            tuple val(base), file("${base}.circ_candidates.bed") into find_circ_results
+            tuple val(base), file("${base}_anchors.qfa.gz") into ch_anchors
             
         when: 'find_circ' in tool
         
-        shell
-        index_prefix = fasta.baseName
-        '''
-        chmod 777 ~/.nextflow/assets/BarryDigby/circrna/bin/*
+        script:
+        """
+        bowtie2 -p 8 --very-sensitive --mm -D 20 --score-min=C,15,0 \
+        -x ${fasta.baseName} -q -1 ${fastq[0]} -2 ${fastq[1]} \
+        | samtools view -hbuS - | samtools sort --threads 8 -m 2G - > ${base}.bam
+
+        samtools view -hf 4 ${base}.bam | samtools view -Sb - > ${base}_unmapped.bam
+
+        unmapped2anchors.py ${base}_unmapped.bam | gzip > ${base}_anchors.qfa.gz
+        """
+}
+
+
+process find_circ{
+
+        publishDir "$params.outdir/circrna_dicovery/find_circ", mode:'copy'
         
-        export VAR=$(realpath !{fasta})
-        export DIR=${VAR%/*}
-        bash find_circ.sh !{DIR} !{index_prefix} !{base} !{fastq[0]} !{fastq[1]}
-        '''
+        input:
+            tuple val(base), file(anchors) from ch_anchors
+            file(bowtie2_index) from ch_bowtie2_index.collect()
+            file(fasta) from ch_fasta
+            val(fasta_chr_path) from ch_fasta_chr
+        
+        output:
+            tuple val(base), file("${base}.bed") into find_circ_results
+         
+        when 'find_circ' in tool
+        
+        script:
+        """
+        bowtie2 -p 8 --reorder --mm -D 20 --score-min=C,-15,0 -q -x ${fasta.baseName} \
+        -U $anchors | find_circ.py -G $fasta_chr_path -p ${base} -s ${base}.sites.log > ${base}.sites.bed 2> ${base}.sites.reads
+
+        echo "#chrom:start:end:name:n_reads:strand:n_uniq:best_qual_A:best_qual_B:spliced_at_begin:spliced_at_end:tissues:tiss_counts:edits:anchor_overlap:breakpoints" > tmp.txt
+
+        cat tmp.txt | tr ':' '\t' > ${base}.bed
+
+        grep circ ${base}.sites.bed | grep -v chrM | sum.py -2,3 | scorethresh.py -16 1 | scorethresh.py -15 2 | scorethresh.py -14 2 | scorethresh.py 7 2 | scorethresh.py 8,9 35 | scorethresh.py -17 100000 >> ${base}.bed
+        """
 }
 
 
@@ -605,7 +633,7 @@ process mapsplice_align{
         
         input:
             tuple val(base), file(fastq) from mapsplice_reads
-            val(mapsplice_ref) from mapsplice_ref_path
+            val(mapsplice_ref) from ch_fasta_chr
             val(bowtie_index) from ch_bowtie_index
             file(gtf) from ch_gencode_gtf
 
