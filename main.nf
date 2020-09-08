@@ -705,7 +705,7 @@ process tophat_align{
         
         script:
         """
-        tophat -p 8 -o ${base} ~/${fasta.baseName} ${fastq[0]}, ${fastq[1]}
+        tophat -p 8 -o ${base} ${fasta.baseName} ${fastq[0]} ${fastq[1]}
         """
 }
             
@@ -731,7 +731,11 @@ process uroborus{
         """
         samtools view $unmaped_bam > unmapped.sam
         
-        perl ${baseDir}/bin/UROBORUS.pl -index ~/${fasta.baseName} -fasta $uroborus_ref unmapped.sam $accepted_hits
+        perl ${baseDir}/bin/UROBORUS.pl \
+        -index ${fasta.baseName} \
+        -gtf $gtf \
+        -fasta $uroborus_ref \
+        unmapped.sam $accepted_hits
         """
 }
 
