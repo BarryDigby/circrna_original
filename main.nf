@@ -73,7 +73,7 @@ if (params.help) {
             print_cyan('      --gene_annotation <path>     ') + print_green('Path to gene annotation file \n') + 
             print_cyan('      --star_index <str>         ') + print_green('Path to STAR index\n') +
             print_cyan('      --bwa_index <str>    ') + print_green('Path to BWA index\n') +
-            print_cyan('      --bowtie_index <str>    ') + print_green('Path to Bowtie index\n') +
+            print_cyan('      --bowtie_index <str>    ') + print_green('Path to Bowtie index (must include glob for files)\n') +
             print_cyan('      --bowtie2_index <str>    ') + print_green('Path to Bowtie2 index (must include glob for files)\n') +
             print_cyan('      --hisat2_index <str>    ') + print_green('Path to Hisat2 index\n') +
             print_cyan('      --ciriquant_yml <str>    ') + print_green('Path to CIRIquant yml configuration file\n') +
