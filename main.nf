@@ -213,7 +213,7 @@ process bwa_index{
             
         output:
             file("${fasta.baseName}.*") into bwa_built
-            val("$projectDir/index/bwa") into bwa_path
+            val("$launchDir/index/bwa") into bwa_path
         
         when: !(params.bwa_index) && 'ciriquant' in tool 
         
@@ -236,7 +236,7 @@ process hisat2_index{
          
         output:
             file("${fasta.baseName}.*.ht2") into hisat2_built
-            val("$projectDir/index/hisat2") into hisat2_path
+            val("$launchDir/index/hisat2") into hisat2_path
             
         when: !(params.hisat2_index) && 'ciriquant' in tool
         
@@ -287,7 +287,7 @@ process bowtie_index{
             
         output:
             file ("${fasta.baseName}.*") into bowtie_built
-            val("$projectDir/index/bowtie") into bowtie_path
+            val("$launchDir/index/bowtie") into bowtie_path
             
         when: !(params.bowtie_index) && 'mapsplice' in tool
 
@@ -338,7 +338,7 @@ process split_fasta{
             
         output:
              file("*.fa") into split_fasta
-             val("$projectDir/index/chromosomes") into split_fasta_path
+             val("$launchDir/index/chromosomes") into split_fasta_path
              
         when ('mapsplice' in tool || 'find_circ' in tool)
         
