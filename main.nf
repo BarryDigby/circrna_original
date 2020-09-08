@@ -557,12 +557,13 @@ process find_circ{
         when: 'find_circ' in tool
         
         shell
+        index_prefix = fasta.baseName
         '''
         chmod 777 ~/.nextflow/assets/BarryDigby/circrna/bin/*
         
         export VAR=$(realpath !{fasta})
         export DIR=${VAR%/*}
-        bash find_circ.sh !{DIR} !{fasta.baseName} !{base} !{fastq[0]} !{fastq[1]}
+        bash find_circ.sh !{DIR} !{index_prefix} !{base} !{fastq[0]} !{fastq[1]}
         '''
 }
 
