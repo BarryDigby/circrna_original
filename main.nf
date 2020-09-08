@@ -557,10 +557,11 @@ process find_circ{
         when: 'find_circ' in tool
         
         script:
+        fasta_path = fasta.getParent()
         """
         chmod 777 ~/.nextflow/assets/BarryDigby/circrna/bin/*
         
-        bash find_circ.sh $fasta ${fasta.baseName} ${base} ${fastq[0]} ${fastq[1]}
+        bash find_circ.sh $fasta_path ${fasta.baseName} ${base} ${fastq[0]} ${fastq[1]}
         """
 }
 
