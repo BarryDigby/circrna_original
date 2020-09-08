@@ -723,7 +723,7 @@ process uroborus{
             file(fasta) from ch_fasta
             
         output:
-            file(*) into uroborus_results
+            file("*") into uroborus_results
             
         when: 'uroborus' in tool
         
