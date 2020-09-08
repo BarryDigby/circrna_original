@@ -289,7 +289,7 @@ process bowtie_index{
             file ("${fasta.baseName}.*") into bowtie_built
             val("$launchDir/index/bowtie") into bowtie_path
             
-        when: !(params.bowtie_index) && 'mapsplice' in tool
+        when: !(params.bowtie_index) && ('mapsplice' in tool || 'uroborus' in tool)
 
         script:
         """
@@ -297,7 +297,7 @@ process bowtie_index{
         """
 }
 
-ch_bowtie_index = params.bowtie_index ? Channel.value(params.bowtie_index) : bowtie_path
+ch_bowtie_index = params.bowtie_index ? Channel.value(file(params.bowtie_index)) : bowtie_built
 ch_bowtie_index.view() 
  
 process bowtie2_index{
@@ -634,7 +634,7 @@ process mapsplice_align{
         input:
             tuple val(base), file(fastq) from mapsplice_reads
             val(mapsplice_ref) from ch_fasta_chr
-            val(bowtie_index) from ch_bowtie_index
+            file(bowtie_index) from ch_bowtie_index.collect()
             file(gtf) from ch_gencode_gtf
 
         output:
@@ -650,7 +650,7 @@ process mapsplice_align{
         
         mapsplice.py \
         -c $mapsplice_ref \
-        -x $bowtie_index/$prefix \
+        -x $prefix \
         -1 ${base}_1.fastq \
         -2 ${base}_2.fastq \
         -p 8 \
@@ -718,6 +718,7 @@ process uroborus{
             val(bowtie_index) from ch_bowtie_index
             file(gtf) from ch_gencode_gtf
             file(uroborus_ref) from ch_fasta_chr
+            file(fasta) from ch_fasta
             
         output:
         
