@@ -640,6 +640,8 @@ process mapsplice_align{
         output:
             tuple val(base), file("${base}/fusions_raw.txt") into mapsplice_fusion
 
+        when: 'mapsplice' in tool
+
         script:
         prefix = gtf.toString() - ~/.gtf/
         """
