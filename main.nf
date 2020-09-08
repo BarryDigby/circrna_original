@@ -556,13 +556,14 @@ process find_circ{
             
         when: 'find_circ' in tool
         
-        script:
-        fasta_path = fasta.getParent()
-        """
+        shell
+        '''
         chmod 777 ~/.nextflow/assets/BarryDigby/circrna/bin/*
         
-        bash find_circ.sh $fasta_path ${fasta.baseName} ${base} ${fastq[0]} ${fastq[1]}
-        """
+        export VAR=$(realpath !{fasta})
+        export DIR=${VAR%/*}
+        bash find_circ.sh !{DIR} !{fasta.baseName} !{base} !{fastq[0]} !{fastq[1]}
+        '''
 }
 
 
