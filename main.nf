@@ -342,7 +342,7 @@ process split_fasta{
              
         when 'mapsplice' in tool
         
-        script:
+        shell:
         '''
         awk '$0 ~ "^>" { match($1, /^>([^:]+)/, id); filename=id[1]} {print >> filename".fa"}' !{fasta}
         rm !{fasta}
