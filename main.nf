@@ -701,7 +701,7 @@ process tophat_align{
             tuple val(base), file("${base}/unmapped.bam") into tophat_unmapped_bam
             tuple val(base), file("${base}/accepted_hits.bam") into tophat_accepted_hits
         
-        when 'uroborus' in tool
+        when: 'uroborus' in tool
         
         script:
         """
