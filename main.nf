@@ -646,8 +646,8 @@ process mapsplice_align{
         mapsplice.py \
         -c $mapsplice_ref \
         -x $bowtie_index/$prefix \
-        -1 ${base}_1.fastq \
-        -2 ${base}_2.fastq \
+        -1 ${base}_1.fastq.gz \
+        -2 ${base}_2.fastq.gz \
         -p 8 \
         --bam \
         --seglen 20 \
