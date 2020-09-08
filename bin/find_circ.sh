@@ -13,7 +13,7 @@ R2=$5
 
         bowtie2 -p 8 --very-sensitive --mm -D 20 --score-min=C,15,0 \
         -x $index -q -1 $R1 -2 $R2 \
-        | samtools view -hbuS - | samtools sort - > ${base}.bam
+        | samtools view -hbuS - | samtools sort --threads 8 -m 2G - > ${base}.bam
 
         samtools view -hf 4 ${base}.bam | samtools view -Sb - > ${base}_unmapped.bam
 
