@@ -608,7 +608,7 @@ process ciriquant{
             file(ciriquant_yml) from ch_ciriquant_yml
 
         output:
-            tuple val(base), file("${base}/${base}.gtf") into ciriquant_results
+            tuple val(base), file("${base}.gtf") into ciriquant_results
             
         when: 'ciriquant' in tool
         
@@ -621,6 +621,8 @@ process ciriquant{
         --no-gene \
         -o ${base} \
         -p ${base}
+        
+        mv ${base}/${base}.gtf ./
         """
 }
       
@@ -698,14 +700,16 @@ process tophat_align{
             file(fasta) from ch_fasta
             
         output:
-            tuple val(base), file("${base}/unmapped.bam") into tophat_unmapped_bam
-            tuple val(base), file("${base}/accepted_hits.bam") into tophat_accepted_hits
+            tuple val(base), file("unmapped.bam") into tophat_unmapped_bam
+            tuple val(base), file("accepted_hits.bam") into tophat_accepted_hits
         
         when: 'uroborus' in tool
         
         script:
         """
         tophat -p 8 -o ${base} ${fasta.baseName} ${fastq[0]} ${fastq[1]}
+        mv ${base}/unmapped_bam ./ 
+        mv ${base}/accepted_hits.bam ./
         """
 }
             
@@ -729,7 +733,7 @@ process uroborus{
         
         script:
         """
-        samtools view $unmaped_bam > unmapped.sam
+        samtools view $unmapped_bam > unmapped.sam
         
         perl ${baseDir}/bin/UROBORUS.pl \
         -index ${fasta.baseName} \
