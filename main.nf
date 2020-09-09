@@ -61,10 +61,11 @@ if (params.help) {
 
             print_yellow('    Mandatory arguments:\n') +
             print_cyan('      --inputdir <path>            ') + print_green('Path to input data\n') +
-            print_cyan('      --input_type <str>           ') + print_green('Input data type. Supported: \'fastq\', \'bam\'\n') +
+            print_cyan('      --input_type <str>           ') + print_green('Input data type. Supported: fastq, bam\n') +
             print_cyan('      --fastq_glob <str>         ') + print_green('Glob pattern of fastq files e.g: \'_R{1,2}.fastq.gz\'\n') +
-            print_cyan('      --bam_glob <str>           ') + print_green('Glob pattern of bam files expected: \'*.bam\'\n') +
+            print_cyan('      --bam_glob <str>           ') + print_green('Glob pattern of bam files. Expected: \'*.bam\'\n') +
             print_cyan('      --tool <str>              ') + print_green('circRNA tool to use for analysis. Supported: \'CIRCexplorer2\', \'CIRIquant\', \'find_circ\', \'UROBORUS\', \'mapsplice\'\n') +
+            print_cyan('      --version <str>           ') + print_green('Genome version. Supported: GRCh37, GRCh38\n') +
             '\n' +
             print_yellow('    Input Files:            if left empty will be generated\n') +
             print_cyan('      --fasta <path>               ') + print_green('Path to genome fasta file\n') +
