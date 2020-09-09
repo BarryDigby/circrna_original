@@ -570,7 +570,7 @@ process find_anchors{
 
 process find_circ{
 
-        publishDir "$params.outdir/circrna_dicovery/find_circ", mode:'copy'
+        publishDir "$params.outdir/circrna_discovery/find_circ", mode:'copy'
         
         input:
             tuple val(base), file(anchors) from ch_anchors
