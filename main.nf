@@ -727,7 +727,7 @@ process uroborus{
             file(fasta) from ch_fasta
             
         output:
-            file("*") into uroborus_results
+            file("${base}.txt") into uroborus_results
             
         when: 'uroborus' in tool
         
@@ -740,6 +740,8 @@ process uroborus{
         -gtf $gtf \
         -fasta $uroborus_ref \
         unmapped.sam $accepted_hits &> uroborus_logs.txt
+        
+        mv circRNA_list.txt ${base}.txt
         """
 }
 
