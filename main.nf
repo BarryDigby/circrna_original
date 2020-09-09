@@ -709,7 +709,7 @@ process tophat_align{
         script:
         """
         tophat -p 8 -o ${base} ${fasta.baseName} ${fastq[0]} ${fastq[1]}
-        mv ${base}/unmapped_bam ./ 
+        mv ${base}/unmapped.bam ./ 
         mv ${base}/accepted_hits.bam ./
         """
 }
