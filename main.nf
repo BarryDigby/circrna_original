@@ -658,7 +658,7 @@ process mapsplice_align{
         -2 ${base}_2.fastq \
         -p 8 \
         --bam \
-        --seglen 20 \
+        --seglen 25 \
         --min-map-len 40 \
         --fusion-non-canonical \
         --min-fusion-distance 200 \
