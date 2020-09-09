@@ -8,12 +8,12 @@ The container hosts the following circRNA tools:
 - CIRCexplorer2
 - MapSplice
 - find_circ
-- UROBORUS
+- UROBORUS **still under testing
 
 ## Gotchas
 Thank you Simone Coughlan for the catch :) 
 ```
-*--params.star_index:* Must put provide full path 
+*--params.star_index:* "/data/bdigby/grch38/index/star_index"
 
 *--params.bwa_index:* "/data/bdigby/grch38/index/bwa"
 
@@ -21,5 +21,5 @@ Thank you Simone Coughlan for the catch :)
 
 *--params.bowtie2_index:* "/data/bdigby/grch38/index/bowtie2/*" (need to point to files to collect for find_circ)
 
-*--params.bowtie_index:* "/data/bdigby/grch38/index/bowtie" just path for mapsplice 
+*--params.bowtie_index:* "/data/bdigby/grch38/index/bowtie/*" 
 ```
