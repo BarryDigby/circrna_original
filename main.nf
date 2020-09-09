@@ -556,7 +556,7 @@ process find_anchors{
         
         script:
         """
-        bowtie2 -p 8 --very-sensitive --mm -D 20 --score-min=C,15,0 \
+        bowtie2 -p 8 --very-sensitive --mm -D 20 --score-min=C,-15,0 \
         -x ${fasta.baseName} -q -1 ${fastq[0]} -2 ${fastq[1]} \
         | samtools view -hbuS - | samtools sort --threads 8 -m 2G - > ${base}.bam
 
