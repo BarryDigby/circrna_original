@@ -739,7 +739,7 @@ process uroborus{
         -index ${fasta.baseName} \
         -gtf $gtf \
         -fasta $uroborus_ref \
-        unmapped.sam $accepted_hits
+        unmapped.sam $accepted_hits &> uroborus_logs.txt
         """
 }
 
