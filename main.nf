@@ -580,7 +580,7 @@ process find_circ{
         output:
             tuple val(base), file("${base}.bed") into find_circ_results
          
-        when 'find_circ' in tool
+        when: 'find_circ' in tool
         
         script:
         """
