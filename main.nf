@@ -64,7 +64,9 @@ if (params.help) {
             print_cyan('      --input_type <str>           ') + print_green('Input data type. Supported: fastq, bam\n') +
             print_cyan('      --fastq_glob <str>           ') + print_green('Glob pattern of fastq files e.g: \'_R{1,2}.fastq.gz\'\n') +
             print_cyan('      --bam_glob <str>             ') + print_green('Glob pattern of bam files. Expected: \'*.bam\'\n') +
-            print_cyan('      --tool <str>                 ') + print_green('circRNA tool to use for analysis. Supported: \'CIRCexplorer2\', \'CIRIquant\', \'find_circ\', \'UROBORUS\', \'mapsplice\'\n') +
+            print_cyan('      --tool <str>                 ') + print_green('circRNA tool to use for analysis. \n
+                                                                             Supported: \'CIRCexplorer2\', \'CIRIquant\', \'find_circ\',\n
+                                                                             \'UROBORUS\', \'mapsplice\', \'DCC\', \'circRNA_finder\'\n) +
             print_cyan('      --version <str>              ') + print_green('Genome version. Supported: GRCh37, GRCh38\n') +
             '\n' +
             print_yellow('    Input Files:            if left empty will be generated\n') +
@@ -261,7 +263,7 @@ process star_index{
         output:
             file("star_index") into star_built
               
-        when: !(params.star_index) && ('circexplorer2' in tool || 'circrna_finder' in tool)
+        when: !(params.star_index) && ('circexplorer2' in tool || 'circrna_finder' in tool || 'dcc' in tool)
         
         script:
         """
@@ -599,35 +601,193 @@ process find_circ{
 
 // circRNA_finder
 
-process circrna_finder_aln{
+process circrna_finder_star{
 
         input:
             tuple val(base), file(fastq) from circrna_finder_reads
             val(star_index) from ch_star_index
-
-        output:
             
-
+        output:
+            tuple val(base), file("${base}") into circrna_finder_star
+            
         when: 'circrna_finder' in tool
         
         script:
-        """
+        """      
         STAR \
         --genomeDir $star_index \
         --readFilesIn ${fastq[0]} ${fastq[1]} \
-        --runThreadN 16 \
+        --readFilesCommand zcat \
+        --runThreadN 8 \
         --chimSegmentMin 20 \
         --chimScoreMin 1 \
         --alignIntronMax 100000 \
         --outFilterMismatchNmax 4 \
         --alignTranscriptsPerReadNmax 100000 \
         --outFilterMultimapNmax 2 \
-        --outFileNamePrefix ${base}
+        --outFileNamePrefix ${base}/${base}.
         """
 }
 
 
+process circrna_finder{
 
+        publishDir "$params.outdir/circrna_discovery/circrna_finder", mode:'copy'
+        
+        input:
+            tuple val(base), file(star_dir) from circrna_finder_star
+         
+        output:
+            tuple val(base), file("${base}.txt") into circrna_finder_results
+            
+        when: 'circrna_finder' in tool
+        
+        script:
+        """
+        postProcessStarAlignment.pl $star_dir ./
+        
+        mv ${base}.filteredJunctions.bed ${base}.txt
+        """
+}
+
+// DCC
+
+process dcc_pair{
+
+        input:
+            tuple val(base), file(fastq) from dcc_reads
+            val(star_index) from ch_star_index
+
+        output:
+            tuple val(base), file("samples") into dcc_samples
+            
+        when: 'dcc' in tool
+        
+        script:
+        """
+        STAR \
+        --runThreadN 16 \
+        --genomeDir $star_index \
+        --outSAMtype BAM SortedByCoordinate \
+        --readFilesIn ${fastq[0]} ${fastq[1]} \
+        --readFilesCommand zcat \
+        --outFileNamePrefix samples/${base}. \
+        --outReadsUnmapped Fastx \
+        --outSJfilterOverhangMin 15 15 15 15 \
+        --alignSJoverhangMin 15 \
+        --alignSJDBoverhangMin 15 \
+        --outFilterMultimapNmax 20 \
+        --outFilterScoreMin 1 \
+        --outFilterMatchNmin 1 \
+        --outFilterMismatchNmax 2 \
+        --chimSegmentMin 15 \
+        --chimScoreMin 15 \
+        --chimScoreSeparation 10 \
+        --chimJunctionOverhangMin 15 
+        """
+}
+
+process dcc_1{
+
+        input:
+            tuple val(base), file(fastq) from dcc_reads
+            val(star_index) from ch_star_index
+
+        output:
+            tuple val(base), file("mate1") into dcc_mate1
+            
+        when: 'dcc' in tool
+        
+        script:
+        """
+        STAR \
+        --runThreadN 10 \
+        --genomeDir $star_index \
+        --outSAMtype None \
+        --readFilesIn ${fastq[0]} \
+        --readFilesCommand zcat \
+        --outFileNamePrefix mate1/${base}. \
+        --outReadsUnmapped Fastx \
+        --outSJfilterOverhangMin 15 15 15 15 \
+        --alignSJoverhangMin 15 \
+        --alignSJDBoverhangMin 15 \
+        --seedSearchStartLmax 30 \
+        --outFilterMultimapNmax 20 \
+        --outFilterScoreMin 1 \
+        --outFilterMatchNmin 1 \
+        --outFilterMismatchNmax 2 \
+        --chimSegmentMin 15 \
+        --chimScoreMin 15 \
+        --chimScoreSeparation 10 \
+        --chimJunctionOverhangMin 15
+        """
+}
+
+process dcc_2{
+
+        input:
+            tuple val(base), file(fastq) from dcc_reads
+            val(star_index) from ch_star_index
+
+        output:
+            tuple val(base), file("mate2") into dcc_mate2
+            
+        when: 'dcc' in tool
+        
+        script:
+        """
+        STAR \
+        --runThreadN 10 \
+        --genomeDir $star_index \
+        --outSAMtype None \
+        --readFilesIn ${fastq[1]} \
+        --readFilesCommand zcat \
+        --outFileNamePrefix mate2/${base}. \
+        --outReadsUnmapped Fastx \
+        --outSJfilterOverhangMin 15 15 15 15 \
+        --alignSJoverhangMin 15 \
+        --alignSJDBoverhangMin 15 \
+        --seedSearchStartLmax 30 \
+        --outFilterMultimapNmax 20 \
+        --outFilterScoreMin 1 \
+        --outFilterMatchNmin 1 \
+        --outFilterMismatchNmax 2 \
+        --chimSegmentMin 15 \
+        --chimScoreMin 15 \
+        --chimScoreSeparation 10 \
+        --chimJunctionOverhangMin 15
+        """
+}
+
+// collect runs according to val(base) in tuple
+ch_dcc_dirs = dcc_samples.join(dcc_mate1).join(dcc_mate2)
+
+process dcc{
+
+        publishDir "$params.outdir/circrna_discovery/dcc", mode:'copy'
+
+        input:
+        tuple val(base), file(samples), file(mate1), file(mate2) from ch_dcc_dirs
+        file(gtf) from ch_gencode_gtf
+
+        output:
+        tuple val(base), file("${base}.txt") into dcc_results
+
+        script:
+        COJ="Chimeric.out.junction"
+        """
+        sed -i 's/^chr//g' $gtf
+
+        printf "samples/${base}.${COJ}" > samplesheet
+        printf "mate1/${base}.${COJ}" > mate1file
+        printf "mate2/${base}.${COJ}" > mate2file
+
+        DCC @samplesheet -mt1 @mate1file -mt2 @mate2file -D -an $gtf -Pi -F -M -Nr 1 1 -fg -A /data/bdigby/grch38/reference/GRCh38.fa -N -T 8
+        
+        awk '{print \$6}' CircCoordinates >> strand
+        paste CircRNACount strand | cut -f 1,2,3,5,4 >> ${base}.txt
+        """
+}
 
 // CIRIquant
 
