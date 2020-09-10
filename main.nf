@@ -261,7 +261,7 @@ process star_index{
         output:
             file("star_index") into star_built
               
-        when: !(params.star_index) && 'circexplorer2' in tool
+        when: !(params.star_index) && ('circexplorer2' in tool || 'circrna_finder' in tool)
         
         script:
         """
@@ -459,7 +459,7 @@ process bbduk {
         """
 }
 
-(circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads) = trim_reads_built.into(5)
+(circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads, circrna_finder_reads, dcc_reads) = trim_reads_built.into(7)
 
 /*
 ================================================================================
@@ -595,6 +595,38 @@ process find_circ{
         grep circ ${base}.sites.bed | grep -v chrM | sum.py -2,3 | scorethresh.py -16 1 | scorethresh.py -15 2 | scorethresh.py -14 2 | scorethresh.py 7 2 | scorethresh.py 8,9 35 | scorethresh.py -17 100000 >> ${base}.bed
         """
 }
+
+
+// circRNA_finder
+
+process circrna_finder_aln{
+
+        input:
+            tuple val(base), file(fastq) from circrna_finder_reads
+            val(star_index) from ch_star_index
+
+        output:
+            
+
+        when: 'circrna_finder' in tool
+        
+        script:
+        """
+        STAR \
+        --genomeDir $star_index \
+        --readFilesIn ${fastq[0]} ${fastq[1]} \
+        --runThreadN 16 \
+        --chimSegmentMin 20 \
+        --chimScoreMin 1 \
+        --alignIntronMax 100000 \
+        --outFilterMismatchNmax 4 \
+        --alignTranscriptsPerReadNmax 100000 \
+        --outFilterMultimapNmax 2 \
+        --outFileNamePrefix ${base}
+        """
+}
+
+
 
 
 // CIRIquant
@@ -770,6 +802,8 @@ def defineToolList() {
         'ciriquant',
         'circexplorer2',
         'find_circ',
+        'circrna_finder',
+        'dcc',
         'mapsplice',
         'uroborus'
         ]
