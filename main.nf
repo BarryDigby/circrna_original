@@ -461,7 +461,7 @@ process bbduk {
         """
 }
 
-(circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads, circrna_finder_reads, dcc_reads) = trim_reads_built.into(7)
+(circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads, circrna_finder_reads, dcc_reads, dcc_reads_mate1, dcc_reads_mate2) = trim_reads_built.into(9)
 
 /*
 ================================================================================
@@ -690,7 +690,7 @@ process dcc_pair{
 process dcc_1{
 
         input:
-            tuple val(base), file(fastq) from dcc_reads
+            tuple val(base), file(fastq) from dcc_reads_mate1
             val(star_index) from ch_star_index
 
         output:
@@ -726,7 +726,7 @@ process dcc_1{
 process dcc_2{
 
         input:
-            tuple val(base), file(fastq) from dcc_reads
+            tuple val(base), file(fastq) from dcc_reads_mate2
             val(star_index) from ch_star_index
 
         output:
