@@ -65,8 +65,8 @@ if (params.help) {
             print_cyan('      --fastq_glob <str>           ') + print_green('Glob pattern of fastq files e.g: \'_R{1,2}.fastq.gz\'\n') +
             print_cyan('      --bam_glob <str>             ') + print_green('Glob pattern of bam files. Expected: \'*.bam\'\n') +
             print_cyan('      --tool <str>                 ') + print_green('circRNA tool to use for analysis. \n') +
-            print_green('                                    Supported: CIRCexplorer2, CIRIquant, find_circ\n') +
-            print_green('                                    UROBORUS, mapsplice, DCC, circRNA_finder\n') +
+            print_green('                                   Supported: CIRCexplorer2, CIRIquant, find_circ\n') +
+            print_green('                                   UROBORUS, mapsplice, DCC, circRNA_finder\n') +
             print_cyan('      --version <str>              ') + print_green('Genome version. Supported: GRCh37, GRCh38\n') +
             '\n' +
             print_yellow('    Input Files:            if left empty will be generated\n') +
