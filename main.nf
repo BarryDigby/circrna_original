@@ -724,7 +724,7 @@ process uroborus{
             tuple val(base), file(accepted_hits) from tophat_accepted_hits
             file(bowtie_index) from ch_bowtie_index.collect()
             file(gtf) from ch_gencode_gtf
-            file(uroborus_ref) from ch_fasta_chr
+            val(uroborus_ref) from ch_fasta_chr
             file(fasta) from ch_fasta
             
         output:
