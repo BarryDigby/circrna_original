@@ -644,7 +644,7 @@ process circrna_finder{
         
         script:
         """
-        postProcessStarAlignment.pl $star_dir ./
+        postProcessStarAlignment.pl --starDir $star_dir --outDir ./
         
         mv ${base}.filteredJunctions.bed ${base}.txt
         """
