@@ -563,7 +563,7 @@ process find_anchors{
 
         samtools view -hf 4 ${base}.bam | samtools view -Sb - > ${base}_unmapped.bam
 
-        python ${baseDir}/bin/unmapped2anchors.py ${base}_unmapped.bam | gzip > ${base}_anchors.qfa.gz
+        python ${baseDir}/bin/find_circ/unmapped2anchors.py ${base}_unmapped.bam | gzip > ${base}_anchors.qfa.gz
         """
 }
 
@@ -586,13 +586,13 @@ process find_circ{
         script:
         """
         bowtie2 -p 8 --reorder --mm -D 20 --score-min=C,-15,0 -q -x ${fasta.baseName} \
-        -U $anchors | python ${baseDir}/bin/find_circ.py -G $fasta_chr_path -p ${base} -s ${base}.sites.log > ${base}.sites.bed 2> ${base}.sites.reads
+        -U $anchors | python ${baseDir}/bin/find_circ/find_circ.py -G $fasta_chr_path -p ${base} -s ${base}.sites.log > ${base}.sites.bed 2> ${base}.sites.reads
 
-        echo "#chrom:start:end:name:n_reads:strand:n_uniq:best_qual_A:best_qual_B:spliced_at_begin:spliced_at_end:tissues:tiss_counts:edits:anchor_overlap:breakpoints" > tmp.txt
+        echo "# chrom:start:end:name:n_reads:strand:n_uniq:best_qual_A:best_qual_B:spliced_at_begin:spliced_at_end:tissues:tiss_counts:edits:anchor_overlap:breakpoints" > tmp.txt
 
         cat tmp.txt | tr ':' '\t' > ${base}.bed
 
-        grep circ ${base}.sites.bed | grep -v chrM | python ${baseDir}/bin/sum.py -2,3 | python ${baseDir}/bin/scorethresh.py -16 1 | python ${baseDir}/bin/scorethresh.py -15 2 | python ${baseDir}/bin/scorethresh.py -14 2 | python ${baseDir}/bin/scorethresh.py 7 2 | python ${baseDir}/bin/scorethresh.py 8,9 35 | python ${baseDir}/bin/scorethresh.py -17 100000 >> ${base}.bed
+        grep circ ${base}.sites.bed | grep -v chrM | python ${baseDir}/bin/find_circ/sum.py -2,3 | python ${baseDir}/bin/find_circ/scorethresh.py -16 1 | python ${baseDir}/bin/find_circ/scorethresh.py -15 2 | python ${baseDir}/bin/find_circ/scorethresh.py -14 2 | python ${baseDir}/bin/find_circ/scorethresh.py 7 2 | python ${baseDir}/bin/find_circ/scorethresh.py 8,9 35 | python ${baseDir}/bin/find_circ/scorethresh.py -17 100000 >> ${base}.bed
         """
 }
 
@@ -736,7 +736,7 @@ process uroborus{
         """
         samtools view $unmapped_bam > unmapped.sam
         
-        perl ${baseDir}/bin/UROBORUS.pl \
+        perl ${baseDir}/bin/UROBORUS/UROBORUS.pl \
         -index ${fasta.baseName} \
         -gtf $gtf \
         -fasta $uroborus_ref \
