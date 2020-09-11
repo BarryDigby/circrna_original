@@ -769,12 +769,15 @@ process dcc{
         publishDir "$params.outdir/circrna_discovery/dcc", mode:'copy'
 
         input:
-        tuple val(base), file(samples), file(mate1), file(mate2) from ch_dcc_dirs
-        file(gtf) from ch_gencode_gtf
+            tuple val(base), file(samples), file(mate1), file(mate2) from ch_dcc_dirs
+            file(gtf) from ch_gencode_gtf
+            file(fasta) from ch_fasta
 
         output:
-        tuple val(base), file("${base}.txt") into dcc_results
+            tuple val(base), file("${base}.txt") into dcc_results
 
+        when: 'dcc' in tool
+        
         script:
         COJ="Chimeric.out.junction"
         """
@@ -784,7 +787,7 @@ process dcc{
         printf "mate1/${base}.${COJ}" > mate1file
         printf "mate2/${base}.${COJ}" > mate2file
 
-        DCC @samplesheet -mt1 @mate1file -mt2 @mate2file -D -an $gtf -Pi -F -M -Nr 1 1 -fg -A /data/bdigby/grch38/reference/GRCh38.fa -N -T 8
+        DCC @samplesheet -mt1 @mate1file -mt2 @mate2file -D -an $gtf -Pi -F -M -Nr 1 1 -fg -A $fasta -N -T 8
         
         awk '{print \$6}' CircCoordinates >> strand
         paste CircRNACount strand | cut -f 1,2,3,5,4 >> ${base}.txt
