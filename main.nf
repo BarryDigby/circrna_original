@@ -645,7 +645,7 @@ process circrna_finder{
         
         script:
         """
-        postProcessStarAlignment.pl --starDir $star_dir --outDir ./
+        postProcessStarAlignment.pl --starDir ${star_dir}/ --outDir ./
         
         printf "chr\tstart\tstop\tname\tcount\tstrand\n" > header
         cat header ${base}.filteredJunctions.bed > ${base}.txt
