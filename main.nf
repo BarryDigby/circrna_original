@@ -621,6 +621,7 @@ process circrna_finder_star{
         --runThreadN 8 \
         --chimSegmentMin 20 \
         --chimScoreMin 1 \
+        --chimOutType Junctions SeparateSAMold \
         --alignIntronMax 100000 \
         --outFilterMismatchNmax 4 \
         --alignTranscriptsPerReadNmax 100000 \
@@ -646,7 +647,8 @@ process circrna_finder{
         """
         postProcessStarAlignment.pl --starDir $star_dir --outDir ./
         
-        mv ${base}.filteredJunctions.bed ${base}.txt
+        printf "chr\tstart\tstop\tname\tcount\tstrand\n" > header
+        cat header ${base}.filteredJunctions.bed > ${base}.txt
         """
 }
 
