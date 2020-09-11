@@ -928,7 +928,7 @@ process uroborus{
         """
         samtools view $unmapped_bam > unmapped.sam
         
-        perl ${baseDir}/bin/UROBORUS/UROBORUS.pl \
+        perl /opt/conda/envs/circrna/bin/UROBORUS.pl \
         -index ${fasta.baseName} \
         -gtf $gtf \
         -fasta $uroborus_ref \
