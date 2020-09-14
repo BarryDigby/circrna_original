@@ -966,7 +966,11 @@ process uroborus{
 // hisat2 path provided, must capture files for this process
 // might be worthwhile revisiting other paths for this
 
-ch_hisat2_index_files = ch_hisat2_index.map{ it -> files = "${it}/*"}
+//ch_hisat2_index_files = ch_hisat2_index.map{ it -> files = "${it}/*"}
+//ch_hisat2_index_files.view()
+
+hisat2_files = "$params.outdir/index/hisat2/*"
+ch_hisat2_index_files = Channel.fromPath( hisat2_files )
 ch_hisat2_index_files.view()
 
 process Hisat2_align{
