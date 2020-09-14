@@ -1006,7 +1006,7 @@ process StringTie{
 		
 	script:
 	"""
-	mkdir ${base}
+	mkdir ${base}/
 	stringtie $bam -e -G $gtf -C ${base}/${base}_cov.gtf -p 16 -o ${base}/${base}.gtf -A ${base}/${base}_genes.list 
 	cp ${base}/${base}_genes.list ./
 	"""
