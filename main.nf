@@ -560,7 +560,7 @@ process circexplorer2_star{
         CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.STAR.junction.bed -o ${base}.tmp
         
         awk '{if(\$13 > 1) print \$0}' ${base}.tmp > ${base}.filtered
-        awk -F"\t" '{print \$1, \$2, \$3, \$6, \$13}' OFS="\t" ${base}.filtered > ${base}.bed
+        cut -f 1,2,3,6,13 ${base}.filtered > ${base}.bed
         """
 }
 
@@ -616,8 +616,10 @@ process find_circ{
 
         cat tmp.txt | tr ':' '\t' > ${base}.bed
 
-        grep circ ${base}.sites.bed | grep -v chrM | python /opt/conda/envs/circrna/bin/sum.py -2,3 | python /opt/conda/envs/circrna/bin/scorethresh.py -16 1 | python /opt/conda/envs/circrna/bin/scorethresh.py -15 2 | python /opt/conda/envs/circrna/bin/scorethresh.py -14 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 7 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 8,9 35 | python /opt/conda/envs/circrna/bin/scorethresh.py -17 100000 >> ${base}.bed
-        """
+        grep circ ${base}.sites.bed | grep -v chrM | python /opt/conda/envs/circrna/bin/sum.py -2,3 | python /opt/conda/envs/circrna/bin/scorethresh.py -16 1 | python /opt/conda/envs/circrna/bin/scorethresh.py -15 2 | python /opt/conda/envs/circrna/bin/scorethresh.py -14 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 7 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 8,9 35 | python /opt/conda/envs/circrna/bin/scorethresh.py -17 100000 >> ${base}.txt
+        
+	tail -n +2 ${base}.txt | cut -f 1,2,3,6,5 > ${base{.bed
+	"""
 }
 
 
@@ -661,7 +663,7 @@ process circrna_finder{
             tuple val(base), file(star_dir) from circrna_finder_star
          
         output:
-            tuple val(base), file("${base}.txt") into circrna_finder_results
+            tuple val(base), file("${base}.bed") into circrna_finder_results
             
         when: 'circrna_finder' in tool
         
@@ -669,8 +671,7 @@ process circrna_finder{
         """
         postProcessStarAlignment.pl --starDir ${star_dir}/ --outDir ./
         
-        printf "chr\tstart\tstop\tname\tcount\tstrand\n" > header
-        cat header ${base}.filteredJunctions.bed > ${base}.txt
+	tail -n +2 ${base}.filteredJunctions.bed | awk '{if(\$5 > 1) print \$0}' | cut -f 1,2,3,6,5 > ${base}.bed
         """
 }
 
@@ -796,7 +797,7 @@ process dcc{
             file(fasta) from ch_fasta
 
         output:
-            tuple val(base), file("${base}.txt") into dcc_results
+            tuple val(base), file("${base}.bed") into dcc_results
 
         when: 'dcc' in tool
         
@@ -812,7 +813,8 @@ process dcc{
         DCC @samplesheet -mt1 @mate1file -mt2 @mate2file -D -an $gtf -Pi -F -M -Nr 1 1 -fg -A $fasta -N -T 8
         
         awk '{print \$6}' CircCoordinates >> strand
-        paste CircRNACount strand | cut -f 1,2,3,5,4 >> ${base}.txt
+        paste CircRNACount strand | cut -f 1,2,3,4,5 >> ${base}.txt
+	tail -n +2 ${base}.txt > ${base}.bed
         """
 }
 
@@ -828,7 +830,7 @@ process ciriquant{
             file(ciriquant_yml) from ch_ciriquant_yml
 
         output:
-            tuple val(base), file("${base}.gtf") into ciriquant_results
+            tuple val(base), file("${base}.bed") into ciriquant_results
             
         when: 'ciriquant' in tool
         
@@ -843,6 +845,11 @@ process ciriquant{
         -p ${base}
         
         mv ${base}/${base}.gtf ./
+	
+	grep -v "#" ${base}.gtf | grep -v "bsj 1.000" > ${base}.filtered
+	awk '{print \$14}' ${base}.filtered | cut -d'.' -f1 > counts
+	cut -f 1,4,5,7 ${base}.filtered > ${base}.txt
+	paste ${base}.txt counts > ${base}.bed
         """
 }
       
@@ -897,7 +904,7 @@ process mapsplice_parse{
             file(gene_annotation) from ch_gene_annotation
             
         output:
-            tuple val(base), file("${base}.txt") into mapsplice_results
+            tuple val(base), file("${base}.bed") into mapsplice_results
         
         when: 'mapsplice' in tool
         
@@ -906,6 +913,9 @@ process mapsplice_parse{
         CIRCexplorer2 parse -t MapSplice $raw_fusion -b ${base}.mapsplice.junction.bed
 
         CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.mapsplice.junction.bed -o ${base}.txt
+	
+	awk '{if(\$13 > 1) print \$0}' ${base}.tmp > ${base}.filtered
+        cut -f 1,2,3,6,13 ${base}.filtered > ${base}.bed
         """
 }
 
