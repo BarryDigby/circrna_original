@@ -969,6 +969,8 @@ process uroborus{
 //ch_hisat2_index_files = ch_hisat2_index.map{ it -> files = "${it}/*"}
 //ch_hisat2_index_files.view()
 
+// this is messy but works. can revisit this and try to work out the above code (currently provides input.4 so not working properly)
+
 hisat2_files = "$params.outdir/index/hisat2/*"
 ch_hisat2_index_files = Channel.fromPath( hisat2_files )
 (ch_hisat2_1, ch_hisat2_2) = ch_hisat2_index_files.into(2)
