@@ -601,7 +601,7 @@ process find_circ{
 
         grep circ ${base}.sites.bed | grep -v chrM | python /opt/conda/envs/circrna/bin/sum.py -2,3 | python /opt/conda/envs/circrna/bin/scorethresh.py -16 1 | python /opt/conda/envs/circrna/bin/scorethresh.py -15 2 | python /opt/conda/envs/circrna/bin/scorethresh.py -14 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 7 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 8,9 35 | python /opt/conda/envs/circrna/bin/scorethresh.py -17 100000 >> ${base}.txt
         
-	tail -n +2 ${base}.txt | cut -f 1,2,3,6,5 > ${base{.bed
+	tail -n +2 ${base}.txt | cut -f 1,2,3,6,5 > ${base}.bed
 	"""
 }
 
