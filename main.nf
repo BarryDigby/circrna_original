@@ -118,7 +118,6 @@ params.input_type = 'fastq'
 params.fastq_glob = '*_R{1,2}.fastq.gz'
 params.bam_glob = '*.bam'
 params.adapters = '/data/bdigby/grch38/adapters.fa'
-params.kallisto_index = ''
 
 toolList = defineToolList()
 tool = params.tool ? params.tool.split(',').collect{it.trim().toLowerCase()} : []
@@ -208,23 +207,7 @@ process samtools_index{
         
 ch_fai = params.fasta_fai ? Channel.value(file(params.fasta_fai)) : fasta_fai_built
 
-process Kallisto_Index{
-        
-        publishDir "$params.outdir/index/kallisto", mode:'copy'
 
-	      input:
-	          file(fasta) from ch_fasta
-
-	      output:
-	          file ("${fasta.baseName}.idx") into kallisto_index_built
-
-        script:
-        """
-        kallisto index -i ${fasta.baseName}.idx $fasta
-        """
-}
-
-ch_kallisto_index = params.kallisto_index ? Channel.value(file(params.kallisto_index)) : kallisto_index_built
 
 process bwa_index{
 
@@ -480,7 +463,7 @@ process bbduk {
         """
 }
 
-(circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads, circrna_finder_reads, dcc_reads, dcc_reads_mate1, dcc_reads_mate2, kallisto_reads) = trim_reads_built.into(10)
+(circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads, circrna_finder_reads, dcc_reads, dcc_reads_mate1, dcc_reads_mate2, hisat2_reads) = trim_reads_built.into(10)
 
 /*
 ================================================================================
@@ -836,7 +819,7 @@ process ciriquant{
         
         script:
         """
-        CIRIquant -t 8 \
+        CIRIquant -t 16 \
         -1 ${fastq[0]} \
         -2 ${fastq[1]} \
         --config $ciriquant_yml \
@@ -983,23 +966,11 @@ process uroborus{
 ================================================================================
 */
 
+// hisat2 path provided, must capture files for this process
 
-process Kallisto{
-
-        publishDir "$params.outdir/rna-seq", mode:'copy'
-        
-        input:
-            tuple val(base), file(fastq) from kallisto_reads
-            file(kallisto_index) from ch_kallisto_index
-            
-        output:
-            file("${base}") into kallisto_results
-            
-        script:
-        """
-        kallisto -i $kallisto_index -t 16 -o ${base} --bias $fastq
-        """
- }
+ch_hisat2_index_files = Channel.fromPath(ch_hisat2_index)
+			       .collect()		        
+ch_hisat2_index_files.view()
  
  
 /*
