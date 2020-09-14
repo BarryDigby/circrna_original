@@ -968,8 +968,8 @@ process uroborus{
 
 // hisat2 path provided, must capture files for this process
 
-hisat2_path = ch_hisat2_index.view()
-println(hisat2_path)
+ch_hisat2_index_files = ch_hisat2_index.map{ it -> files = "${it}/*"}
+ch_hisat2_index_files.view()
 
  
  
