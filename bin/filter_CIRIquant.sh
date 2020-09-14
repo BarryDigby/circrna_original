@@ -17,7 +17,8 @@ while read line
         start=$(echo $line | awk '{sum = $2 -1; print sum}')
         stop=$(echo $line | awk '{print $3}')
         sign=$(echo $line | awk '{print $4}')
+        count=$(echo $line | awk '{print $5}')
 
-        echo -e "$chr\t$start\t$stop\t$sign" >> ${base}.bed
+        echo -e "$chr\t$start\t$stop\t$sign\t$count" >> ${base}.bed
 
 done < ${base}.bed.tmp
