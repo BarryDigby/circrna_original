@@ -118,6 +118,7 @@ params.input_type = 'fastq'
 params.fastq_glob = '*_R{1,2}.fastq.gz'
 params.bam_glob = '*.bam'
 params.adapters = '/data/bdigby/grch38/adapters.fa'
+params.kallisto_index = ''
 
 toolList = defineToolList()
 tool = params.tool ? params.tool.split(',').collect{it.trim().toLowerCase()} : []
@@ -206,6 +207,24 @@ process samtools_index{
 }
         
 ch_fai = params.fasta_fai ? Channel.value(file(params.fasta_fai)) : fasta_fai_built
+
+process Kallisto_Index{
+        
+        publishDir "$params.outdir/index/kallisto", mode:'copy'
+
+	      input:
+	          file(fasta) from ch_fasta
+
+	      output:
+	          file ("${fasta.baseName}.idx") into kallisto_index_built
+
+        script:
+        """
+        kallisto index -i ${fasta.baseName}.idx $fasta
+        """
+}
+
+ch_kallisto_index = params.kallisto_index ? Channel.value(file(params.kallisto_index)) : kallisto_index_built
 
 process bwa_index{
 
@@ -461,7 +480,7 @@ process bbduk {
         """
 }
 
-(circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads, circrna_finder_reads, dcc_reads, dcc_reads_mate1, dcc_reads_mate2) = trim_reads_built.into(9)
+(circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads, circrna_finder_reads, dcc_reads, dcc_reads_mate1, dcc_reads_mate2, kallisto_reads) = trim_reads_built.into(10)
 
 /*
 ================================================================================
@@ -531,14 +550,17 @@ process circexplorer2_star{
             file(gene_annotation) from ch_gene_annotation
             
         output:
-            tuple val(base), file("${base}.txt") into circexplorer2_results
+            tuple val(base), file("${base}.bed") into circexplorer2_results
         
         when: 'circexplorer2' in tool
         
         script:
         """
         CIRCexplorer2 parse -t STAR $chimeric_reads -b ${base}.STAR.junction.bed
-        CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.STAR.junction.bed -o ${base}.txt
+        CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.STAR.junction.bed -o ${base}.tmp
+        
+        awk '{if(\$13 > 1) print \$0}' ${base}.tmp > ${base}.filtered
+        awk -F"\t" '{print \$1, \$2, \$3, \$6, \$13}' OFS="\t" ${base}.filtered > ${base}.bed
         """
 }
 
@@ -942,6 +964,47 @@ process uroborus{
         mv circRNA_list.txt ${base}.txt
         """
 }
+
+
+
+/*
+================================================================================
+                                  RNA-Seq
+================================================================================
+*/
+
+
+process Kallisto{
+
+        publishDir "$params.outdir/rna-seq", mode:'copy'
+        
+        input:
+            tuple val(base), file(fastq) from kallisto_reads
+            file(kallisto_index) from ch_kallisto_index
+            
+        output:
+            file("${base}") into kallisto_results
+            
+        script:
+        """
+        kallisto -i $kallisto_index -t 16 -o ${base} --bias $fastq
+        """
+ }
+ 
+ 
+/*
+================================================================================
+                         circRNA Differential Expression
+================================================================================
+*/
+
+
+// need to consolidate circRNA results into single channel.
+// apply filtering steps before this step! 
+// simple awk|grep one liners will do after tool generates results. 
+
+
+
 
 
 
