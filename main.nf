@@ -601,7 +601,7 @@ process find_circ{
 
         grep circ ${base}.sites.bed | grep -v chrM | python /opt/conda/envs/circrna/bin/sum.py -2,3 | python /opt/conda/envs/circrna/bin/scorethresh.py -16 1 | python /opt/conda/envs/circrna/bin/scorethresh.py -15 2 | python /opt/conda/envs/circrna/bin/scorethresh.py -14 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 7 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 8,9 35 | python /opt/conda/envs/circrna/bin/scorethresh.py -17 100000 >> ${base}.txt
         
-	tail -n +2 ${base}.txt | cut -f 1,2,3,6,5 > ${base}.bed
+	tail -n +2 ${base}.txt | cut -f 1,2,3,5,6 > ${base}.bed
 	"""
 }
 
@@ -653,8 +653,8 @@ process circrna_finder{
         script:
         """
         postProcessStarAlignment.pl --starDir ${star_dir}/ --outDir ./
-        
-	tail -n +2 ${base}.filteredJunctions.bed | awk '{if(\$5 > 1) print \$0}' | cut -f 1,2,3,6,5 > ${base}.bed
+
+	tail -n +2 ${base}.filteredJunctions.bed | awk '{if(\$5 > 1) print $0}' | awk  -v OFS="\t" -F"\t" '{print \$1,\$2,\$3,\$6,\$5}'
         """
 }
 
@@ -796,8 +796,8 @@ process dcc{
         DCC @samplesheet -mt1 @mate1file -mt2 @mate2file -D -an $gtf -Pi -F -M -Nr 1 1 -fg -A $fasta -N -T 8
         
         awk '{print \$6}' CircCoordinates >> strand
-        paste CircRNACount strand | cut -f 1,2,3,4,5 >> ${base}.txt
-	tail -n +2 ${base}.txt > ${base}.bed
+        paste CircRNACount strand | cut -f 1,2,3,4,5 | tail -n +2 >> ${base}.txt
+	bash filter_DCC.sh ${base}.txt
         """
 }
 
@@ -829,10 +829,7 @@ process ciriquant{
         
         mv ${base}/${base}.gtf ./
 	
-	grep -v "#" ${base}.gtf | grep -v "bsj 1.000" > ${base}.filtered
-	awk '{print \$14}' ${base}.filtered | cut -d'.' -f1 > counts
-	cut -f 1,4,5,7 ${base}.filtered > ${base}.txt
-	paste ${base}.txt counts > ${base}.bed
+	bash filter_CIRIquant.sh ${base}.gtf
         """
 }
       
