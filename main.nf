@@ -1002,11 +1002,13 @@ process StringTie{
 		file(gtf) from ch_gencode_gtf
 	output:
 		tuple val(base), file("${base}_genes.list") into stringtie_quant
+		file("${base}") into stringtie_dir
 		
 	script:
 	"""
+	mkdir ${base}
 	stringtie $bam -e -G $gtf -C ${base}/${base}_cov.gtf -p 16 -o ${base}/${base}.gtf -A ${base}/${base}_genes.list 
-	mv ${base}/${base}_genes.list ./
+	cp ${base}/${base}_genes.list ./
 	"""
 }
  
