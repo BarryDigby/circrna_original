@@ -967,11 +967,44 @@ process uroborus{
 */
 
 // hisat2 path provided, must capture files for this process
+// might be worthwhile revisiting other paths for this
 
 ch_hisat2_index_files = ch_hisat2_index.map{ it -> files = "${it}/*"}
 ch_hisat2_index_files.view()
 
- 
+process Hisat2_align{
+
+	input:
+		tuple val(base), file(fastq) from hisat2_reads
+		file(hisat2_index) from ch_hisat2_index_files.collect()
+		file(fasta) from ch_fasta
+		
+	output:
+		tuple val(base), file("${base}.bam") into hisat2_bam
+		
+	script:
+	"""
+	hisat2 -p 16 --dta -q -x ${fasta.baseName} -1 ${fastq[0]} -2 ${fastq[1]} -t | samtools view -bS - | samtools sort --threads 16 -m 2G - > ${base}.bam
+	"""
+}
+
+
+process StringTie{
+
+	publishDir "$params.outdir/rna-seq", mode:'copy'
+	
+	input:
+		tuple val(base), file(bam) from hisat2_bam
+		file(gtf) from ch_gencode_gtf
+	output:
+		tuple val(base), file("${base}_genes.list") into stringtie_quant
+		
+	script:
+	"""
+	stringtie $bam -e -G $gtf -C ${base}/${base}_cov.gtf -p 16 -o ${base}/${base}.gtf -A ${base}/${base}_genes.list 
+	mv ${base}/${base}_genes.list ./
+	"""
+}
  
 /*
 ================================================================================
