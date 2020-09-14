@@ -968,9 +968,9 @@ process uroborus{
 
 // hisat2 path provided, must capture files for this process
 
-ch_hisat2_index_files = Channel.fromPath(ch_hisat2_index/*)
-			       .collect()		        
-ch_hisat2_index_files.view()
+hisat2_path = ch_hisat2_index.view()
+println(hisat2_path)
+
  
  
 /*
