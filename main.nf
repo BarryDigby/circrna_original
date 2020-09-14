@@ -971,13 +971,14 @@ process uroborus{
 
 hisat2_files = "$params.outdir/index/hisat2/*"
 ch_hisat2_index_files = Channel.fromPath( hisat2_files )
-ch_hisat2_index_files.view()
+(ch_hisat2_1, ch_hisat2_2) = ch_hisat2_index_files.into(2)
+ch_hisat2_1.view()
 
 process Hisat2_align{
 
 	input:
 		tuple val(base), file(fastq) from hisat2_reads
-		file(hisat2_index) from ch_hisat2_index_files.collect()
+		file(hisat2_index) from ch_hisat2_2.collect()
 		file(fasta) from ch_fasta
 		
 	output:
