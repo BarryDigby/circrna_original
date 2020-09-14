@@ -3,6 +3,9 @@
 input=$1
 base=$(basename $input .txt)
 
+## filter low reads
+awk '{if($4 > 1) print $0}' $input > ${base}.filtered
+
 ## fix start position (+1) compared to circexplorer2, find_circ, circRNA_finder
 while read line 
         do
@@ -15,4 +18,4 @@ while read line
         
         echo -e "$chr\t$start\t$stop\t$sign\t$count" >> ${base}.bed
 
-done < $input
+done < ${base}.filtered
