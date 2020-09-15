@@ -542,8 +542,7 @@ process circexplorer2_star{
         CIRCexplorer2 parse -t STAR $chimeric_reads -b ${base}.STAR.junction.bed
         CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.STAR.junction.bed -o ${base}.txt
         
-        awk '{if(\$13 > 1) print \$0}' ${base}.txt > ${base}.filtered
-        cut -f 1,2,3,6,13 ${base}.filtered > ${base}.bed
+        awk '{if(\$13 > 1) print $0}' ${base}.txt | awk -v OFS="\t" '{print \$1,\$2,\$3,\$6,\$13}' > ${base}.bed
         """
 }
 
@@ -601,7 +600,7 @@ process find_circ{
 
         grep circ ${base}.sites.bed | grep -v chrM | python /opt/conda/envs/circrna/bin/sum.py -2,3 | python /opt/conda/envs/circrna/bin/scorethresh.py -16 1 | python /opt/conda/envs/circrna/bin/scorethresh.py -15 2 | python /opt/conda/envs/circrna/bin/scorethresh.py -14 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 7 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 8,9 35 | python /opt/conda/envs/circrna/bin/scorethresh.py -17 100000 >> ${base}.txt
         
-	tail -n +2 ${base}.txt | cut -f 1,2,3,5,6 > ${base}.bed
+	tail -n +2 ${base}.txt | awk -v OFS="\t" '{print \$1,\$2,\$3,\$6,\$5}' > ${base}.bed
 	"""
 }
 
@@ -796,7 +795,7 @@ process dcc{
         DCC @samplesheet -mt1 @mate1file -mt2 @mate2file -D -an $gtf -Pi -F -M -Nr 1 1 -fg -A $fasta -N -T 8
         
         awk '{print \$6}' CircCoordinates >> strand
-        paste CircRNACount strand | cut -f 1,2,3,4,5 | tail -n +2 >> ${base}.txt
+        paste CircRNACount strand | tail -n +2 | awk -v OFS="\t" '{print \$1,\$2,\$3,\$5,\$4}' >> ${base}.txt
 	bash filter_DCC.sh ${base}.txt
         """
 }
@@ -894,8 +893,7 @@ process mapsplice_parse{
 
         CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.mapsplice.junction.bed -o ${base}.txt
 	
-	awk '{if(\$13 > 1) print \$0}' ${base}.txt > ${base}.filtered
-        cut -f 1,2,3,6,13 ${base}.filtered > ${base}.bed
+	awk '{if(\$13 > 1) print $0}' ${base}.txt | awk -v OFS="\t" '{print \$1,\$2,\$3,\$6,\$13}' > ${base}.bed
         """
 }
 
