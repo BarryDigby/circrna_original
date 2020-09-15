@@ -220,7 +220,7 @@ process bwa_index{
             file("${fasta.baseName}.*") into bwa_built
             val("$launchDir/index/bwa") into bwa_path
         
-        when: !(params.bwa_index) && 'ciriquant' in tool 
+        when: !(params.bwa_index) && ('ciriquant' in tool || 'combine' in tool)
         
         script:
         """
@@ -243,7 +243,7 @@ process hisat2_index{
             file("${fasta.baseName}.*.ht2") into hisat2_built
             val("$launchDir/index/hisat2") into hisat2_path
             
-        when: !(params.hisat2_index) && 'ciriquant' in tool
+        when: !(params.hisat2_index) && ('ciriquant' in tool || 'combine' in tool)
         
         script:
         """
@@ -265,7 +265,7 @@ process star_index{
         output:
             file("star_index") into star_built
               
-        when: !(params.star_index) && ('circexplorer2' in tool || 'circrna_finder' in tool || 'dcc' in tool)
+        when: !(params.star_index) && ('circexplorer2' in tool || 'circrna_finder' in tool || 'dcc' in tool || 'combine' in tool))
         
         script:
         """
@@ -294,7 +294,7 @@ process bowtie_index{
             file ("${fasta.baseName}.*") into bowtie_built
             val("$launchDir/index/bowtie") into bowtie_path
             
-        when: !(params.bowtie_index) && ('mapsplice' in tool || 'uroborus' in tool)
+        when: !(params.bowtie_index) && ('mapsplice' in tool || 'uroborus' in tool || 'combine' in tool)
 
         script:
         """
@@ -315,7 +315,7 @@ process bowtie2_index{
         output:
             file ("${fasta.baseName}.*") into bowtie2_built
             
-        when: !(params.bowtie2_index) && ('find_circ' in tool || 'uroborus' in tool)
+        when: !(params.bowtie2_index) && ('find_circ' in tool || 'uroborus' in tool || 'combine' in tool)
 
         script:
         """
@@ -345,7 +345,7 @@ process split_fasta{
              file("*.fa") into split_fasta
              val("$launchDir/index/chromosomes") into split_fasta_path
              
-        when: ('mapsplice' in tool || 'find_circ' in tool)
+        when: ('mapsplice' in tool || 'find_circ' in tool || 'combine' in tool)
         
         shell:
         '''
@@ -371,7 +371,7 @@ process ciriquant_yml{
         output:
             file("travis.yml") into yml_built
 
-        when: !(params.ciriquant_yml) && 'ciriquant' in tool
+        when: !(params.ciriquant_yml) && ('ciriquant' in tool || 'combine' in tool)
 
         script:
         index_prefix = fasta.toString() - ~/.fa/
@@ -485,7 +485,7 @@ process star_align{
         output:
             tuple val(base), file("${base}.Chimeric.out.junction") into circexplorer2_input
          
-        when: 'circexplorer2' in tool
+        when: ('circexplorer2' in tool || 'combine' in tool)
         
         script:
         """
@@ -535,7 +535,7 @@ process circexplorer2_star{
         output:
             tuple val(base), file("${base}.bed") into circexplorer2_results
         
-        when: 'circexplorer2' in tool
+        when: ('circexplorer2' in tool || 'combine' in tool)
         
         script:
         """
@@ -560,7 +560,7 @@ process find_anchors{
         output:
             tuple val(base), file("${base}_anchors.qfa.gz") into ch_anchors
             
-        when: 'find_circ' in tool
+        when: ('find_circ' in tool || 'combine' in tool)
         
         script:
         """
@@ -588,7 +588,7 @@ process find_circ{
         output:
             tuple val(base), file("${base}.bed") into find_circ_results
          
-        when: 'find_circ' in tool
+        when: ('find_circ' in tool || 'combine' in tool)
         
         script:
         """
@@ -617,7 +617,7 @@ process circrna_finder_star{
         output:
             tuple val(base), file("${base}") into circrna_finder_star
             
-        when: 'circrna_finder' in tool
+        when: ('circrna_finder' in tool || 'combine' in tool)
         
         script:
         """      
@@ -648,7 +648,7 @@ process circrna_finder{
         output:
             tuple val(base), file("${base}.bed") into circrna_finder_results
             
-        when: 'circrna_finder' in tool
+        when: ('circrna_finder' in tool || 'combine' in tool)
         
         script:
         """
@@ -669,7 +669,7 @@ process dcc_pair{
         output:
             tuple val(base), file("samples") into dcc_samples
             
-        when: 'dcc' in tool
+        when: ('dcc' in tool || 'combine' in tool)
         
         script:
         """
@@ -704,7 +704,7 @@ process dcc_1{
         output:
             tuple val(base), file("mate1") into dcc_mate1
             
-        when: 'dcc' in tool
+       when: ('dcc' in tool || 'combine' in tool)
         
         script:
         """
@@ -740,8 +740,8 @@ process dcc_2{
         output:
             tuple val(base), file("mate2") into dcc_mate2
             
-        when: 'dcc' in tool
-        
+        when: ('dcc' in tool || 'combine' in tool)
+	
         script:
         """
         STAR \
@@ -782,7 +782,7 @@ process dcc{
         output:
             tuple val(base), file("${base}.bed") into dcc_results
 
-        when: 'dcc' in tool
+       when: ('dcc' in tool || 'combine' in tool)
         
         script:
         COJ="Chimeric.out.junction"
@@ -815,7 +815,7 @@ process ciriquant{
         output:
             tuple val(base), file("${base}.bed") into ciriquant_results
             
-        when: 'ciriquant' in tool
+        when: ('ciriquant' in tool || 'combine' in tool)
         
         script:
         """
@@ -849,7 +849,7 @@ process mapsplice_align{
         output:
             tuple val(base), file("${base}/fusions_raw.txt") into mapsplice_fusion
 
-        when: 'mapsplice' in tool
+        when: ('mapsplice' in tool || 'combine' in tool)
 
         script:
         prefix = gtf.toString() - ~/.gtf/
@@ -886,7 +886,7 @@ process mapsplice_parse{
         output:
             tuple val(base), file("${base}.bed") into mapsplice_results
         
-        when: 'mapsplice' in tool
+        when: ('mapsplice' in tool || 'combine' in tool)
         
         script:
         """
@@ -963,53 +963,43 @@ process uroborus{
 ================================================================================
 */
 
-// hisat2 path provided, must capture files for this process
-// might be worthwhile revisiting other paths for this
-
-//ch_hisat2_index_files = ch_hisat2_index.map{ it -> files = "${it}/*"}
-//ch_hisat2_index_files.view()
-
-// this is messy but works. can revisit this and try to work out the above code (currently provides input.4 so not working properly)
-
-hisat2_files = "$params.outdir/index/hisat2/*"
+hisat2_files = params.hisat2_index + "/*"
 ch_hisat2_index_files = Channel.fromPath( hisat2_files )
-(ch_hisat2_1, ch_hisat2_2) = ch_hisat2_index_files.into(2)
-ch_hisat2_1.view()
 
 process Hisat2_align{
 
-	input:
-		tuple val(base), file(fastq) from hisat2_reads
-		file(hisat2_index) from ch_hisat2_2.collect()
-		file(fasta) from ch_fasta
-		
-	output:
-		tuple val(base), file("${base}.bam") into hisat2_bam
-		
-	script:
-	"""
-	hisat2 -p 16 --dta -q -x ${fasta.baseName} -1 ${fastq[0]} -2 ${fastq[1]} -t | samtools view -bS - | samtools sort --threads 16 -m 2G - > ${base}.bam
-	"""
+        input:
+                tuple val(base), file(fastq) from hisat2_reads
+                file(hisat2_index) from ch_hisat2_index_files.collect()
+                file(fasta) from ch_fasta
+
+        output:
+                tuple val(base), file("${base}.bam") into hisat2_bam
+
+        script:
+        """
+        hisat2 -p 16 --dta -q -x ${fasta.baseName} -1 ${fastq[0]} -2 ${fastq[1]} -t | samtools view -bS - | samtools sort --threads 16 -m 2G - > ${base}.bam
+        """
 }
 
 
 process StringTie{
 
-	publishDir "$params.outdir/rna-seq", mode:'copy'
-	
-	input:
-		tuple val(base), file(bam) from hisat2_bam
-		file(gtf) from ch_gencode_gtf
-	output:
-		tuple val(base), file("${base}_genes.list") into stringtie_quant
-		file("${base}") into stringtie_dir
-		
-	script:
-	"""
-	mkdir ${base}/
-	stringtie $bam -e -G $gtf -C ${base}/${base}_cov.gtf -p 16 -o ${base}/${base}.gtf -A ${base}/${base}_genes.list 
-	cp ${base}/${base}_genes.list ./
-	"""
+        publishDir "$params.outdir/rna-seq", mode:'copy'
+
+        input:
+                tuple val(base), file(bam) from hisat2_bam
+                file(gtf) from ch_gencode_gtf
+        output:
+                tuple val(base), file("${base}_genes.list") into stringtie_quant
+                file("${base}") into stringtie_dir
+
+        script:
+        """
+        mkdir ${base}/
+        stringtie $bam -e -G $gtf -C ${base}/${base}_cov.gtf -p 16 -o ${base}/${base}.gtf -A ${base}/${base}_genes.list
+        cp ${base}/${base}_genes.list ./
+        """
 }
  
 /*
@@ -1023,6 +1013,61 @@ process StringTie{
 // apply filtering steps before this step! 
 // simple awk|grep one liners will do after tool generates results. 
 
+// CONSOLIDATION TIME
+
+// it works, sloppy perhaps but whos fuckin' looking
+
+if('combine' in tool){
+
+	output_ch = ciriquant_results.join(circexplorer2_results).join(dcc_results).join(circrna_finder_results).join(find_circ_results)
+
+        (test1, test2) = output_ch.into(2)
+
+        test1.view()
+
+        process consolidate_meh{
+                        echo true
+                        publishDir "$params.outdir/circrna_discovery/matrix1", mode:'copy'
+
+                        input:
+                                tuple val(base), file(ciriquant), file(circexplorer2), file(dcc), file(circrna_finder), file(find_circ) from test2
+
+                        output:
+                                file("*") into consolidate_meh_out
+
+                        script:
+                        """
+                        echo $base $ciriquant $circexplorer2 $dcc $circrna_finder $find_circ
+                        """
+                        }
+} else{
+
+        counts_channel = ciriquant_results.mix(circexplorer2_results, dcc_results, circrna_finder_results, find_circ_results)
+        (test3, test4) = counts_channel.into(2)
+        test3.view()
+
+        // contains input.1 , input2 because i do not know how to get rid of val from tuple
+        process consolidate_me2{
+
+                        echo true
+                        publishDir "$params.outdir/circrna_discovery/matrix", mode:'copy'
+
+
+                        input:
+                                file(bed) from test4.collect()
+
+                        output:
+                                stdout to out
+                                file("bed_files") into output
+
+                        script:
+                        """
+                        echo $bed
+                        mkdir bed_files/
+                        mv *.bed bed_files/
+                        """
+                        }
+}
 
 
 
@@ -1053,6 +1098,7 @@ def defineToolList() {
         'circrna_finder',
         'dcc',
         'mapsplice',
-        'uroborus'
+        'uroborus',
+	'combined'
         ]
 }
