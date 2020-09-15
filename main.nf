@@ -533,7 +533,7 @@ process circexplorer2_star{
             file(gene_annotation) from ch_gene_annotation
             
         output:
-            tuple val(base), file("${base}.bed") into circexplorer2_results
+            tuple val(base), file("${base}_circexplorer2.bed") into circexplorer2_results
         
         when: ('circexplorer2' in tool || 'combine' in tool)
         
@@ -542,7 +542,7 @@ process circexplorer2_star{
         CIRCexplorer2 parse -t STAR $chimeric_reads -b ${base}.STAR.junction.bed
         CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.STAR.junction.bed -o ${base}.txt
         
-        awk '{if(\$13 > 1) print $0}' ${base}.txt | awk -v OFS="\t" '{print \$1,\$2,\$3,\$6,\$13}' > ${base}.bed
+        awk '{if(\$13 > 1) print \$0}' ${base}.txt | awk -v OFS="\t" '{print \$1,\$2,\$3,\$6,\$13}' > ${base}_circexplorer2.bed
         """
 }
 
@@ -585,7 +585,7 @@ process find_circ{
             val(fasta_chr_path) from ch_fasta_chr
         
         output:
-            tuple val(base), file("${base}.bed") into find_circ_results
+            tuple val(base), file("${base}_find_circ.bed") into find_circ_results
          
         when: ('find_circ' in tool || 'combine' in tool)
         
@@ -600,7 +600,7 @@ process find_circ{
 
         grep circ ${base}.sites.bed | grep -v chrM | python /opt/conda/envs/circrna/bin/sum.py -2,3 | python /opt/conda/envs/circrna/bin/scorethresh.py -16 1 | python /opt/conda/envs/circrna/bin/scorethresh.py -15 2 | python /opt/conda/envs/circrna/bin/scorethresh.py -14 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 7 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 8,9 35 | python /opt/conda/envs/circrna/bin/scorethresh.py -17 100000 >> ${base}.txt
         
-	tail -n +2 ${base}.txt | awk -v OFS="\t" '{print \$1,\$2,\$3,\$6,\$5}' > ${base}.bed
+	tail -n +2 ${base}.txt | awk -v OFS="\t" '{print \$1,\$2,\$3,\$6,\$5}' > ${base}_find_circ.bed
 	"""
 }
 
@@ -645,7 +645,7 @@ process circrna_finder{
             tuple val(base), file(star_dir) from circrna_finder_star
          
         output:
-            tuple val(base), file("${base}.bed") into circrna_finder_results
+            tuple val(base), file("${base}_circrna_finder.bed") into circrna_finder_results
             
         when: ('circrna_finder' in tool || 'combine' in tool)
         
@@ -653,7 +653,7 @@ process circrna_finder{
         """
         postProcessStarAlignment.pl --starDir ${star_dir}/ --outDir ./
 
-	tail -n +2 ${base}.filteredJunctions.bed | awk '{if(\$5 > 1) print \$0}' | awk  -v OFS="\t" -F"\t" '{print \$1,\$2,\$3,\$6,\$5}' > ${base}.bed
+	tail -n +2 ${base}.filteredJunctions.bed | awk '{if(\$5 > 1) print \$0}' | awk  -v OFS="\t" -F"\t" '{print \$1,\$2,\$3,\$6,\$5}' > ${base}_circrna_finder.bed
         """
 }
 
@@ -779,7 +779,7 @@ process dcc{
             file(fasta) from ch_fasta
 
         output:
-            tuple val(base), file("${base}.bed") into dcc_results
+            tuple val(base), file("${base}_dcc.bed") into dcc_results
 
        when: ('dcc' in tool || 'combine' in tool)
         
@@ -795,8 +795,8 @@ process dcc{
         DCC @samplesheet -mt1 @mate1file -mt2 @mate2file -D -an $gtf -Pi -F -M -Nr 1 1 -fg -A $fasta -N -T 8
         
         awk '{print \$6}' CircCoordinates >> strand
-        paste CircRNACount strand | tail -n +2 | awk -v OFS="\t" '{print \$1,\$2,\$3,\$5,\$4}' >> ${base}.txt
-	bash filter_DCC.sh ${base}.txt
+        paste CircRNACount strand | tail -n +2 | awk -v OFS="\t" '{print \$1,\$2,\$3,\$5,\$4}' >> ${base}_dcc.txt
+	bash filter_DCC.sh ${base}_dcc.txt
         """
 }
 
@@ -826,9 +826,9 @@ process ciriquant{
         -o ${base} \
         -p ${base}
         
-        mv ${base}/${base}.gtf ./
+        mv ${base}/${base}_ciriquant.gtf ./
 	
-	bash filter_CIRIquant.sh ${base}.gtf
+	bash filter_CIRIquant.sh ${base}_ciriquant.gtf
         """
 }
       
@@ -883,7 +883,7 @@ process mapsplice_parse{
             file(gene_annotation) from ch_gene_annotation
             
         output:
-            tuple val(base), file("${base}.bed") into mapsplice_results
+            tuple val(base), file("${base}_mapsplice.bed") into mapsplice_results
         
         when: ('mapsplice' in tool || 'combine' in tool)
         
@@ -893,7 +893,7 @@ process mapsplice_parse{
 
         CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.mapsplice.junction.bed -o ${base}.txt
 	
-	awk '{if(\$13 > 1) print $0}' ${base}.txt | awk -v OFS="\t" '{print \$1,\$2,\$3,\$6,\$13}' > ${base}.bed
+	awk '{if(\$13 > 1) print \$0}' ${base}.txt | awk -v OFS="\t" '{print \$1,\$2,\$3,\$6,\$13}' > ${base}_mapsplice.bed
         """
 }
 
