@@ -265,7 +265,7 @@ process star_index{
         output:
             file("star_index") into star_built
               
-        when: !(params.star_index) && ('circexplorer2' in tool || 'circrna_finder' in tool || 'dcc' in tool || 'combine' in tool))
+        when: !(params.star_index) && ('circexplorer2' in tool || 'circrna_finder' in tool || 'dcc' in tool || 'combine' in tool)
         
         script:
         """
