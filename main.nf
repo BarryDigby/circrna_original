@@ -1115,6 +1115,6 @@ def defineToolList() {
         'dcc',
         'mapsplice',
         'uroborus',
-	'combined'
+	'combine'
         ]
 }
