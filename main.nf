@@ -180,6 +180,7 @@ ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : 
 ch_fasta.view()
 ch_gene_annotation.view()
 ch_gencode_gtf.view()
+println "$projectDir"
 
 /*
 ================================================================================
@@ -1035,7 +1036,7 @@ if('combine' in tool){
                                 printf "\$i\n" >> samples.csv
                         done
 
-                        Rscript consolidate_algorithms.R
+                        Rscript "$projectDir"/bin/consolidate_algorithms.R
 			
                         mv combined_counts.bed ${base}.bed
                         """
@@ -1052,7 +1053,7 @@ if('combine' in tool){
 				
 			script:
 			"""
-			python circRNA_counts_matrix.py > circRNA_matrix.txt
+			python "$projectDir"/bin/circRNA_counts_matrix.py > circRNA_matrix.txt
 			"""
 			}
 
@@ -1080,7 +1081,7 @@ if('combine' in tool){
 				mv \$b \${bar}.bed
 			done
 			
-			python circRNA_counts_matrix.py > circRNA_matrix.txt
+			python "$projectDir"/bin/circRNA_counts_matrix.py > circRNA_matrix.txt
                         """
                         }
 }
