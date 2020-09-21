@@ -826,7 +826,7 @@ process ciriquant{
         -o ${base} \
         -p ${base}
         
-        mv ${base}/${base}_ciriquant.gtf ./
+        mv ${base}/${base}.gtf ${base}_ciriquant.gtf
 	
 	bash filter_CIRIquant.sh ${base}_ciriquant.gtf
         """
