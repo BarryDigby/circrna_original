@@ -1068,7 +1068,7 @@ if('combine' in tool){
 
 
                         input:
-                                tuple val(base), file(bed) from single_tool.collect()
+                                file(bed) from single_tool.collect()
 				val(tool) from params.tool
                         output:
                                 file("circRNA_matrix.txt") into circRNA_counts
