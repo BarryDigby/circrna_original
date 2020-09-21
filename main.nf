@@ -1026,7 +1026,7 @@ if('combine' in tool){
                                 tuple val(base), file(ciriquant), file(circexplorer2), file(dcc), file(circrna_finder), file(find_circ), file(mapsplice) from combined_tool
 
                         output:
-                                tuple val(base), file("${base}.bed") into sample_counts
+                                file("${base}.bed") into sample_counts
 
                         script:
                         """
@@ -1046,7 +1046,7 @@ if('combine' in tool){
 			publishDir "$params.outdir/circrna_discovery/matrix", mode:'copy'
 			
 			input:
-				tuple val(base), file(bed) from sample_counts.collect()
+				file(bed) from sample_counts.collect()
 				
 			output:
 				file("circRNA_matrix.txt") into circRNA_counts_combined
