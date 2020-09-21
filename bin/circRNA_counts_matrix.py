@@ -1,9 +1,6 @@
 import sys,glob
 from collections import defaultdict
 
-
-#chr1	105927622	105952278	-	12
-
 par = sys.argv
 hld = defaultdict(list)
 samps = defaultdict(list)
