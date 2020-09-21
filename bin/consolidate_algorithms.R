@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-dir = "./"
+dir = "."
 samples = read.table(file.path(dir, 'samples.csv'))
 files = file.path(dir, samples[,1])
 
