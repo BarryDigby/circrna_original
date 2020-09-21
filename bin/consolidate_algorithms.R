@@ -7,7 +7,7 @@ files = file.path(dir, samples[,1])
 ciriq_index <- grep("ciriquant", files)
 ciriquant <- read.table(files[ciriq_index], header = F, sep ="\t")
 
-circrna_finder_index <- grep("circrnafinder", files)
+circrna_finder_index <- grep("circrna_finder", files)
 circrna_finder <- read.table(files[circrna_finder_index], header = F, sep="\t")
 
 circexplorer2_index = grep("circexplorer", files)
