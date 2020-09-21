@@ -436,34 +436,34 @@ if(params.input_type == 'bam'){
     
 ch_reads = fastq_built
 
-process bbduk {
-    
-        publishDir "$params.outdir/trimmed_reads", mode:'copy'
-    
-        input:
-            tuple val(base), file(fastq) from ch_reads
-            path adapters from params.adapters
-            
-        output:
-            tuple val(base), file('*.fastq.gz') into trim_reads_built
-            
-        script:
-        """
-        bbduk.sh -Xmx4g \
-        in1=${fastq[0]} \
-        in2=${fastq[1]} \
-        out1=${base}_1.fastq.gz \
-        out2=${base}_2.fastq.gz \
-        ref=$adapters \
-        minlen=30 \
-        ktrim=r \
-        k=12 \
-        qtrim=r \
-        trimq=20
-        """
-}
+/process bbduk {
+/    
+/        publishDir "$params.outdir/trimmed_reads", mode:'copy'
+/    
+/        input:
+/            tuple val(base), file(fastq) from ch_reads
+/            path adapters from params.adapters
+/            
+/        output:
+/            tuple val(base), file('*.fastq.gz') into trim_reads_built
+/            
+/        script:
+/        """
+/        bbduk.sh -Xmx4g \
+/        in1=${fastq[0]} \
+/        in2=${fastq[1]} \
+/        out1=${base}_1.fastq.gz \
+/        out2=${base}_2.fastq.gz \
+/        ref=$adapters \
+/        minlen=30 \
+/        ktrim=r \
+/        k=12 \
+/        qtrim=r \
+/        trimq=20
+/        """
+/}
 
-(circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads, circrna_finder_reads, dcc_reads, dcc_reads_mate1, dcc_reads_mate2, hisat2_reads) = trim_reads_built.into(10)
+(circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads, circrna_finder_reads, dcc_reads, dcc_reads_mate1, dcc_reads_mate2, hisat2_reads) = ch_reads.into(10)
 
 /*
 ================================================================================
@@ -812,7 +812,7 @@ process ciriquant{
             file(ciriquant_yml) from ch_ciriquant_yml
 
         output:
-            tuple val(base), file("${base}.bed") into ciriquant_results
+            tuple val(base), file("${base}_ciriquant.bed") into ciriquant_results
             
         when: ('ciriquant' in tool || 'combine' in tool)
         
@@ -1011,58 +1011,76 @@ process StringTie{
 // apply filtering steps before this step! 
 // simple awk|grep one liners will do after tool generates results. 
 
-// CONSOLIDATION TIME
-
-// it works, sloppy perhaps but whos fuckin' looking
+// CONSOLIDATION
 
 if('combine' in tool){
 
-	output_ch = ciriquant_results.join(circexplorer2_results).join(dcc_results).join(circrna_finder_results).join(find_circ_results)
+	combined_tool = ciriquant_results.join(circexplorer2_results).join(dcc_results).join(circrna_finder_results).join(find_circ_results).join(mapsplice)
 
-        (test1, test2) = output_ch.into(2)
-
-        test1.view()
-
-        process consolidate_meh{
+        process consolidate_algorithms{
                         echo true
-                        publishDir "$params.outdir/circrna_discovery/matrix1", mode:'copy'
+                        publishDir "$params.outdir/circrna_discovery/matrix", mode:'copy'
 
                         input:
-                                tuple val(base), file(ciriquant), file(circexplorer2), file(dcc), file(circrna_finder), file(find_circ) from test2
+                                tuple val(base), file(ciriquant), file(circexplorer2), file(dcc), file(circrna_finder), file(find_circ), file(mapsplice) from combined_tool
 
                         output:
-                                file("*") into consolidate_meh_out
+                                tuple val(base), file("${base}.bed") into sample_counts
 
                         script:
                         """
-                        echo $base $ciriquant $circexplorer2 $dcc $circrna_finder $find_circ
+                        files=\$(ls *.bed)
+
+                        for i in \$files; do
+                                printf "\$i\n" >> samples.csv
+                        done
+
+                        Rscript consolidate_algorithms.R
+			
+                        mv combined_counts.bed ${base}.bed
                         """
                         }
+			
+	process get_counts_combined{
+			publishDir "$params.outdir/circrna_discovery/matrix", mode:'copy'
+			
+			input:
+				tuple val(base), file(bed) from sample_counts.collect()
+				
+			output:
+				file("circRNA_matrix.txt") into circRNA_counts_combined
+				
+			script:
+			"""
+			python circRNA_counts_matrix.py > circRNA_matrix.txt
+			"""
+			}
+
 } else{
 
-        counts_channel = ciriquant_results.mix(circexplorer2_results, dcc_results, circrna_finder_results, find_circ_results)
-        (test3, test4) = counts_channel.into(2)
-        test3.view()
+        single_tool = ciriquant_results.mix(circexplorer2_results, dcc_results, circrna_finder_results, find_circ_results)
 
-        // contains input.1 , input2 because i do not know how to get rid of val from tuple
-        process consolidate_me2{
+        process get_counts_single{
 
                         echo true
                         publishDir "$params.outdir/circrna_discovery/matrix", mode:'copy'
 
 
                         input:
-                                file(bed) from test4.collect()
-
+                                tuple val(base), file(bed) from single_tool.collect()
+				val(tool) from params.tool
                         output:
-                                stdout to out
-                                file("bed_files") into output
+                                file("circRNA_matrix.txt") into circRNA_counts
 
                         script:
                         """
-                        echo $bed
-                        mkdir bed_files/
-                        mv *.bed bed_files/
+                        for b in *.bed; do 
+				foo=\${b%".bed"}; 
+				bar=\${foo%"_${tool}"}; 
+				mv \$b \${bar}.bed
+			done
+			
+			python circRNA_counts_matrix.py > circRNA_matrix.txt
                         """
                         }
 }
