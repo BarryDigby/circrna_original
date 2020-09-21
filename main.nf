@@ -436,32 +436,32 @@ if(params.input_type == 'bam'){
     
 ch_reads = fastq_built
 
-/process bbduk {
-/    
-/        publishDir "$params.outdir/trimmed_reads", mode:'copy'
-/    
-/        input:
-/            tuple val(base), file(fastq) from ch_reads
-/            path adapters from params.adapters
-/            
-/        output:
-/            tuple val(base), file('*.fastq.gz') into trim_reads_built
-/            
-/        script:
-/        """
-/        bbduk.sh -Xmx4g \
-/        in1=${fastq[0]} \
-/        in2=${fastq[1]} \
-/        out1=${base}_1.fastq.gz \
-/        out2=${base}_2.fastq.gz \
-/        ref=$adapters \
-/        minlen=30 \
-/        ktrim=r \
-/        k=12 \
-/        qtrim=r \
-/        trimq=20
-/        """
-/}
+//process bbduk {
+//    
+//        publishDir "$params.outdir/trimmed_reads", mode:'copy'
+//    
+//        input:
+//            tuple val(base), file(fastq) from ch_reads
+//            path adapters from params.adapters
+//            
+//        output:
+//            tuple val(base), file('*.fastq.gz') into trim_reads_built
+//            
+//        script:
+//        """
+//        bbduk.sh -Xmx4g \
+//        in1=${fastq[0]} \
+//        in2=${fastq[1]} \
+//        out1=${base}_1.fastq.gz \
+//        out2=${base}_2.fastq.gz \
+//        ref=$adapters \
+//        minlen=30 \
+//        ktrim=r \
+//        k=12 \
+//        qtrim=r \
+//        trimq=20
+//        """
+//}
 
 (circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads, circrna_finder_reads, dcc_reads, dcc_reads_mate1, dcc_reads_mate2, hisat2_reads) = ch_reads.into(10)
 
