@@ -1015,7 +1015,7 @@ process StringTie{
 
 if('combine' in tool){
 
-	combined_tool = ciriquant_results.join(circexplorer2_results).join(dcc_results).join(circrna_finder_results).join(find_circ_results).join(mapsplice)
+	combined_tool = ciriquant_results.join(circexplorer2_results).join(dcc_results).join(circrna_finder_results).join(find_circ_results).join(mapsplice_results)
 
         process consolidate_algorithms{
                         echo true
