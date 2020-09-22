@@ -118,6 +118,8 @@ params.input_type = 'fastq'
 params.fastq_glob = '*_R{1,2}.fastq.gz'
 params.bam_glob = '*.bam'
 params.adapters = '/data/bdigby/grch38/adapters.fa'
+params.phenotype = ''
+params.deseq2_design = '~ condition'
 
 toolList = defineToolList()
 tool = params.tool ? params.tool.split(',').collect{it.trim().toLowerCase()} : []
@@ -990,14 +992,12 @@ process StringTie{
                 tuple val(base), file(bam) from hisat2_bam
                 file(gtf) from ch_gencode_gtf
         output:
-                tuple val(base), file("${base}_genes.list") into stringtie_quant
                 file("${base}") into stringtie_dir
 
         script:
         """
         mkdir ${base}/
         stringtie $bam -e -G $gtf -C ${base}/${base}_cov.gtf -p 16 -o ${base}/${base}.gtf -A ${base}/${base}_genes.list
-        cp ${base}/${base}_genes.list ./
         """
 }
  
@@ -1087,7 +1087,31 @@ if('combine' in tool){
 }
 
 
+// user can chose either method so merge channels
 
+circRNA_matrix = circRNA_counts_combined.join(circRNA_counts)
+
+process diff_exp{
+
+	publishDir "$params.outdir/rna-seq", mode:'copy'
+	
+	input:
+		file(gtf_dir) from stringtie_dir.collect()
+		file(circ_mtx) from circRNA_matrix
+		file(phenotype) from params.phenotype
+		val(design) from params.deseq2_design
+	output:
+		file("*") into diff_exp_results
+		
+	script:
+	"""
+	for i in \$(ls -d */); do sample=\${i%"/"}; file=\${sample}.gtf; touch samples.txt; printf "\$sample\t\${i}\${file}\n" >> samples.txt; done
+	
+	prepDE.py -i samples.txt
+	
+	Rscript "$projectDir"/bin/DE.R $phenotype $design
+	"""
+}
 
 
 
