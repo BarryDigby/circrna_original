@@ -571,7 +571,7 @@ process find_anchors{
         """
         bowtie2 -p 16 --very-sensitive --mm -D 20 --score-min=C,-15,0 \
         -x ${fasta.baseName} -q -1 ${fastq[0]} -2 ${fastq[1]} \
-        | samtools view -hbuS - | samtools sort --threads 8 -m 2G - > ${base}.bam
+        | samtools view -hbuS - | samtools sort --threads 16 -m 2G - > ${base}.bam
 
         samtools view -hf 4 ${base}.bam | samtools view -Sb - > ${base}_unmapped.bam
 
@@ -630,7 +630,7 @@ process circrna_finder_star{
         --genomeDir $star_index \
         --readFilesIn ${fastq[0]} ${fastq[1]} \
         --readFilesCommand zcat \
-        --runThreadN 8 \
+        --runThreadN 16 \
         --chimSegmentMin 20 \
         --chimScoreMin 1 \
         --chimOutType Junctions SeparateSAMold \
@@ -679,7 +679,7 @@ process dcc_pair{
         script:
         """
         STAR \
-        --runThreadN 8 \
+        --runThreadN 16 \
         --genomeDir $star_index \
         --outSAMtype BAM SortedByCoordinate \
         --readFilesIn ${fastq[0]} ${fastq[1]} \
@@ -714,7 +714,7 @@ process dcc_1{
         script:
         """
         STAR \
-        --runThreadN 8 \
+        --runThreadN 16 \
         --genomeDir $star_index \
         --outSAMtype None \
         --readFilesIn ${fastq[0]} \
@@ -750,7 +750,7 @@ process dcc_2{
         script:
         """
         STAR \
-        --runThreadN 8 \
+        --runThreadN 16 \
         --genomeDir $star_index \
         --outSAMtype None \
         --readFilesIn ${fastq[1]} \
@@ -824,7 +824,7 @@ process ciriquant{
         
         script:
         """
-        CIRIquant -t 8 \
+        CIRIquant -t 16 \
         -1 ${fastq[0]} \
         -2 ${fastq[1]} \
         --config $ciriquant_yml \
@@ -867,7 +867,7 @@ process mapsplice_align{
         -x $prefix \
         -1 ${base}_R1.fastq \
         -2 ${base}_R2.fastq \
-        -p 8 \
+        -p 16 \
         --bam \
         --seglen 25 \
         --min-map-len 40 \
@@ -982,7 +982,7 @@ process Hisat2_align{
 
         script:
         """
-        hisat2 -p 8 --dta -q -x ${fasta.baseName} -1 ${fastq[0]} -2 ${fastq[1]} -t | samtools view -bS - | samtools sort --threads 8 -m 2G - > ${base}.bam
+        hisat2 -p 16 --dta -q -x ${fasta.baseName} -1 ${fastq[0]} -2 ${fastq[1]} -t | samtools view -bS - | samtools sort --threads 16 -m 2G - > ${base}.bam
         """
 }
 
@@ -1000,7 +1000,7 @@ process StringTie{
         script:
         """
         mkdir ${base}/
-        stringtie $bam -e -G $gtf -C ${base}/${base}_cov.gtf -p 8 -o ${base}/${base}.gtf -A ${base}/${base}_genes.list
+        stringtie $bam -e -G $gtf -C ${base}/${base}_cov.gtf -p 16 -o ${base}/${base}.gtf -A ${base}/${base}_genes.list
         """
 }
  
