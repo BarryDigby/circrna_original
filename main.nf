@@ -120,6 +120,7 @@ params.bam_glob = '*.bam'
 params.adapters = '/data/bdigby/grch38/adapters.fa'
 params.phenotype = ''
 params.deseq2_design = '~ condition'
+params.max_cpus = '16'
 
 toolList = defineToolList()
 tool = params.tool ? params.tool.split(',').collect{it.trim().toLowerCase()} : []
