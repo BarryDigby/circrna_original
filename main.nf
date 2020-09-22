@@ -1049,7 +1049,7 @@ if('combine' in tool){
 				file(bed) from sample_counts.collect()
 				
 			output:
-				file("circRNA_matrix.txt") into circRNA_counts_combined
+				file("circRNA_matrix.txt") into circRNA_counts
 				
 			script:
 			"""
@@ -1087,9 +1087,6 @@ if('combine' in tool){
 }
 
 
-// user can chose either method so merge channels
-
-circRNA_matrix = circRNA_counts_combined.join(circRNA_counts)
 
 process diff_exp{
 
@@ -1097,7 +1094,7 @@ process diff_exp{
 	
 	input:
 		file(gtf_dir) from stringtie_dir.collect()
-		file(circ_mtx) from circRNA_matrix
+		file(circ_mtx) from circRNA_counts
 		file(phenotype) from params.phenotype
 		val(design) from params.deseq2_design
 	output:
