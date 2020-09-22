@@ -41,7 +41,7 @@ circ <- subset(circ, select=-c(Chr, Start, Stop, Strand, circ))
 ## now have circ mat
 
 dds_circ <- DESeqDataSetFromMatrix(circ, colData, design = args[2])
-sizeFactors(dds_circ) = c(size_fasctors)
+sizeFactors(dds_circ) = c(size_factors)
 dds_circ <- DESeq(dds_circ)
 res <- results(dds_circ)
 
