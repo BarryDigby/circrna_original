@@ -477,6 +477,7 @@ ch_reads = fastq_built
 // CIRCexplorer2
 
 process star_align{
+	label 'cpus_max'
 
         publishDir "$params.outdir/star_alignment", mode:'copy', overwrite: true
     
