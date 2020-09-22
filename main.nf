@@ -123,6 +123,9 @@ params.deseq2_design = '~ condition'
 params.max_cpus = '16'
 params.cpus = '8'
 
+println "$params.phenotype"
+println "$params.deseq2_design"
+
 toolList = defineToolList()
 tool = params.tool ? params.tool.split(',').collect{it.trim().toLowerCase()} : []
 if (!checkParameterList(tool, toolList)) exit 1, 'Unknown tool, see --help for more information'
