@@ -120,8 +120,7 @@ params.bam_glob = '*.bam'
 params.adapters = '/data/bdigby/grch38/adapters.fa'
 params.phenotype = ''
 params.deseq2_design = '~ condition'
-params.max_cpus = '16'
-params.cpus = '8'
+
 
 println "$params.phenotype"
 println "$params.deseq2_design"
@@ -482,7 +481,6 @@ ch_reads = fastq_built
 // CIRCexplorer2
 
 process star_align{
-	label 'cpus_max'
 
         publishDir "$params.outdir/star_alignment", mode:'copy', overwrite: true
     
