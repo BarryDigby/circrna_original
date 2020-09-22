@@ -496,7 +496,7 @@ process star_align{
         script:
         """
         STAR    \
-        --runThreadN 8 \
+        --runThreadN 16 \
         --twopassMode Basic \
         --twopass1readsN -1 \
         --genomeLoad NoSharedMemory \
