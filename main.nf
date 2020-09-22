@@ -493,7 +493,7 @@ process star_align{
         script:
         """
         STAR    \
-        --runThreadN 8 \
+        --runThreadN 16 \
         --twopassMode Basic \
         --twopass1readsN -1 \
         --genomeLoad NoSharedMemory \
@@ -627,7 +627,7 @@ process circrna_finder_star{
         --genomeDir $star_index \
         --readFilesIn ${fastq[0]} ${fastq[1]} \
         --readFilesCommand zcat \
-        --runThreadN 8 \
+        --runThreadN 16 \
         --chimSegmentMin 20 \
         --chimScoreMin 1 \
         --chimOutType Junctions SeparateSAMold \
@@ -711,7 +711,7 @@ process dcc_1{
         script:
         """
         STAR \
-        --runThreadN 10 \
+        --runThreadN 16 \
         --genomeDir $star_index \
         --outSAMtype None \
         --readFilesIn ${fastq[0]} \
@@ -747,7 +747,7 @@ process dcc_2{
         script:
         """
         STAR \
-        --runThreadN 10 \
+        --runThreadN 16 \
         --genomeDir $star_index \
         --outSAMtype None \
         --readFilesIn ${fastq[1]} \
@@ -795,7 +795,7 @@ process dcc{
         printf "mate1/${base}.${COJ}" > mate1file
         printf "mate2/${base}.${COJ}" > mate2file
 
-        DCC @samplesheet -mt1 @mate1file -mt2 @mate2file -D -an $gtf -Pi -F -M -Nr 1 1 -fg -A $fasta -N -T 8
+        DCC @samplesheet -mt1 @mate1file -mt2 @mate2file -D -an $gtf -Pi -F -M -Nr 1 1 -fg -A $fasta -N -T 16
         
         awk '{print \$6}' CircCoordinates >> strand
         paste CircRNACount strand | tail -n +2 | awk -v OFS="\t" '{print \$1,\$2,\$3,\$5,\$4}' >> ${base}_dcc.txt
@@ -864,7 +864,7 @@ process mapsplice_align{
         -x $prefix \
         -1 ${base}_R1.fastq \
         -2 ${base}_R2.fastq \
-        -p 8 \
+        -p 16 \
         --bam \
         --seglen 25 \
         --min-map-len 40 \
