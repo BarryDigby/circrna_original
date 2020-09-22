@@ -6,8 +6,10 @@ The container hosts the following circRNA tools:
 
 - CIRIquant (CIRI2)
 - CIRCexplorer2
+- circrna_finder
 - MapSplice
 - find_circ
+- DCC
 - UROBORUS **still under testing
 
 ## Gotchas
@@ -24,5 +26,3 @@ Thank you Simone Coughlan for the catch :)
 *--params.bowtie_index:* "/data/bdigby/grch38/index/bowtie/*" 
 ```
 
-
-Put Mapsplice & UROBORUS on ice for now (poor results?? tweak params. try test data) UROBORUS not working, cant be bothered making special GTF file thats years out of date
