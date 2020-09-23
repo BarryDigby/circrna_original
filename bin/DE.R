@@ -34,7 +34,7 @@ size_factors <- sizeFactors(dds)
 circ <- read.table("circRNA_matrix.txt", sep ="\t", header = T)
 
 ## merge coordinates for row names
-circ$circ <- with(circ, paste0(Chr, sep="_", Start, sep="_", Stop, sep="_", Strand))
+circ$circ <- with(circ, paste0(Chr, sep=":", Start, sep="-", Stop, sep=":", Strand))
 rownames(circ) <- circ$circ
 circ <- subset(circ, select=-c(Chr, Start, Stop, Strand, circ))
 
@@ -49,7 +49,7 @@ sizeFactors(dds_circ) = c(size_factors)
 dds_circ <- DESeq(dds_circ)
 res <- results(dds_circ)
 
-up_regulated <- get_upregutaled(res)
+up_regulated <- get_upregulated(res)
 down_regulated <- get_downregulated(res)
 
 write.table(up_regulated, "up_reg.txt", sep="\t", quote=F)
