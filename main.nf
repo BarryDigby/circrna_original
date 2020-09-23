@@ -866,8 +866,8 @@ process mapsplice_align{
         mapsplice.py \
         -c $mapsplice_ref \
         -x $prefix \
-        -1 ${base}_R1.fastq \
-        -2 ${base}_R2.fastq \
+        -1 ${base}_r1.fastq \
+        -2 ${base}_r2.fastq \
         -p 8 \
         --bam \
         --seglen 25 \
