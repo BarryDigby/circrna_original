@@ -119,7 +119,7 @@ params.fastq_glob = '*_R{1,2}.fastq.gz'
 params.bam_glob = '*.bam'
 params.adapters = '/data/bdigby/grch38/adapters.fa'
 params.phenotype = ''
-params.deseq2_design = '~ condition'
+params.deseq2_design = '~condition'
 
 
 println "$params.phenotype"
