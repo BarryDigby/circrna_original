@@ -24,7 +24,7 @@ library(biomaRt)
 countData <- as.matrix(read.csv("gene_count_matrix.csv", row.names="gene_id", check.names=F))
 colData <- read.csv(args[1], sep="\t", row.names=1)
 
-dds <- DESeqDataSetFromMatrix(countData, colData, design = args[2])
+dds <- DESeqDataSetFromMatrix(countData, colData, design = ~ condition)
 dds <- DESeq(dds)
 
 size_factors <- sizeFactors(dds)
@@ -38,9 +38,13 @@ circ$circ <- with(circ, paste0(Chr, sep="_", Start, sep="_", Stop, sep="_", Stra
 rownames(circ) <- circ$circ
 circ <- subset(circ, select=-c(Chr, Start, Stop, Strand, circ))
 
+## make sure colnames == rownames(pheno)
+reorder <- rownames(colData)
+circ <- circ[, reorder]
+
 ## now have circ mat
 
-dds_circ <- DESeqDataSetFromMatrix(circ, colData, design = args[2])
+dds_circ <- DESeqDataSetFromMatrix(circ, colData, design = ~ condition)
 sizeFactors(dds_circ) = c(size_factors)
 dds_circ <- DESeq(dds_circ)
 res <- results(dds_circ)
