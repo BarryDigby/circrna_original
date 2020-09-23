@@ -36,5 +36,5 @@ for k,v in samps.items():
 		for x in v:
 			if x[0] == h:
 				li.append(x[1])
-	print '\t'.join(k.split("_")) + '\t' + '\t'.join(li)
+	print('\t'.join(k.split("_")) + '\t' + '\t'.join(li))
 sys.exit()
