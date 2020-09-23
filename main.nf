@@ -1099,7 +1099,7 @@ process diff_exp{
 	input:
 		file(gtf_dir) from stringtie_dir.collect()
 		file(circ_mtx) from circRNA_counts
-		tuple val(phenotype), val(design) from Channel.value([params.phenotype, params.deseq2_design]) 
+		tuple file(phenotype), val(design) from Channel.value([params.phenotype, params.deseq2_design]) 
 		
 	output:
 		file("*") into diff_exp_results
