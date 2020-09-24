@@ -497,7 +497,7 @@ process star_align{
         script:
         """
         STAR    \
-        --runThreadN 16 \
+        --runThreadN 32 \
         --twopassMode Basic \
         --twopass1readsN -1 \
         --genomeLoad NoSharedMemory \
@@ -570,9 +570,9 @@ process find_anchors{
         
         script:
         """
-        bowtie2 -p 16 --very-sensitive --mm -D 20 --score-min=C,-15,0 \
+        bowtie2 -p 32 --very-sensitive --mm -D 20 --score-min=C,-15,0 \
         -x ${fasta.baseName} -q -1 ${fastq[0]} -2 ${fastq[1]} \
-        | samtools view -hbuS - | samtools sort --threads 16 -m 2G - > ${base}.bam
+        | samtools view -hbuS - | samtools sort --threads 32 -m 2G - > ${base}.bam
 
         samtools view -hf 4 ${base}.bam | samtools view -Sb - > ${base}_unmapped.bam
 
@@ -598,7 +598,7 @@ process find_circ{
         
         script:
         """
-        bowtie2 -p 16 --reorder --mm -D 20 --score-min=C,-15,0 -q -x ${fasta.baseName} \
+        bowtie2 -p 32 --reorder --mm -D 20 --score-min=C,-15,0 -q -x ${fasta.baseName} \
         -U $anchors | python /opt/conda/envs/circrna/bin/find_circ.py -G $fasta_chr_path -p ${base} -s ${base}.sites.log > ${base}.sites.bed 2> ${base}.sites.reads
 
         echo "# chrom:start:end:name:n_reads:strand:n_uniq:best_qual_A:best_qual_B:spliced_at_begin:spliced_at_end:tissues:tiss_counts:edits:anchor_overlap:breakpoints" > tmp.txt
