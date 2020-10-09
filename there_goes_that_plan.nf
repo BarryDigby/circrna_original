@@ -1094,16 +1094,17 @@ ch_phenotype = Channel.fromPath(params.phenotype)
 
 process diff_exp{
 
-	publishDir "$params.outdir/rna-seq", mode:'copy'
+	publishDir "$params.outdir/Differential_Expression", mode:'copy'
 	
 	input:
 		file(gtf_dir) from stringtie_dir.collect()
-		file(circ_mtx) from circRNA_counts
+		file(circ_matrix) from circRNA_counts
 		file(phenotype) from ch_phenotype
 		val(design) from params.deseq2_design 
 		
 	output:
-		file("*") into diff_exp_results
+		file("RNA-Srq") into RNA_Seq_Dir
+		file("circRNA") into circRNA_Dir
 		
 	script:
 	"""
@@ -1111,7 +1112,7 @@ process diff_exp{
 	
 	prepDE.py -i samples.txt
 	
-	Rscript "$projectDir"/bin/DE.R $phenotype $design
+	Rscript "$projectDir"/bin/DEA.R gene_coun_matrix.csv $phenotype $circ_matrix
 	"""
 }
 
