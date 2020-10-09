@@ -119,7 +119,6 @@ params.fastq_glob = '*_R{1,2}.fastq.gz'
 params.bam_glob = '*.bam'
 params.adapters = '/data/bdigby/grch38/adapters.fa'
 params.phenotype = ''
-params.deseq2_design = '~condition'
 
 
 println "$params.phenotype"
@@ -1100,7 +1099,6 @@ process diff_exp{
 		file(gtf_dir) from stringtie_dir.collect()
 		file(circ_matrix) from circRNA_counts
 		file(phenotype) from ch_phenotype
-		val(design) from params.deseq2_design 
 		
 	output:
 		file("RNA-Srq") into RNA_Seq_Dir
