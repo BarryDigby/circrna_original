@@ -121,8 +121,6 @@ params.adapters = '/data/bdigby/grch38/adapters.fa'
 params.phenotype = ''
 
 
-println "$params.phenotype"
-println "$params.deseq2_design"
 
 toolList = defineToolList()
 tool = params.tool ? params.tool.split(',').collect{it.trim().toLowerCase()} : []
