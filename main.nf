@@ -1099,7 +1099,7 @@ process diff_exp{
 		file(phenotype) from ch_phenotype
 		
 	output:
-		file("RNA-Srq") into RNA_Seq_Dir
+		file("RNA-Seq") into RNA_Seq_Dir
 		file("circRNA") into circRNA_Dir
 		
 	script:
