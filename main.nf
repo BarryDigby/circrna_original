@@ -1108,7 +1108,7 @@ process diff_exp{
 	
 	prepDE.py -i samples.txt
 	
-	Rscript "$projectDir"/bin/DEA.R gene_coun_matrix.csv $phenotype $circ_matrix
+	Rscript "$projectDir"/bin/DEA.R gene_count_matrix.csv $phenotype $circ_matrix
 	"""
 }
 
