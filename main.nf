@@ -798,7 +798,7 @@ process dcc{
         printf "mate1/${base}.${COJ}" > mate1file
         printf "mate2/${base}.${COJ}" > mate2file
 
-        DCC @samplesheet -mt1 @mate1file -mt2 @mate2file -D -an $gtf -Pi -F -M -Nr 1 1 -fg -A $fasta -N -T 8
+        DCC @samplesheet -mt1 @mate1file -mt2 @mate2file -D -an $gtf -Pi -ss -F -M -Nr 1 1 -fg -A $fasta -N -T 8
         
         awk '{print \$6}' CircCoordinates >> strand
         paste CircRNACount strand | tail -n +2 | awk -v OFS="\t" '{print \$1,\$2,\$3,\$5,\$4}' >> ${base}_dcc.txt
