@@ -1202,7 +1202,7 @@ process miRanda{
 	"""	
 	miranda $mirbase $miranda -out ${prefix}.bindsites.out -quiet
         echo "miRNA Target  Score Energy-Kcal/Mol Query-Aln(start-end) Subject-Al(Start-End) Al-Len Subject-Identity Query-Identity" > ${prefix}.bindsites.txt
-        grep -A 1 "Scores for this hit:" ${prefix}.mirna.bindsites.out | sort | grep ">" | cut -c 2- >> ${prefix}.bindsites.txt
+        grep -A 1 "Scores for this hit:" ${prefix}.bindsites.out | sort | grep ">" | cut -c 2- >> ${prefix}.bindsites.txt
 	"""
 }
 
