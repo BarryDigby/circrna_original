@@ -1,10 +1,13 @@
 #!/usr/bin/bash
 
+GTF=$1
+gtf_prefix=$(basename $GTF .gtf)
+
 echo "Removing unwanted gene_types from GTF file"
 echo "Inspect unwanted_biotypes.txt to view excluded features"
-grep -vf unwanted_biotypes.txt GRCh38.gtf > GRCh38_f.gtf
-mv GRCh38.gtf GRCh38_original.gtf
-mv GRCh38_f.gtf GRCh38.gtf
+grep -vf unwanted_biotypes.txt $GTF > ${gtf_prefix}_f.gtf
+mv $GTF ${gtf_prefix}_original.gtf
+mv ${gtf_prefix}_f.gtf analysis.gtf
 echo "Done!"
 
 while IFS='' read -r line; do
@@ -12,7 +15,7 @@ while IFS='' read -r line; do
         touch ${name}.bed
         echo "$line" >> ${name}.bed_tmp
         sed 's/[\t]*$//' ${name}.bed_tmp > ${name}.bed && rm ${name}.bed_tmp
-        bedtools intersect -a GRCh38.gtf -b ${name}.bed -s -f 1.00 > ${name}.gtf
+        bedtools intersect -a analysis.gtf -b ${name}.bed -s -f 1.00 > ${name}.gtf
         start=$(echo $line | awk '{print $2}')
         stop=$(echo $line | awk '{print $3}')
 	echo "#"
