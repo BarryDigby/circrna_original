@@ -82,8 +82,8 @@ rm -f ${name}.genepred
 rm -f ${name}_predtobed.bed
 rm -f ${name}.bed
 
-done < bed/circrna_finder.bed
+done < de_circ.bed
 
-cat *_bed12.bed > recreated_circrna_finder.bed
+cat *_bed12.bed > de_circ_bed12.bed
 
 rm -f *_bed12.bed
