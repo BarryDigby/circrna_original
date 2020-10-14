@@ -1149,7 +1149,7 @@ process get_mature_seq{
 	awk '{print \$1}' *down_regulated_differential_expression.txt | tail -n +2 > down_reg_circ.txt
 	
 	bash "$projectDir"/bin/ID_to_BED.sh up_reg_circ.txt
-	bash "$projectDir"/bin/ID_to_BED.sh down_reg.txt
+	bash "$projectDir"/bin/ID_to_BED.sh down_reg_circ.txt
 
 	cat *.bed > de_circ.bed
 	
