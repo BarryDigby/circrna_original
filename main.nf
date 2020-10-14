@@ -1157,7 +1157,7 @@ process get_mature_seq{
 	
 	# miRanda
 	bedtools getfasta -fi $fasta -bed de_circ_bed12.bed -s -split -name > de_circ_sequences.fa_tmp
-	grep \> de_circ_sequences.fa_tmp | cut -d: -f1,2,3 > de_circ_sequences.fa && rm de_circ_sequences.fa_tmp
+	grep '>' de_circ_sequences.fa_tmp | cut -d: -f1,2,3 > de_circ_sequences.fa && rm de_circ_sequences.fa_tmp
 	mkdir -p miranda
 	awk -F '>' '/^>/ {F=sprintf("miranda/%s.fasta",\$2); print > F;next;} {print >> F;}' < de_circ_sequences.fa
 	
