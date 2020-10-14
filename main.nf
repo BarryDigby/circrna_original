@@ -1136,7 +1136,7 @@ process get_mature_seq{
 		file(fasta) from ch_fasta
 		file(fai) from ch_fai
 		file(gtf) from ch_gencode_gtf
-		file(circRNA) from circ_DE
+		file(circRNA) from circrna_dir
 		
 	output:
 		file("miranda/*.fa") into miranda_sequences
