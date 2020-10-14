@@ -1153,6 +1153,7 @@ process get_mature_seq{
 
 	cat *.bed > de_circ.bed
 	
+	cp "$projectDir"/bin/unwanted_biotypes.txt ./
 	bash "$projectDir"/bin/get_mature_seq.sh 
 	
 	# miRanda
