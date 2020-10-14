@@ -182,7 +182,7 @@ process download_mirbase{
 	publishDir "$params.outdir/assets", mode:'copy'
 	
 	output:
-		file("hsa_mature.fa") into mirbase_downloaded
+		file("hsa_mature.fa") into miranda_miRs
 		
 	script:
 	"""
@@ -1191,7 +1191,7 @@ process miRanda{
 	publishDir "$params.outdir/miRanda", mode:'copy'
 	
 	input:
-		file(mirbase) from ch_mirbase
+		file(mirbase) from miranda_miRs
 		file(miranda) from miranda_sequences.flatten()
 	
 	output:
