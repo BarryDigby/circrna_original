@@ -119,6 +119,7 @@ params.fastq_glob = '*_R{1,2}.fastq.gz'
 params.bam_glob = '*.bam'
 params.adapters = '/data/bdigby/grch38/adapters.fa'
 params.phenotype = ''
+params.mirbase_fasta = ''
 
 
 
@@ -129,7 +130,7 @@ if (!checkParameterList(tool, toolList)) exit 1, 'Unknown tool, see --help for m
 
 /*
 ================================================================================
-                          Download Reference Files
+                          Download Files
 ================================================================================
 */
  
@@ -179,11 +180,22 @@ ch_fasta = params.fasta ? Channel.value(file(params.fasta)) : fasta_downloaded
 ch_gene_annotation = params.gene_annotation ? Channel.value(file(params.gene_annotation)) : gene_annotation_created
 ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : gencode_gtf_downloaded
 
+process download_mirbase{
+	
+	publishDir "$params.outdir/assets", mode:'copy'
+	
+	output:
+		file("hsa_mature.fa") into mirbase_downloaded
+		
+	script:
+	"""
+	wget ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz
+	gunzip mature.fa.gz
+	grep "sapiens" -A1 mature.fa | awk '!/--/' > hsa_mature.fa
+	"""
+}
 
-ch_fasta.view()
-ch_gene_annotation.view()
-ch_gencode_gtf.view()
-println "$projectDir"
+ch_mirbase = params.mirbase_fasta ? Channel.value(file(params.mirbase_fasta)) : mirbase_downloaded
 
 /*
 ================================================================================
@@ -1101,6 +1113,7 @@ process diff_exp{
 	output:
 		file("RNA-Seq") into rnaseq_dir
 		file("circRNA") into circrna_dir
+		file("circRNA/*differential_expression.txt") into circ_DE
 		
 	script:
 	"""
@@ -1112,7 +1125,79 @@ process diff_exp{
 	"""
 }
 
+/*
+================================================================================
+                         circRNA - miRNA prediction
+================================================================================
+*/
 
+process get_mature_seq{
+	
+	input:
+		file(fasta) from ch_fasta
+		file(fai) from ch_fai
+		file(gtf) from ch_gencode_gtf
+		file(de_circ) from circ_DE
+		
+	output:
+		file("miranda") into miranda_sequences
+		file("targetscan") into targetscan_sequences
+		
+	script:
+	"""
+	awk '{print \$1}' *up_regulated_differential_expression.txt | tail -n +2 > up_reg_circ.txt
+	awk '{print \$1}' *down_regulated_differential_expression.txt | tail -n +2 > down_reg_circ.txt
+	
+	bash "$projectDir"/bin/ID_to_BED.sh up_reg_circ.txt
+	bash "$projectDir"/bin/ID_to_BED.sh down_reg.txt
+
+	cat *.bed > de_circ.bed
+	
+	bash "$projectDir"/bin/get_mature_seq.sh 
+	
+	# miRanda
+	bedtools getfasta -fi $fasta -bed de_circ_bed12.bed -s -split -name > de_circ_sequences.fa_tmp
+	grep \> de_circ_sequences.fa_tmp | cut -d: -f1,2,3 > de_circ_sequences.fa && rm de_circ_sequences.fa_tmp
+	mkdir -p miranda
+	awk -F '>' '/^>/ {F=sprintf("miranda/%s.fasta",\$2); print > F;next;} {print >> F;}' < de_circ_sequences.fa
+	
+	# TargetScan
+	bedtools getfasta -fi $fasta -bed de_circ_bed12.bed -s -split -tab | sed 's/(/:/g' | sed 's/)//g' > de_circ_seq_tab.txt_tmp
+	awk -v OFS="\t" '{print \$1, 9606, \$2}' de_circ_seq_tab.txt_tmp > de_circ_seq_tab.txt && rm de_circ_seq_tab.txt_tmp
+	mkdir -p targetscan
+	while IFS='' read -r line; do name=\$(echo \$line | awk '{print \$1}'); echo \$line | tr ' ' \\t >> targetscan/\${name}.txt; done < de_circ_seq_tab.txt
+	"""
+}
+
+
+process miRanda{
+
+	publishDir "$params.outdir/miRanda", mode:'copy'
+	
+	input:
+		file(mirbase) from ch_mirbase
+		file(miranda) from miranda_sequences
+	
+	output:
+		file("*.txt") into miranda_predictions
+		
+	script:
+	"""
+	for i in miranda/*fa; do
+	
+		base=\$(basename \$i .fa)
+		
+		miranda $mirbase \$i -out \${base}.bindsites.out -quiet
+        
+        	echo "miRNA Target  Score Energy-Kcal/Mol Query-Aln(start-end) Subject-Al(Start-End) Al-Len Subject-Identity Query-Identity" > \${base}.bindsites.txt
+        
+        	grep -A 1 "Scores for this hit:" \${base}.mirna.bindsites.out | sort | grep ">" | cut -c 2- >> \${base}.bindsites.txt
+		
+		rm \${base}.bindsites.out
+		
+	done
+	"""
+}
 
 // Check parameter existence
 def checkParameterExistence(it, list) {
