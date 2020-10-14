@@ -189,7 +189,7 @@ process download_mirbase{
 		
 	script:
 	"""
-	wget ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz
+	wget --no-check-certificate ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz
 	gunzip mature.fa.gz
 	grep "sapiens" -A1 mature.fa | awk '!/--/' > hsa_mature.fa
 	"""
