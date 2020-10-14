@@ -26,8 +26,8 @@ while IFS='' read -r line; do
 		gene_types=$(awk -F'gene_type ' '{print $2}' ${name}.gtf | \
 		awk -F';' '{print $1}' | sed 's/"//g' | uniq)
 		echo "$gene_types"
-		./gtfToGenePred ${name}.gtf ${name}.genepred
-                ./genePredToBed ${name}.genepred ${name}_predtobed.bed
+		gtfToGenePred ${name}.gtf ${name}.genepred
+                genePredToBed ${name}.genepred ${name}_predtobed.bed
                 awk -v OFS="\t" -v start="$start" -v stop="$stop" \
 		'{if($2==start && $3==stop) print $0}' ${name}_predtobed.bed | \
 		sort -rnk10 | head -n 1 > ${name}_bed12.bed
@@ -40,7 +40,6 @@ while IFS='' read -r line; do
 			echo "Retrying with longest transcript"
 			awk -v OFS="\t" '{$13 = $3 - $2; print}' ${name}_predtobed.bed | \
 			sort -rnk13 | cut -f13 --complement | head -n 1 > ${name}_bed12.bed_tmp
-			#awk '!a[$0]++' ${name}_bed12.bed_tmp > ${name}_bed12.bed_tmp2 && rm ${name}_bed12.bed_tmp
 			echo "Checking best transcript with $name"
 			tx_len=$(awk -v OFS="\t" '{$13 = $3 - $2; print}' ${name}_predtobed.bed | \
                         sort -rnk13 | awk '{print $13}' | head -n 1)
@@ -75,6 +74,11 @@ while IFS='' read -r line; do
                 awk -v OFS="\t" -v thick=$start -v rgb=$rgb -v count=$block_count -v start=$block_start -v size=$block_size \
                 '{print $0, thick, thick, rgb, count, size, start}' ${name}.bed > ${name}_bed12.bed
 	fi
+	
+echo "replacing tx with circRNA in ID field"
+awk -v OFS="\t" -v name=$name '{$4 = name; print}' ${name}_bed12.bed > ${name}_bed12.bed_tmp
+rm ${name}_bed12.bed
+mv ${name}_bed12.bed_tmp ${name}_bed12.bed
 
 echo "cleaning up intermediate files"
 rm -f ${name}.gtf
