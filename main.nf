@@ -1113,7 +1113,6 @@ process diff_exp{
 	output:
 		file("RNA-Seq") into rnaseq_dir
 		file("circRNA") into circrna_dir
-		file("circRNA/*differential_expression.txt") into circ_DE
 		
 	script:
 	"""
@@ -1137,16 +1136,18 @@ process get_mature_seq{
 		file(fasta) from ch_fasta
 		file(fai) from ch_fai
 		file(gtf) from ch_gencode_gtf
-		file(de_circ) from circ_DE
+		file(circRNA) from circ_DE
 		
 	output:
 		file("miranda/*.fa") into miranda_sequences
 		file("targetscan/*.txt") into targetscan_sequences
 		
 	script:
+	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
+	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
 	"""
-	awk '{print \$1}' *up_regulated_differential_expression.txt | tail -n +2 > up_reg_circ.txt
-	awk '{print \$1}' *down_regulated_differential_expression.txt | tail -n +2 > down_reg_circ.txt
+	awk '{print \$1}' $up_reg | tail -n +2 > up_reg_circ.txt
+	awk '{print \$1}' $down_reg | tail -n +2 > down_reg_circ.txt
 	
 	bash "$projectDir"/bin/ID_to_BED.sh up_reg_circ.txt
 	bash "$projectDir"/bin/ID_to_BED.sh down_reg_circ.txt
