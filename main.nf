@@ -1175,7 +1175,7 @@ process get_mature_seq{
 	bedtools getfasta -fi $fasta -bed de_circ_exon_annotated.bed -s -split -name > de_circ_sequences.fa_tmp
 	grep '>' de_circ_sequences.fa_tmp | cut -d: -f1,2,3 > de_circ_sequences.fa && rm de_circ_sequences.fa_tmp
 	mkdir -p miranda
-	awk -F '>' '/^>/ {F=sprintf("miranda/%s.fasta",\$2); print > F;next;} {print >> F;}' < de_circ_sequences.fa
+	awk -F '>' '/^>/ {F=sprintf("miranda/%s.fa",\$2); print > F;next;} {print >> F;}' < de_circ_sequences.fa
 	
 	# TargetScan
 	bedtools getfasta -fi $fasta -bed de_circ_exon_annotated.bed -s -split -tab | sed 's/(/:/g' | sed 's/)//g' > de_circ_seq_tab.txt_tmp
