@@ -1181,7 +1181,7 @@ process get_mature_seq{
 	bedtools getfasta -fi $fasta -bed de_circ_exon_annotated.bed -s -split -tab | sed 's/(/:/g' | sed 's/)//g' > de_circ_seq_tab.txt_tmp
 	awk -v OFS="\t" '{print \$1, 9606, \$2}' de_circ_seq_tab.txt_tmp > de_circ_seq_tab.txt && rm de_circ_seq_tab.txt_tmp
 	mkdir -p targetscan
-	while IFS='' read -r line; do name=\$(echo \$line | awk '{print \$1}'); echo \$line | tr ' ' \\t >> targetscan/\${name}.txt; done < de_circ_seq_tab.txt
+	while IFS='' read -r line; do name=\$(echo \$line | awk '{print \$1}'); echo \$line | sed 's/ /\t/g' >> targetscan/\${name}.txt; done < de_circ_seq_tab.txt
 	"""
 }
 
