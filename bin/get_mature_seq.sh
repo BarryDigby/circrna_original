@@ -1,13 +1,12 @@
 #!/usr/bin/bash
 
 GTF=$1
-gtf_prefix=$(basename $GTF .gtf)
 
 echo "Removing unwanted gene_types from GTF file"
 echo "Inspect unwanted_biotypes.txt to view excluded features"
-grep -vf unwanted_biotypes.txt $GTF > ${gtf_prefix}_f.gtf
-mv $GTF ${gtf_prefix}_original.gtf
-mv ${gtf_prefix}_f.gtf analysis.gtf
+grep -vf unwanted_biotypes.txt $GTF > GRCh38_f.gtf
+mv GRCh38.gtf GRCh38_original.gtf
+mv GRCh38_f.gtf GRCh38.gtf
 echo "Done!"
 
 while IFS='' read -r line; do
