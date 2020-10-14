@@ -90,6 +90,6 @@ rm -f ${name}.bed
 
 done < de_circ.bed
 
-cat *_bed12.bed > de_circ_bed12.bed
+cat *_bed12.bed > de_circ_exon_annotated.bed
 
 rm -f *_bed12.bed
