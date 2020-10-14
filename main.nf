@@ -119,9 +119,6 @@ params.fastq_glob = '*_R{1,2}.fastq.gz'
 params.bam_glob = '*.bam'
 params.adapters = '/data/bdigby/grch38/adapters.fa'
 params.phenotype = ''
-params.mirbase_fasta = ''
-
-
 
 toolList = defineToolList()
 tool = params.tool ? params.tool.split(',').collect{it.trim().toLowerCase()} : []
@@ -195,7 +192,24 @@ process download_mirbase{
 	"""
 }
 
-ch_mirbase = params.mirbase_fasta ? Channel.value(file(params.mirbase_fasta)) : mirbase_downloaded
+process download_targetscan{
+
+	publishDir "$params.outdir/assets", mode:'copy'
+
+	output:
+	file("hsa_miR.txt") into targetscan_miRs
+	file("hsa_miR_for_context_scores.txt") into targetscan_miRs_context_scores
+
+	script:
+	"""
+	wget --no-check-certificate http://www.targetscan.org/vert_72/vert_72_data_download/miR_Family_Info.txt.zip
+	jar xvf miR_Family_Info.txt.zip
+	grep 9606 miR_Family_Info.txt > hsa_miR_Family_Info.txt
+	awk -v OFS="\t" '{print \$1, \$2, \$3}' hsa_miR_Family_Info.txt > hsa_miR.txt
+	awk -v OFS="\t" '{print \$1, \$3, \$4, \$5}' hsa_miR.txt > hsa_miR_for_context_scores.txt
+	"""
+}
+
 
 /*
 ================================================================================
@@ -1192,6 +1206,27 @@ process miRanda{
 	rm ${prefix}.bindsites.out
 	"""
 }
+
+
+process targetscan{
+
+	publishDir "$params.outdir/TargetScan", mode:'copy'
+	
+	input:
+		file(miR) from targetscan_miRs
+		file(circ) from targetscan_sequences.flatten()
+		
+	output:
+		file("*") into targetscan_out 
+		
+	script:
+	prefix = circ.toString() - ~/.txt/
+	"""
+	"$projectDir"/bin/targetscan_70.pl $miR $circ ${prefix}_70_output.txt
+	"""
+}
+	
+
 
 // Check parameter existence
 def checkParameterExistence(it, list) {
