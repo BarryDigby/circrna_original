@@ -1221,7 +1221,7 @@ process targetscan{
 	script:
 	prefix = circ.toString() - ~/.txt/
 	"""
-	"$projectDir"/bin/targetscan_70.pl $miR $circ ${prefix}_70_output.txt
+	targetscan_70.pl $miR $circ ${prefix}_70_output.txt
 	"""
 }
 	
