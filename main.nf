@@ -1158,13 +1158,13 @@ process get_mature_seq{
 	bash "$projectDir"/bin/get_mature_seq.sh $gtf
 	
 	# miRanda
-	bedtools getfasta -fi $fasta -bed de_circ_bed12.bed -s -split -name > de_circ_sequences.fa_tmp
+	bedtools getfasta -fi $fasta -bed de_circ_exon_annotated.bed -s -split -name > de_circ_sequences.fa_tmp
 	grep '>' de_circ_sequences.fa_tmp | cut -d: -f1,2,3 > de_circ_sequences.fa && rm de_circ_sequences.fa_tmp
 	mkdir -p miranda
 	awk -F '>' '/^>/ {F=sprintf("miranda/%s.fasta",\$2); print > F;next;} {print >> F;}' < de_circ_sequences.fa
 	
 	# TargetScan
-	bedtools getfasta -fi $fasta -bed de_circ_bed12.bed -s -split -tab | sed 's/(/:/g' | sed 's/)//g' > de_circ_seq_tab.txt_tmp
+	bedtools getfasta -fi $fasta -bed de_circ_exon_annotated.bed -s -split -tab | sed 's/(/:/g' | sed 's/)//g' > de_circ_seq_tab.txt_tmp
 	awk -v OFS="\t" '{print \$1, 9606, \$2}' de_circ_seq_tab.txt_tmp > de_circ_seq_tab.txt && rm de_circ_seq_tab.txt_tmp
 	mkdir -p targetscan
 	while IFS='' read -r line; do name=\$(echo \$line | awk '{print \$1}'); echo \$line | tr ' ' \\t >> targetscan/\${name}.txt; done < de_circ_seq_tab.txt
