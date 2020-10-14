@@ -1140,8 +1140,8 @@ process get_mature_seq{
 		file(de_circ) from circ_DE
 		
 	output:
-		file("miranda") into miranda_sequences
-		file("targetscan") into targetscan_sequences
+		file("miranda/*.fa") into miranda_sequences
+		file("targetscan/*.txt") into targetscan_sequences
 		
 	script:
 	"""
@@ -1176,26 +1176,18 @@ process miRanda{
 	
 	input:
 		file(mirbase) from ch_mirbase
-		file(miranda) from miranda_sequences
+		file(miranda) from miranda_sequences.flatten()
 	
 	output:
-		file("*.txt") into miranda_predictions
+		file("*bindsites.txt") into miranda_predictions
 		
 	script:
-	"""
-	for i in miranda/*fa; do
-	
-		base=\$(basename \$i .fa)
-		
-		miranda $mirbase \$i -out \${base}.bindsites.out -quiet
-        
-        	echo "miRNA Target  Score Energy-Kcal/Mol Query-Aln(start-end) Subject-Al(Start-End) Al-Len Subject-Identity Query-Identity" > \${base}.bindsites.txt
-        
-        	grep -A 1 "Scores for this hit:" \${base}.mirna.bindsites.out | sort | grep ">" | cut -c 2- >> \${base}.bindsites.txt
-		
-		rm \${base}.bindsites.out
-		
-	done
+	prefix = miranda.toString() - ~/.fa/
+	"""	
+	miranda $mirbase $miranda -out ${prefix}.bindsites.out -quiet
+        echo "miRNA Target  Score Energy-Kcal/Mol Query-Aln(start-end) Subject-Al(Start-End) Al-Len Subject-Identity Query-Identity" > ${prefix}.bindsites.txt
+        grep -A 1 "Scores for this hit:" ${prefix}.mirna.bindsites.out | sort | grep ">" | cut -c 2- >> ${prefix}.bindsites.txt
+	rm ${prefix}.bindsites.out
 	"""
 }
 
