@@ -1155,7 +1155,7 @@ process get_mature_seq{
 	cat *.bed > de_circ.bed
 	
 	cp "$projectDir"/bin/unwanted_biotypes.txt ./
-	bash "$projectDir"/bin/get_mature_seq.sh 
+	bash "$projectDir"/bin/get_mature_seq.sh $gtf
 	
 	# miRanda
 	bedtools getfasta -fi $fasta -bed de_circ_bed12.bed -s -split -name > de_circ_sequences.fa_tmp
