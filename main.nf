@@ -1197,7 +1197,7 @@ process miRanda{
 		file(miranda) from miranda_sequences.flatten()
 	
 	output:
-		tuple(prefix), file("${prefix}.miRanda.txt") into miranda_out
+		tuple val(prefix), file("${prefix}.miRanda.txt") into miranda_out
 		
 	script:
 	prefix = miranda.toString() - ~/.fa/
@@ -1218,7 +1218,7 @@ process targetscan{
 		file(circ) from targetscan_sequences.flatten()
 		
 	output:
-		tuple(prefix), file("${prefix}.targetscan.txt") into targetscan_out 
+		tuple val(prefix), file("${prefix}.targetscan.txt") into targetscan_out 
 		
 	script:
 	prefix = circ.toString() - ~/.txt/
