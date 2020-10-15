@@ -1226,7 +1226,7 @@ process targetscan{
 }
 	
 
-# need to merge miranda and targetscan by a common key, create tuple first
+// need to merge miranda and targetscan by a common key, create tuple first
 ch_miranda_out = miranda_out.map{ file -> [file.baseName, file]}
 			
 ch_targetscan_out = targetscan_out.map{ file -> [file.baseName, file]}
