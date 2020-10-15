@@ -1229,11 +1229,11 @@ process targetscan{
 // need to merge miranda and targetscan by a common key, create tuple first
 ch_miranda_tmp = miranda_out.map{ file -> [file.baseName, file]}
 		
-ch_miranda_tmp.into(ch_miranda_view; ch_miranda_out)
+(ch_miranda_view, ch_miranda_out) = ch_miranda_tmp.into(2)
 
 ch_targetscan_tmp = targetscan_out.map{ file -> [file.baseName, file]}
 
-ch_targetscan_tmp.into(ch_targetscan_view; ch_targetscan_out)
+(ch_targetscan_view, ch_targetscan_out) = ch_targetscan_tmp.into(2)
 
 ch_filter_miRs = ch_targetscan_out.join(ch_miranda_out)
 
