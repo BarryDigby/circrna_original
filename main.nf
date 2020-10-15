@@ -7,8 +7,8 @@
 Started August 2020
 --------------------------------------------------------------------------------
 Description:
-  (To my knowledge) the first circRNA tool to scan RNA-Seq data for circRNAs and
-  conduct circRNA-miRNA predictions
+  (To my knowledge) the first circRNA pipeline to scan RNA-Seq data for circRNAs and
+  conduct differential expression analysis + circRNA-miRNA predictions
 --------------------------------------------------------------------------------
  @Homepage
  https://github.com/BarryDigby/circRNA
