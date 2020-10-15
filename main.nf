@@ -1197,14 +1197,14 @@ process miRanda{
 		file(miranda) from miranda_sequences.flatten()
 	
 	output:
-		file("${prefix}.txt") into miranda_out
+		tuple(prefix), file("${prefix}.miRanda.txt") into miranda_out
 		
 	script:
 	prefix = miranda.toString() - ~/.fa/
 	"""	
 	miranda $mirbase $miranda -out ${prefix}.bindsites.out -quiet
         echo "miRNA Target  Score Energy-Kcal/Mol Query-Aln(start-end) Subject-Al(Start-End) Al-Len Subject-Identity Query-Identity" > ${prefix}.txt
-        grep -A 1 "Scores for this hit:" ${prefix}.bindsites.out | sort | grep ">" | cut -c 2- >> ${prefix}.txt
+        grep -A 1 "Scores for this hit:" ${prefix}.bindsites.out | sort | grep ">" | cut -c 2- >> ${prefix}.miRanda.txt
 	"""
 }
 
@@ -1218,30 +1218,22 @@ process targetscan{
 		file(circ) from targetscan_sequences.flatten()
 		
 	output:
-		file("${prefix}.txt") into targetscan_out 
+		tuple(prefix), file("${prefix}.targetscan.txt") into targetscan_out 
 		
 	script:
 	prefix = circ.toString() - ~/.txt/
 	"""
-	targetscan_70.pl $miR $circ ${prefix}.txt
+	targetscan_70.pl $miR $circ ${prefix}.targetscan.txt
 	"""
 }
 	
 
 // need to merge miranda and targetscan by a common key, create tuple first
-ch_miranda_tmp = miranda_out.map{ file -> [file.baseName, file]}
-		
-(ch_miranda_view, ch_miranda_out) = ch_miranda_tmp.into(2)
+ch_miRs = targetscan_out.join(miranda_out)
 
-ch_targetscan_tmp = targetscan_out.map{ file -> [file.baseName, file]}
+(ch_miRs_view, ch_miRs_test) = ch_miRs.into(2)
 
-(ch_targetscan_view, ch_targetscan_out) = ch_targetscan_tmp.into(2)
-
-ch_filter_miRs = ch_targetscan_out.join(ch_miranda_out)
-
-ch_miranda_view.view()
-ch_targetscan_view.view()
-ch_filter_miRs.view()
+ch_miRs_view.view()
 
 
 
