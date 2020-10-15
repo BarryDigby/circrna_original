@@ -1241,7 +1241,8 @@ ch_targetscan_view.view()
 ch_miranda_view.view()
 ch_miRs.view()
 
-
+// miRNA predictions now merged together in channel grouped by circRNA ID.
+// Run final process to compute overlaps between predicitons :) 
 
 // Check parameter existence
 def checkParameterExistence(it, list) {
