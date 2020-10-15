@@ -1201,8 +1201,8 @@ process miRanda{
 	prefix = miranda.toString() - ~/.fa/
 	"""	
 	miranda $mirbase $miranda -out ${prefix}.bindsites.out -quiet
-        echo "miRNA Target  Score Energy-Kcal/Mol Query-Aln(start-end) Subject-Al(Start-End) Al-Len Subject-Identity Query-Identity" > ${prefix}.bindsites.txt
-        grep -A 1 "Scores for this hit:" ${prefix}.bindsites.out | sort | grep ">" | cut -c 2- >> ${prefix}.bindsites.txt
+        echo "miRNA Target  Score Energy-Kcal/Mol Query-Aln(start-end) Subject-Al(Start-End) Al-Len Subject-Identity Query-Identity" > ${prefix}.txt
+        grep -A 1 "Scores for this hit:" ${prefix}.bindsites.out | sort | grep ">" | cut -c 2- >> ${prefix}.txt
 	"""
 }
 
@@ -1221,7 +1221,7 @@ process targetscan{
 	script:
 	prefix = circ.toString() - ~/.txt/
 	"""
-	targetscan_70.pl $miR $circ ${prefix}_70_output.txt
+	targetscan_70.pl $miR $circ ${prefix}.txt
 	"""
 }
 	
