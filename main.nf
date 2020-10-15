@@ -1195,7 +1195,7 @@ process miRanda{
 		file(miranda) from miranda_sequences.flatten()
 	
 	output:
-		file("*bindsites.txt") into miranda_predictions
+		file("*bindsites.txt") into miranda_out
 		
 	script:
 	prefix = miranda.toString() - ~/.fa/
@@ -1225,6 +1225,15 @@ process targetscan{
 	"""
 }
 	
+
+# need to merge miranda and targetscan by a common key, create tuple first
+ch_miranda_out = Channel.from( miranda_out )
+			.map{ file -> [file.baseName, file]}
+			
+ch_targetscan_out = Channel.from( targetscan_out )
+			   .map{ file -> [file.baseName, file]}
+
+ch_filter_miRs = ch_targetscan_out.join(ch_miranda_out)
 
 
 // Check parameter existence
