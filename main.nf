@@ -1197,7 +1197,7 @@ process miRanda{
 		file(miranda) from miranda_sequences.flatten()
 	
 	output:
-		tuple val(prefix), file("${prefix}.miRanda.txt") into miranda_out
+		file("${prefix}.miRanda.txt") into miranda_out
 		
 	script:
 	prefix = miranda.toString() - ~/.fa/
@@ -1218,7 +1218,7 @@ process targetscan{
 		file(circ) from targetscan_sequences.flatten()
 		
 	output:
-		tuple val(prefix), file("${prefix}.targetscan.txt") into targetscan_out 
+		file("${prefix}.targetscan.txt") into targetscan_out 
 		
 	script:
 	prefix = circ.toString() - ~/.txt/
@@ -1229,11 +1229,17 @@ process targetscan{
 	
 
 // need to merge miranda and targetscan by a common key, create tuple first
-ch_miRs = targetscan_out.join(miranda_out)
+ch_targetscan = targetscan_out.map{ file -> [file.simpleName, file]}
+ch_miranda = miranda_out.map{ file -> [file.simpleName, file]}
 
-(ch_miRs_view, ch_miRs_test) = ch_miRs.into(2)
+(ch_miranda_test, ch_miranda_view) = ch_miranda.into(2)
+(ch_targetscan_test, ch_targetscan_view) = ch_targetscan.into(2)
 
-ch_miRs_view.view()
+ch_miRs = ch_targetscan_test.join(ch_miranda_test)
+
+ch_targetscan_view.view()
+ch_miranda_view.view()
+ch_miRs.view()
 
 
 
