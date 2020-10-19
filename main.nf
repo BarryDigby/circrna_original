@@ -1065,6 +1065,7 @@ if('combine' in tool){
                                 printf "\$i\n" >> samples.csv
                         done
 
+			## filters circRNA called by at least 2 algorithms in Rscript
                         Rscript "$projectDir"/bin/consolidate_algorithms.R
 			
                         mv combined_counts.bed ${base}.bed
