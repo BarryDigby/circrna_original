@@ -195,6 +195,8 @@ process download_mirbase{
 // TO DO: add a retry attempt for process below (it sometimes fails to resolve the link)
 
 process download_targetscan{
+	errorStrategy 'retry'
+   	maxRetries 3
 
 	publishDir "$params.outdir/assets", mode:'copy'
 
