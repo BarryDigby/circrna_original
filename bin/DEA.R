@@ -246,6 +246,13 @@ getDESeqDEAbyContrast <- function(dds, group, outdir) {
 	up_regulated <- get_upregulated(res)
 	down_regulated <- get_downregulated(res)
 
+	de_up <- rownames(up_regulated)
+        de_down <- rownames(down_regulated)
+        de <- c(de_up, de_down)
+        cts <- counts(dds, normalized=T)
+        log2 <- log2(cts +1)
+        global_heatmap(de, log2, contrast, outdir)
+	
 	if(outdir == "RNA-Seq/"){
 		up_regulated <- annotate_de_genes(up_regulated)
 		down_regulated <- annotate_de_genes(down_regulated)
@@ -428,9 +435,32 @@ volcano_plot <- function(res, contrast, outdir){
 	plot(p)
 	dev.off()
 }
-	
 
 
+global_heatmap <- function(de, log2, contrast, outdir){
+
+        conditions <- strsplit(contrast, "vs")
+        level <- unlist(conditions)[1]
+        pheno <- inputdata$pheno
+        pheno_mtx <- as.matrix(pheno)
+        index <- which(matrix(grepl(paste(level), pheno_mtx), ncol=ncol(pheno_mtx)), arr.ind=T)
+        index_col <- unique(index[,2])
+        col_anno <- names(pheno[index_col])
+        sample_col <- pheno[paste(col_anno)]
+        mat <- as.data.frame((log2)[which(rownames(log2) %in% de),])
+        mat <- t(mat)
+        mat <- scale(mat, center=T)
+        mat <- t(mat)
+        pdf(file.path(outdir, paste("DESeq2", contrast, "global_heatmap.pdf", sep="_")), height = 10, width=8)
+        pheatmap(mat,
+                annotation_col=sample_col,
+                color=greenred(75),
+                cluster_rows = T,
+                fontsize=9,
+                cellwidth = 30,
+                show_rownames = F)
+        dev.off()
+}
 
 
 options(error=function()traceback(2))
