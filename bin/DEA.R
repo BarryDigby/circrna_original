@@ -1,5 +1,5 @@
 #!/usr/bin/Rscript
-version="0.0.1"
+
 ##
 ##
 ## Pass to script:
