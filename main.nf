@@ -178,6 +178,8 @@ ch_gene_annotation = params.gene_annotation ? Channel.value(file(params.gene_ann
 ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : gencode_gtf_downloaded
 
 process download_mirbase{
+	errorStrategy 'retry'
+   	maxRetries 3
 	
 	publishDir "$params.outdir/assets", mode:'copy'
 	
@@ -195,9 +197,7 @@ process download_mirbase{
 // TO DO: add a retry attempt for process below (it sometimes fails to resolve the link)
 
 process download_targetscan{
-	errorStrategy 'retry'
-   	maxRetries 3
-
+	
 	publishDir "$params.outdir/assets", mode:'copy'
 
 	output:
