@@ -129,15 +129,15 @@ ens2symbol <- function(mat){
 	mat <- as.data.frame(mat)
 	mat$ensembl_gene_id_version <- rownames(mat)
 
-	info <- getBM(attributes=c("ensembl_gene_id_version","hgnc_symbol"),
+	info <- getBM(attributes=c("ensembl_gene_id_version","external_gene_name"),
 	              filters = c("ensembl_gene_id_version"),
 		      values = mat$ensembl_gene_id_version,
 		      mart = mart)
 
 	tmp <- merge(mat, info, by="ensembl_gene_id_version")
-	tmp$hgnc_symbol <- make.names(tmp$hgnc_symbol, unique = T)
-	rownames(tmp) <- tmp$hgnc_symbol
-	tmp <- subset(tmp, select=-c(ensembl_gene_id_version, hgnc_symbol))
+	tmp$external_gene_name <- make.names(tmp$external_gene_name, unique = T)
+	rownames(tmp) <- tmp$external_gene_name
+	tmp <- subset(tmp, select=-c(ensembl_gene_id_version, external_gene_name))
 	
 	return(tmp)
 }
@@ -166,7 +166,7 @@ annotate_de_genes <- function(df){
 	mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
  
 	info <- getBM(attributes=c("ensembl_gene_id_version",
-                             "hgnc_symbol",
+                             "external_gene_name",
                              "chromosome_name",
                              "start_position",
                              "end_position",
@@ -180,7 +180,7 @@ annotate_de_genes <- function(df){
 	tmp <- merge(df, info, by="ensembl_gene_id_version")
 	tmp$strand <- gsub("-1", "-", tmp$strand)
 	tmp$strand <- gsub("1", "+", tmp$strand)
-	tmp$hgnc_symbol <- make.names(tmp$hgnc_symbol, unique = T)
+	tmp$external_gene_name <- make.names(tmp$external_gene_name, unique = T)
 
 	output_col <- c("Gene", "Chromosome", "Start", "Stop", "Strand", "Description", "Log2FC", "P-value", "Adj P-value")
 	index <- c(9, 10, 11, 12, 13, 14, 3, 6, 7)
@@ -221,7 +221,6 @@ DESeq2 <- function(inputdata, data_type){
 		print("ERROR in Execution stage of script")
 	}
 
-	dds <- dds[rowSums(counts(dds)) > 1,]
 	dds$condition <- relevel(dds$condition, ref="normal")
 	dds <- DESeq(dds, quiet=TRUE)
 	contrasts <- levels(dds$condition)
