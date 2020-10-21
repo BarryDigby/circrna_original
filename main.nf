@@ -1321,8 +1321,14 @@ process make_circRNA_report{
 		tuple val(base), file("${base}_Report.html") into circRNA_report_finished
 		
 	script:
+	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
+	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
 	"""
 	## correction: do not need to mess with targetscan headers, only miRanda (solved in file gen stage)
+	## merge de circs
+	## something like
+	tail -n +2 $up_reg > up_reg.txt
+	cat $down_reg up_reg.txt > de_circ.txt
 	"""
 }
 
