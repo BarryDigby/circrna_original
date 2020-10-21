@@ -1149,6 +1149,11 @@ process diff_exp{
 ================================================================================
 */
 
+//Create filtered gtf in its own channel so sym link used
+// saves space in work dir. 
+
+
+
 process get_mature_seq{
 	
 	input:
