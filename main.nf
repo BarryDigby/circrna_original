@@ -1329,6 +1329,10 @@ process make_circRNA_report{
 	## something like
 	tail -n +2 $up_reg > up_reg.txt
 	cat $down_reg up_reg.txt > de_circ.txt
+	
+	## currently working to convert Rscript to html. 
+	## cannot use argparser. must hardcode files
+	## you will have to rename all input nf vars to hardcoded file names to make it work
 	"""
 }
 
