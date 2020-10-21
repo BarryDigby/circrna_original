@@ -1149,9 +1149,25 @@ process diff_exp{
 ================================================================================
 */
 
-//Create filtered gtf in its own channel so sym link used
+//Create filtered gtf in its own channel so sym link used,
 // saves space in work dir. 
 
+
+process remove_unwanted_biotypes{
+
+	input:
+		file(gtf) from ch_gencode_gtf
+	
+	output:
+		file("filt.gtf") into ch_gtf_filtered
+		
+	script:
+	"""
+	cp "$projectDir"/bin/unwanted_biotypes.txt ./
+	
+	grep -vf unwanted_biotypes.txt $gtf > filt.gtf
+	"""
+}
 
 
 process get_mature_seq{
@@ -1159,7 +1175,7 @@ process get_mature_seq{
 	input:
 		file(fasta) from ch_fasta
 		file(fai) from ch_fai
-		file(gtf) from ch_gencode_gtf
+		file(gtf) from ch_gtf_filtered
 		file(circRNA) from circrna_dir
 		
 	output:
@@ -1170,24 +1186,27 @@ process get_mature_seq{
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
 	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
 	"""
+	# Extract circRNA ID's from DESeq2 DECs. 
 	awk '{print \$1}' $up_reg | tail -n +2 > up_reg_circ.txt
 	awk '{print \$1}' $down_reg | tail -n +2 > down_reg_circ.txt
 	
+	# Split ID to BED file
 	bash "$projectDir"/bin/ID_to_BED.sh up_reg_circ.txt
 	bash "$projectDir"/bin/ID_to_BED.sh down_reg_circ.txt
 
+	# Consolidate DEC BED files
 	cat *.bed > de_circ.bed
 	
-	cp "$projectDir"/bin/unwanted_biotypes.txt ./
-	bash "$projectDir"/bin/get_mature_seq.sh $gtf
+	# Create BED12 file
+	bash "$projectDir"/bin/get_mature_seq.sh 
 	
-	# miRanda
+	# Create miRanda inputs
 	bedtools getfasta -fi $fasta -bed de_circ_exon_annotated.bed -s -split -name > de_circ_sequences.fa_tmp
 	grep -A 1 '>' de_circ_sequences.fa_tmp | cut -d: -f1,2,3 > de_circ_sequences.fa && rm de_circ_sequences.fa_tmp
 	mkdir -p miranda
 	awk -F '>' '/^>/ {F=sprintf("miranda/%s.fa",\$2); print > F;next;} {print >> F;}' < de_circ_sequences.fa
 	
-	# TargetScan
+	# Create TargetScan inputs
 	bedtools getfasta -fi $fasta -bed de_circ_exon_annotated.bed -s -split -tab | sed 's/(/:/g' | sed 's/)//g' > de_circ_seq_tab.txt_tmp
 	awk -v OFS="\t" '{print \$1, 9606, \$2}' de_circ_seq_tab.txt_tmp > de_circ_seq_tab.txt && rm de_circ_seq_tab.txt_tmp
 	mkdir -p targetscan
@@ -1251,6 +1270,15 @@ ch_miRs.view()
 
 // miRNA predictions now merged together in channel grouped by circRNA ID.
 // Run final process to compute overlaps between predicitons :) 
+
+// need to make sure these are going in by sample ID. could make big channel before, or mutliple input channels. 
+
+	
+	
+
+
+
+
 
 // Check parameter existence
 def checkParameterExistence(it, list) {
