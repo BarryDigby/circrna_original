@@ -1322,10 +1322,7 @@ process make_circRNA_report{
 		
 	script:
 	"""
-	## need to fix targetscan header until proper context scores are generated
-	mv $targetscan targetscan.txt
-	echo echo "Gene_ID miRNA_family_ID species_ID MSA_start MSA_end UTR_start UTR_end Group_num Site_type miRNA_in_species Species_in_group Species_in_group_with_site_type ORF_overlap" | tr ' ' '\t' > ${base}.targetscan.txt
-	tail -n +2 targetscan.txt >> ${base}.targetscan.txt && rm targetscan.txt
+	## correction: do not need to mess with targetscan headers, only miRanda (solved in file gen stage)
 	"""
 }
 
