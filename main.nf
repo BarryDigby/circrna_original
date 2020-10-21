@@ -1184,7 +1184,7 @@ process get_mature_seq{
 	output:
 		file("miranda/*.fa") into miranda_sequences
 		file("targetscan/*.txt") into targetscan_sequences
-		file("BED12/*.bed") into BED12_files
+		file("BED12/*.bed") into bed_files
 		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
@@ -1286,6 +1286,14 @@ process get_parent_gene{
 	"""
 }
 
+
+/*
+================================================================================
+                         circRNA Report
+================================================================================
+*/
+
+
 // Create tuples, merge channels for report. 
 ch_mature_len = mature_len.map{ file -> [file.simpleName, file]}
 
@@ -1295,10 +1303,10 @@ ch_parent_genes = ch_parent_genes_tmp.map{ file -> [file.simpleName, file]}
 ch_targetscan = targetscan_out.map{ file -> [file.simpleName, file]}
 ch_miranda = miranda_out.map{ file -> [file.simpleName, file]}
 
-ch_BED12_tmp = BED12_files.flatten()
-ch_BED12 = ch_BED12_tmp.map{ file -> [file.simpleName, file]}
+ch_bed_tmp = bed_files.flatten()
+ch_bed = ch_bed_tmp.map{ file -> [file.simpleName, file]}
 	
-ch_report = ch_targetscan.join(ch_miranda).join(ch_BED12).join(ch_parent_genes).join(ch_mature_len)
+ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
 
 process make_circRNA_report{
 	publishDir "$params.outdir/circRNA_reports", mode:'copy'
@@ -1307,7 +1315,7 @@ process make_circRNA_report{
 		file(circRNA) from circrna_dir_report
 		file(RNA_Seq) from rnaseq_dir_report
 		file(phenotype) from ch_phenotype
-		tuple val(base) file(targetscan), file(miranda), file(BED12), file(parent_gene), file(mature_len) from ch_report
+		tuple val(base) file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
 
 	output:
 		tuple val(base), file("${base}_Report.html") into circRNA_report_finished
