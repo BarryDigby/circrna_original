@@ -1322,6 +1322,7 @@ process make_circRNA_report{
 		
 	script:
 	"""
+	## need to fix targetscan header until proper context scores are generated
 	echo "hello there"
 	"""
 }
