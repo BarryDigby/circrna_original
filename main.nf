@@ -1143,6 +1143,9 @@ process diff_exp{
 	"""
 }
 
+(circrna_dir_mature_seq, circrna_dir_parent_gene, circrna_dir_report) = circrna_dir.into(3)
+(rnaseq_dir_parent_gene, rnaseq_dir_report) = rnaseq_dir.into(2)
+
 /*
 ================================================================================
                          circRNA - miRNA prediction
@@ -1176,11 +1179,12 @@ process get_mature_seq{
 		file(fasta) from ch_fasta
 		file(fai) from ch_fai
 		file(gtf) from ch_gtf_filtered
-		file(circRNA) from circrna_dir
+		file(circRNA) from circrna_dir_mature_seq
 		
 	output:
 		file("miranda/*.fa") into miranda_sequences
 		file("targetscan/*.txt") into targetscan_sequences
+		file("BED12/*.bed") into BED12_files
 		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
@@ -1197,7 +1201,7 @@ process get_mature_seq{
 	# Consolidate DEC BED files
 	cat *.bed > de_circ.bed
 	
-	# Create BED12 file
+	# Create BED12 files
 	bash "$projectDir"/bin/get_mature_seq.sh 
 	
 	# Create miRanda inputs
@@ -1214,7 +1218,6 @@ process get_mature_seq{
 	"""
 }
 
-
 process miRanda{
 
 	publishDir "$params.outdir/miRanda", mode:'copy'
@@ -1225,16 +1228,16 @@ process miRanda{
 	
 	output:
 		file("*.miRanda.txt") into miranda_out
-		
+		file("*.mature_len.txt") into mature_len
 	script:
 	prefix = miranda.toString() - ~/.fa/
-	"""	
+	"""
+	grep -v '>' $miranda | wc -c > ${prefix}.mature_len.txt
 	miranda $mirbase $miranda -out ${prefix}.bindsites.out -quiet
         echo "miRNA Target Score Energy_KcalMol Query_Start Query_End Subject_Start Subject_End Aln_len Subject_Identity Query_Identity" | tr ' ' '\t' > ${prefix}.miRanda.txt
         grep -A 1 "Scores for this hit:" ${prefix}.bindsites.out | sort | grep ">" | cut -c 2- | tr ' ' '\t' >> ${prefix}.miRanda.txt
 	"""
 }
-
 
 process targetscan{
 
@@ -1253,31 +1256,66 @@ process targetscan{
 	targetscan_70.pl $miR $circ ${prefix}.targetscan.txt
 	"""
 }
-	
 
-// need to merge miranda and targetscan by a common key, create tuple first
+
+process get_parent_gene{
+
+	input:
+		file(gtf) from ch_gtf_filtered
+		file(circRNA) from circrna_dir_parent_gene
+		
+	output:
+		file("parent_genes/*.txt") into parent_genes
+		
+	script:
+	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
+	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
+	"""
+	# Extract circRNA ID's from DESeq2 DECs. 
+	awk '{print \$1}' $up_reg | tail -n +2 > up_reg_circ.txt
+	awk '{print \$1}' $down_reg | tail -n +2 > down_reg_circ.txt
+	
+	# Split ID to BED file
+	bash "$projectDir"/bin/ID_to_BED.sh up_reg_circ.txt
+	bash "$projectDir"/bin/ID_to_BED.sh down_reg_circ.txt
+
+	# Consolidate DEC BED files
+	cat *.bed > de_circ.bed
+	
+	bash "$projectDir"/bin/get_parent_genes.sh
+	"""
+}
+
+// Create tuples, merge channels for report. 
+ch_mature_len = mature_len.map{ file -> [file.simpleName, file]}
+
+ch_parent_genes_tmp = parent_genes.flatten()
+ch_parent_genes = ch_parent_genes_tmp.map{ file -> [file.simpleName, file]}
+
 ch_targetscan = targetscan_out.map{ file -> [file.simpleName, file]}
 ch_miranda = miranda_out.map{ file -> [file.simpleName, file]}
 
-(ch_miranda_test, ch_miranda_view) = ch_miranda.into(2)
-(ch_targetscan_test, ch_targetscan_view) = ch_targetscan.into(2)
-
-ch_miRs = ch_targetscan_test.join(ch_miranda_test)
-
-ch_targetscan_view.view()
-ch_miranda_view.view()
-ch_miRs.view()
-
-// miRNA predictions now merged together in channel grouped by circRNA ID.
-// Run final process to compute overlaps between predicitons :) 
-
-// need to make sure these are going in by sample ID. could make big channel before, or mutliple input channels. 
-
+ch_BED12_tmp = BED12_files.flatten()
+ch_BED12 = ch_BED12_tmp.map{ file -> [file.simpleName, file]}
 	
+ch_report = ch_targetscan.join(ch_miranda).join(ch_BED12).join(ch_parent_genes).join(ch_mature_len)
+
+process make_circRNA_report{
+	publishDir "$params.outdir/circRNA_reports", mode:'copy'
 	
+	input:
+		file(circRNA) from circrna_dir_report
+		file(RNA_Seq) from rnaseq_dir_report
+		tuple val(base) file(targetscan), file(miranda), file(BED12), file(parent_gene), file(mature_len) from ch_report
 
-
-
+	output:
+		tuple val(base), file("${base}_Report.html") into circRNA_report_finished
+		
+	script:
+	"""
+	echo "hello there"
+	"""
+}
 
 
 // Check parameter existence
