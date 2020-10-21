@@ -1,12 +1,5 @@
 #!/usr/bin/bash
 
-GTF=$1
-
-echo "Removing unwanted gene_types from GTF file"
-echo "Inspect unwanted_biotypes.txt to view excluded features"
-grep -vf unwanted_biotypes.txt $GTF > filt.gtf
-echo "Done!"
-
 while IFS='' read -r line; do
         name=$(echo $line | awk '{print $4}')
         touch ${name}.bed
