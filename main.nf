@@ -1306,6 +1306,7 @@ process make_circRNA_report{
 	input:
 		file(circRNA) from circrna_dir_report
 		file(RNA_Seq) from rnaseq_dir_report
+		file(phenotype) from ch_phenotype
 		tuple val(base) file(targetscan), file(miranda), file(BED12), file(parent_gene), file(mature_len) from ch_report
 
 	output:
