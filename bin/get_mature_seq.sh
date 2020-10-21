@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+mkdir -p BED12
+
 while IFS='' read -r line; do
         name=$(echo $line | awk '{print $4}')
         touch ${name}.bed
@@ -78,6 +80,8 @@ rm -f ${name}.gtf
 rm -f ${name}.genepred
 rm -f ${name}_predtobed.bed
 rm -f ${name}.bed
+
+cp ${name}_bed12.bed BED12/
 
 done < de_circ.bed
 
