@@ -1330,9 +1330,9 @@ process make_circRNA_report{
 	tail -n +2 $up_reg > up_reg.txt
 	cat $down_reg up_reg.txt > de_circ.txt
 	
-	## currently working to convert Rscript to html. 
-	## cannot use argparser. must hardcode files
-	## you will have to rename all input nf vars to hardcoded file names to make it work
+	
+	## make a file with this info -- https://www.frontiersin.org/files/Articles/564301/fgene-11-564301-HTML/image_m/fgene-11-564301-t001.jpg
+	can merge each DE circ file into a master in the next channel. 
 	"""
 }
 
