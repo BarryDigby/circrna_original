@@ -1309,7 +1309,7 @@ ch_bed = ch_bed_tmp.map{ file -> [file.simpleName, file]}
 ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
 
 //process make_circRNA_report{
-//	publishDir "$params.outdir/circRNA_Plots", mode:'copy'
+//	publishDir "$params.outdir/circRNA_Report", mode:'copy'
 //	
 //	input:
 //		file(circRNA) from circrna_dir_report
@@ -1318,7 +1318,8 @@ ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).jo
 //		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
 //
 //	output:
-//		tuple val(base), file("${base}_Report.html") into circRNA_report_finished
+//		## capture folder containing the 3 plots plus info like below. 
+//		tuple val(base), file("${base}/") into circRNA_report_finished
 //		
 //	script:
 //	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
