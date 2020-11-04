@@ -85,6 +85,6 @@ cp ${name}_bed12.bed BED12/
 
 done < de_circ.bed
 
-#cat *.bed12.bed > de_circ_exon_annotated.bed
+cat BED12/*_bed12.bed > de_circ_exon_annotated.bed
 
 #rm -f *.bed12.bed
