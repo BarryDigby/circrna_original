@@ -1340,7 +1340,7 @@ process make_circRNA_plots{
 	grep -v "6mer" $targetscan > targetscan_filt.txt
 	
 	// Make plots and generate circRNA info
-	Rscript "$projectDir"/bin/circ_report.R de_circ.txt $circ_counts $gene_counts $parent_gene $bed $miranda $targetscan_filt $mature_len $phenotype circlize_exons.txt 
+	Rscript "$projectDir"/bin/circ_report.R de_circ.txt $circ_counts $gene_counts $parent_gene $bed $miranda targetscan_filt.txt $mature_len $phenotype circlize_exons.txt 
 	"""
 }
 
