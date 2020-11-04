@@ -1320,7 +1320,7 @@ process make_circRNA_plots{
 		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
 
 	output: 
-		tuple val(base), file("${base}"/) into circRNA_report_finished
+		tuple val(base), file("${base}/") into circRNA_report_finished
 		tuple val(base), file("*_Information.txt") into single_reports
 		
 	script:
