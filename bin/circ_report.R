@@ -149,7 +149,7 @@ singular_report <- function(inputdata){
 	
 	colnames(out_df) <- c("circRNA_ID", "Parent_Gene", "Mature_Length", "Log2FC", "pvalue", "Adjusted_pvalue")
 
-	write.table(out_df, file.path(file_name, paste(file_name, "Information.txt", sep="_")), quote=F, sep="\t", row.names=F)
+	write.table(out_df, file.path(file_name, paste(file_name, "Report.txt", sep="_")), quote=F, sep="\t", row.names=F)
 } 
 	
 
