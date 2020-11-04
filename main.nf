@@ -1327,7 +1327,7 @@ process make_circRNA_plots{
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
 	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
 	circ_counts = "${circRNA}/DESeq2_normalized_counts.txt"
-	gene_counts = "${RNA_Seq}"/DESeq2_normalized_counts.txt"
+	gene_counts = "${RNA_Seq}/DESeq2_normalized_counts.txt"
 	"""
 	// create file for circos plot
 	bash "$projectDir"/bin/prep_circos.sh $bed
