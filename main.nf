@@ -179,7 +179,7 @@ ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : 
 
 process download_mirbase{
 	errorStrategy 'retry'
-   	maxRetries 3
+   	maxRetries 10
 	
 	publishDir "$params.outdir/assets", mode:'copy'
 	
@@ -197,6 +197,8 @@ process download_mirbase{
 // TO DO: add a retry attempt for process below (it sometimes fails to resolve the link)
 
 process download_targetscan{
+	errorStrategy 'retry'
+   	maxRetries 10	
 	
 	publishDir "$params.outdir/assets", mode:'copy'
 
