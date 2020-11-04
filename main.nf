@@ -118,7 +118,7 @@ params.input_type = 'fastq'
 params.fastq_glob = '*_R{1,2}.fastq.gz'
 params.bam_glob = '*.bam'
 params.adapters = '/data/bdigby/grch38/adapters.fa'
-params.phenotype = ''
+params.phenotype = '/data/bdigby/grch38/phenotype.txt'
 
 toolList = defineToolList()
 tool = params.tool ? params.tool.split(',').collect{it.trim().toLowerCase()} : []
@@ -1121,6 +1121,7 @@ if('combine' in tool){
 }
 
 ch_phenotype = Channel.fromPath(params.phenotype)
+(ch_phenotype_de, ch_phenotype_report) = ch_phenotype.into(2)
 
 process diff_exp{
 
@@ -1129,7 +1130,7 @@ process diff_exp{
 	input:
 		file(gtf_dir) from stringtie_dir.collect()
 		file(circ_matrix) from circRNA_counts
-		file(phenotype) from ch_phenotype
+		file(phenotype) from ch_phenotype_de
 		
 	output:
 		file("RNA-Seq") into rnaseq_dir
@@ -1316,7 +1317,7 @@ process make_circRNA_plots{
 	input:
 		file(circRNA) from circrna_dir_report
 		file(RNA_Seq) from rnaseq_dir_report
-		file(phenotype) from ch_phenotype
+		file(phenotype) from ch_phenotype_report
 		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
 
 	output: 
