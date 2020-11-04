@@ -1310,35 +1310,39 @@ ch_bed = ch_bed_tmp.map{ file -> [file.simpleName, file]}
 	
 ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
 
-//process make_circRNA_report{
-//	publishDir "$params.outdir/circRNA_Report", mode:'copy'
-//	
-//	input:
-//		file(circRNA) from circrna_dir_report
-//		file(RNA_Seq) from rnaseq_dir_report
-//		file(phenotype) from ch_phenotype
-//		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
-//
-//	output:
-//		## capture folder containing the 3 plots plus info like below. 
-//		tuple val(base), file("${base}/") into circRNA_report_finished
-//		
-//	script:
-//	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
-//	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
-//	"""
-//	## correction: do not need to mess with targetscan headers, only miRanda (solved in file gen stage)
-//	## merge de circs
-//	## something like
-//	tail -n +2 $up_reg > up_reg.txt
-//	cat $down_reg up_reg.txt > de_circ.txt
-//	
-//	
-//	## make a file with this info -- https://www.frontiersin.org/files/Articles/564301/fgene-11-564301-HTML/image_m/fgene-11-564301-t001.jpg
-//	can merge each DE circ file into a master in the next channel. 
-//	"""
-//}
-//
+process make_circRNA_plots{
+	publishDir "$params.outdir/circRNA_Report", mode:'copy'
+	
+	input:
+		file(circRNA) from circrna_dir_report
+		file(RNA_Seq) from rnaseq_dir_report
+		file(phenotype) from ch_phenotype
+		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
+
+	output: 
+		tuple val(base), file("${base}"/) into circRNA_report_finished
+		tuple val(base), file("*_Information.txt") into single_reports
+		
+	script:
+	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
+	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
+	circ_counts = "${circRNA}/DESeq2_normalized_counts.txt"
+	gene_counts = "${RNA_Seq}"/DESeq2_normalized_counts.txt"
+	"""
+	// create file for circos plot
+	bash "$projectDir"/bin/prep_circos.sh $bed
+	
+	// merge upreg, downreg info 
+	cat $up_reg $down_reg > de_circ.txt
+	
+	// remove 6mers from TargetScan 
+	grep -v "6mer" $targetscan > targetscan_filt.txt
+	
+	// Make plots and generate circRNA info
+	Rscript "$projectDir"/bin/circ_report.R de_circ.txt $circ_counts $gene_counts $parent_gene $bed $miranda $targetscan_filt $mature_len $phenotype circlize_exons.txt 
+	"""
+}
+
 
 // Check parameter existence
 def checkParameterExistence(it, list) {
