@@ -1289,7 +1289,7 @@ process get_parent_gene{
 
 /*
 ================================================================================
-                         circRNA Report
+                         circRNA Plots
 ================================================================================
 */
 
@@ -1308,34 +1308,34 @@ ch_bed = ch_bed_tmp.map{ file -> [file.simpleName, file]}
 	
 ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
 
-process make_circRNA_report{
-	publishDir "$params.outdir/circRNA_reports", mode:'copy'
-	
-	input:
-		file(circRNA) from circrna_dir_report
-		file(RNA_Seq) from rnaseq_dir_report
-		file(phenotype) from ch_phenotype
-		tuple val(base) file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
-
-	output:
-		tuple val(base), file("${base}_Report.html") into circRNA_report_finished
-		
-	script:
-	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
-	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
-	"""
-	## correction: do not need to mess with targetscan headers, only miRanda (solved in file gen stage)
-	## merge de circs
-	## something like
-	tail -n +2 $up_reg > up_reg.txt
-	cat $down_reg up_reg.txt > de_circ.txt
-	
-	
-	## make a file with this info -- https://www.frontiersin.org/files/Articles/564301/fgene-11-564301-HTML/image_m/fgene-11-564301-t001.jpg
-	can merge each DE circ file into a master in the next channel. 
-	"""
-}
-
+//process make_circRNA_report{
+//	publishDir "$params.outdir/circRNA_Plots", mode:'copy'
+//	
+//	input:
+//		file(circRNA) from circrna_dir_report
+//		file(RNA_Seq) from rnaseq_dir_report
+//		file(phenotype) from ch_phenotype
+//		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
+//
+//	output:
+//		tuple val(base), file("${base}_Report.html") into circRNA_report_finished
+//		
+//	script:
+//	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
+//	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
+//	"""
+//	## correction: do not need to mess with targetscan headers, only miRanda (solved in file gen stage)
+//	## merge de circs
+//	## something like
+//	tail -n +2 $up_reg > up_reg.txt
+//	cat $down_reg up_reg.txt > de_circ.txt
+//	
+//	
+//	## make a file with this info -- https://www.frontiersin.org/files/Articles/564301/fgene-11-564301-HTML/image_m/fgene-11-564301-t001.jpg
+//	can merge each DE circ file into a master in the next channel. 
+//	"""
+//}
+//
 
 // Check parameter existence
 def checkParameterExistence(it, list) {
