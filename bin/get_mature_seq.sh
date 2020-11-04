@@ -81,10 +81,10 @@ rm -f ${name}.genepred
 rm -f ${name}_predtobed.bed
 rm -f ${name}.bed
 
-cp ${name}.bed12.bed BED12/
+cp ${name}_bed12.bed BED12/
 
 done < de_circ.bed
 
-cat *.bed12.bed > de_circ_exon_annotated.bed
+#cat *.bed12.bed > de_circ_exon_annotated.bed
 
-rm -f *.bed12.bed
+#rm -f *.bed12.bed
