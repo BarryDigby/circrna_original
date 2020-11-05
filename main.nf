@@ -472,6 +472,8 @@ if(params.input_type == 'bam'){
     
 ch_reads = fastq_built
 
+// Test dataset does not like being trimmed, omit for testing. 
+
 //process bbduk {
 //    
 //        publishDir "$params.outdir/trimmed_reads", mode:'copy'
@@ -500,6 +502,9 @@ ch_reads = fastq_built
 //}
 
 (circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads, circrna_finder_reads, dcc_reads, dcc_reads_mate1, dcc_reads_mate2, hisat2_reads) = ch_reads.into(10)
+
+// fastqc , multiqc omitted until I figure out how to incorporate multiQC separately (multiqc is python3, container is python2). 
+// perhaps use multiqc container for this. 
 
 /*
 ================================================================================
