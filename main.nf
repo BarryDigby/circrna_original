@@ -1333,16 +1333,16 @@ process make_circRNA_plots{
 	circ_counts = "${circRNA}/DESeq2_normalized_counts.txt"
 	gene_counts = "${rnaseq}/DESeq2_normalized_counts.txt"
 	"""
-	// create file for circos plot
+	# create file for circos plot
 	bash "$projectDir"/bin/prep_circos.sh $bed
 	
-	// merge upreg, downreg info 
+	# merge upreg, downreg info 
 	cat $up_reg $down_reg > de_circ.txt
 	
-	// remove 6mers from TargetScan 
+	# remove 6mers from TargetScan 
 	grep -v "6mer" $targetscan > targetscan_filt.txt
 	
-	// Make plots and generate circRNA info
+	# Make plots and generate circRNA info
 	Rscript "$projectDir"/bin/circ_report.R de_circ.txt $circ_counts $gene_counts $parent_gene $bed $miranda targetscan_filt.txt $mature_len $phenotype circlize_exons.txt 
 	"""
 }
