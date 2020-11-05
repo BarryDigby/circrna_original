@@ -1311,24 +1311,26 @@ ch_bed = ch_bed_tmp.map{ file -> [file.simpleName, file]}
 	
 ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
 
+(test1, test2) = ch_report.into(2)
+
 process make_circRNA_plots{
 	publishDir "$params.outdir/circRNA_Report", mode:'copy'
 	
 	input:
 		file(circRNA) from circrna_dir_report
-		file(RNA_Seq) from rnaseq_dir_report
+		file(rnaseq) from rnaseq_dir_report
 		file(phenotype) from ch_phenotype_report
-		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
+		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from test1
 
 	output: 
 		tuple val(base), file("${base}/") into circRNA_report_finished
-		tuple val(base), file("*_Information.txt") into single_reports
+		tuple val(base), file("*_Report.txt") into single_reports
 		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
 	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
 	circ_counts = "${circRNA}/DESeq2_normalized_counts.txt"
-	gene_counts = "${RNA_Seq}/DESeq2_normalized_counts.txt"
+	gene_counts = "${rnaseq}/DESeq2_normalized_counts.txt"
 	"""
 	// create file for circos plot
 	bash "$projectDir"/bin/prep_circos.sh $bed
