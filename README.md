@@ -1,5 +1,8 @@
-# circRNA
-Nextflow pipeline to scan high throughput sequencing data for circRNAs, perform differential expression and generate circRNA-miRNA targets
+# circseq
+Nextflow pipeline to scan high throughput sequencing data for circRNAs, perform differential expression and generate circRNA-miRNA targets.
+
+# Installation
+To run the pipeline, `nextflow` and `singularity` must be installed. 
 
 # TOOLS
 The container hosts the following circRNA tools:
