@@ -157,6 +157,8 @@ singular_report <- function(inputdata){
 
 
 miRNAs <- function(inputdata){
+	
+	outdir <- inputdata$bed$name
 
 	miranda <- inputdata$miranda
 	targetscan <- inputdata$targetscan
@@ -164,21 +166,22 @@ miRNAs <- function(inputdata){
 	circlize_exons <- inputdata$circlize_exons
 
 	miranda$miRNA <- gsub("hsa-", "", miranda$miRNA)
-
-	miranda_mirs <- as.character(miranda$miRNA)
-	targetscan_mirs <- as.character(targetscan$miRNA_family_ID)
-
-	int <- intersect(miranda_mirs, targetscan_mirs)
-	filter <- miranda[which((miranda$miRNA) %in% int),]
-	filter <- subset(filter, filter$Energy_KcalMol <= -20.00)
-
-	miR_key <- filter$miRNA
-	targets <- targetscan[which((targetscan$miRNA_family_ID) %in% miR_key),]
-
-	miRs <- targets[,c(2,4,5)]
-
+	colnames(targetscan)[2] <- "miRNA"
+	
+	mir_df <- merge(miranda, targetscan, by="miRNA")
+	
+	## Filtering Step:
+	## Removes miRNA <= -20.00Kcal/Mol
+	## Removes duplicate miRNAs sharing the same bind site (these are duplicate miRNA IDs)
+	## Keeps the miRNA with the higher "Score"
+	mir_df <- mir_df[order(mir_df$MSA_start, -abs(mir_df$Score)),]
+	mir_df <- mir_df[!duplicated(mir_df$MSA_start),]
+	miRs <- subset(mir_df, select=c(miRNA, MSA_start, MSA_end))
+	colnames(miRs) <- c("miRNA", "Start", "End")
+	
+	## Calculate where the miRNAs fall in the context of the exons of the circRNA
 	if(nrow(x)==1){
-		exon_1 <- miRs[which(miRs$MSA_start < x$V3[1]),]
+		exon_1 <- miRs[which(miRs$Start < x$V3[1]),]
   		exon_1$value = 1
   		exon_1$chr <- "exon1"
   		exon_1 <- exon_1[,c(5,2,3,4,1)]
@@ -187,25 +190,32 @@ miRNAs <- function(inputdata){
   		circlize_mirs <- data.frame(ncol(5))
   	for(n in 1:nrow(x)){
     		if(n==1){
-      			exon_1 <- miRs[which(miRs$MSA_start < x$V3[n]),]
+      			exon_1 <- miRs[which(miRs$Start < x$V3[n]),]
       			exon_1$value = 1
       			exon_1$chr <- "exon1"
       			exon_1 <- exon_1[,c(5,2,3,4,1)]
       			circlize_mirs <- exon_1
     		}else{
-      			exon <- miRs[which(miRs$MSA_start >=  sum(x$V3[0:(n-1)]) & miRs$MSA_start < sum(x$V3[0:n])),]
+      			exon <- miRs[which(miRs$Start >=  sum(x$V3[0:(n-1)]) & miRs$Start < sum(x$V3[0:n])),]
       			exon$value = 1
       			exon$chr <- paste("exon", n, sep="")
       			subtract_me <- sum(x$V3[0:(n-1)])
-      			exon$MSA_start <- (exon$MSA_start) - subtract_me
-      			exon$MSA_end <- (exon$MSA_end) - subtract_me
+      			exon$Start <- (exon$Start) - subtract_me
+      			exon$End <- (exon$End) - subtract_me
       			exon <- exon[,c(5,2,3,4,1)]
       			circlize_mirs <- rbind(circlize_mirs, exon)
-    		}
-  	}
-}
+    			}
+  		}
+	}
 
-make_circos_plot(inputdata, circlize_exons, circlize_mirs)
+	write_mirs <- circlize_mirs
+	write_mirs <- subset(write_mirs, select=-c(value, Start, End))
+	write_mirs <- cbind(write_mirs, mir_df)
+	write_mirs <- subset(write_mirs, select=c(miRNA, Score, Energy_KcalMol, MSA_start, MSA_end, Site_type))
+	colnames(write_mirs) <- c("miRNA", "Score", "Energy_KcalMol", "Start", "End", "Site_type")
+	
+	write.table(write_mirs, file.path(outdir, paste(outdir, "miRNA_targets.txt", sep="_")), sep="\t", row.names=F, quote=F)
+	make_circos_plot(inputdata, circlize_exons, circlize_mirs)
 }
 
 prep_plots <- function(inputdata){
