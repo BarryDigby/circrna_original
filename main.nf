@@ -1312,6 +1312,7 @@ ch_bed = ch_bed_tmp.map{ file -> [file.simpleName, file]}
 ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
 
 (test1, test2) = ch_report.into(2)
+test2.view()
 
 process make_circRNA_plots{
 	publishDir "$params.outdir/circRNA_Report", mode:'copy'
