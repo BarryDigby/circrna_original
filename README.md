@@ -21,6 +21,10 @@ For example:
 
 ***
 
+# TO-DO
+Facilitate single end data. 
+Incorporate 'stranded' datasets.
+
 # TOOLS
 The container hosts the following circRNA tools:
 
