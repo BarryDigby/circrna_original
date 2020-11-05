@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-mkdir -p BED12
+mkdir -p bed12
 
 while IFS='' read -r line; do
         name=$(echo $line | awk '{print $4}')
@@ -81,10 +81,10 @@ rm -f ${name}.genepred
 rm -f ${name}_predtobed.bed
 rm -f ${name}.bed
 
-cp ${name}.bed12.bed BED12/
+cp ${name}.bed12.bed bed12/
 
 done < de_circ.bed
 
-cat BED12/*.bed12.bed > de_circ_exon_annotated.bed
+cat bed12/*.bed12.bed > de_circ_exon_annotated.bed
 
 #rm -f *.bed12.bed
