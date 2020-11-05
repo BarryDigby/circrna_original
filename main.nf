@@ -1351,7 +1351,7 @@ process make_circRNA_plots{
 
 
 process master_report{
-	publishDir "$params.outdir/circ_RNA_Report", mode:'copy'
+	publishDir "$params.outdir/circRNA_Report", mode:'copy'
 	
 	input:
 		file(reports) from single_reports.collect()
@@ -1367,6 +1367,7 @@ process master_report{
 	echo "circRNA_ID Parent_Gene Mature_Length Log2FC pvalue Adjusted_pvalue" | tr ' ' '\t' > headers.txt
 	cat headers.txt no_headers.txt > merged_reports.txt
 	
+	Rscript "$projectDir"/bin/annotate_report.R
 	"""
 }
 
