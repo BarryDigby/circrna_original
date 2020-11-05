@@ -1347,7 +1347,8 @@ process make_circRNA_plots{
 	Rscript "$projectDir"/bin/circ_report.R de_circ.txt $circ_counts $gene_counts $parent_gene $bed $miranda targetscan_filt.txt $mature_len $phenotype circlize_exons.txt 
 	
 	# remove all intermediate files except dir for output
-	rm *
+	rm *.txt
+	rm *.bed
 	"""
 }
 
