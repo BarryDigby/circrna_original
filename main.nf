@@ -1312,7 +1312,11 @@ ch_miranda.view()
 ch_bed_tmp = bed_files.flatten()
 ch_bed = ch_bed_tmp.map{ file -> [file.simpleName, file]}
 ch_bed.view()
-	
+
+circrna_dir_report.view()
+rnaseq_dir_report.view()
+ch_phenotype_report.view()
+
 //ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
 
 //(test1, test2) = ch_report.into(2)
