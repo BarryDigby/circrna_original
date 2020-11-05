@@ -10,13 +10,16 @@ Differential expression -- the contrast of interest must be labelled as `conditi
 
 For example:
 
-sample  condition
-rep1_trt  trt
-rep2_trt  trt
-rep3_trt  trt
-rep1  normal
-rep2  normal 
-rep3  normal
+| sample   	| condition 	|
+|----------	|-----------	|
+| rep1_trt 	| treated   	|
+| rep2_trt 	| treated   	|
+| rep3_trt 	| treated   	|
+| rep1     	| normal    	|
+| rep2     	| normal    	|
+| rep3     	| normal    	|
+
+***
 
 # TOOLS
 The container hosts the following circRNA tools:
