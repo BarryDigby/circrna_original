@@ -207,23 +207,39 @@ DESeq2 <- function(inputdata, data_type){
 		countData=inputdata$gene,
 		colData=inputdata$pheno,
 		design = inputdata$design)
+		
+		dds$condition <- relevel(dds$condition, ref="normal")
+		dds <- DESeq(dds, quiet=TRUE)
+		contrasts <- levels(dds$condition)
 
 	}else if(data_type == "circRNA"){
 
 		outdir <- "circRNA/"
 
+		## use gene sizeFactors
+		tmp <- DESeqDataSetFromMatrix(
+		countData=inputdata$gene,
+		colData=inputdata$pheno,
+		design = inputdata$design)
+		tmp$condition <- relevel(tmp$condition, ref="normal")
+		tmp <- DESeq(tmp, quiet=TRUE)
+		contrasts <- levels(tmp$condition)
+		
+		sizefactors <- sizeFactors(tmp)
+		
 		dds <- DESeqDataSetFromMatrix(
 		countData=inputdata$circ,
 		colData=inputdata$pheno,
 		design = inputdata$design)
-
+		
+		dds$condition <- relevel(dds$condition, ref="normal")
+		dds <- DESeq(dds, quiet=TRUE)
+		contrasts <- levels(dds$condition)
+		sizeFactors(dds) <- sizefactors
+		
 	}else{
 		print("ERROR in Execution stage of script")
 	}
-
-	dds$condition <- relevel(dds$condition, ref="normal")
-	dds <- DESeq(dds, quiet=TRUE)
-	contrasts <- levels(dds$condition)
 
 	DESeq2_plots(dds, outdir)
 
