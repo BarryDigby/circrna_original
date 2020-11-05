@@ -1178,7 +1178,7 @@ process remove_unwanted_biotypes{
 
 process get_mature_seq{
 
-	publishDir "$params.outdir/bed12", mode:'copy', pattern: 'BED12/*.bed'
+	publishDir "$params.outdir/bed12", mode:'copy', pattern: 'bed12/*.bed'
 	
 	input:
 		file(fasta) from ch_fasta
@@ -1189,7 +1189,7 @@ process get_mature_seq{
 	output:
 		file("miranda/*.fa") into miranda_sequences
 		file("targetscan/*.txt") into targetscan_sequences
-		file("BED12/*.bed") into bed_files
+		file("bed12/*.bed") into bed_files
 		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
