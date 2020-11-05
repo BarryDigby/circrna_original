@@ -1177,6 +1177,8 @@ process remove_unwanted_biotypes{
 
 
 process get_mature_seq{
+
+	publishDir "$params.outdir/bed12", mode:'copy', pattern: 'BED12/*.bed'
 	
 	input:
 		file(fasta) from ch_fasta
