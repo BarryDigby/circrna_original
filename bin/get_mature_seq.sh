@@ -25,16 +25,16 @@ while IFS='' read -r line; do
                 genePredToBed ${name}.genepred ${name}_predtobed.bed
                 awk -v OFS="\t" -v start="$start" -v stop="$stop" \
 		'{if($2==start && $3==stop) print $0}' ${name}_predtobed.bed | \
-		sort -rnk10 | head -n 1 > ${name}_bed12.bed
-		if [[ -s ${name}_bed12.bed ]];
+		sort -rnk10 | head -n 1 > ${name}.bed12.bed
+		if [[ -s ${name}.bed12.bed ]];
 		then
 			:
 		else
 			echo "The circRNA imperfectly overlaps an exon"
 			echo "Investigating if EIciRNA or acceptable to take longest transcript"
 			echo "Retrying with longest transcript"
-			awk -v OFS="\t" '{$13 = $3 - $2; print}' ${name}_predtobed.bed | \
-			sort -rnk13 | cut -f13 --complement | head -n 1 > ${name}_bed12.bed_tmp
+			awk -v OFS="\t" '{$13 = $3 - $2; print}' ${name}.predtobed.bed | \
+			sort -rnk13 | cut -f13 --complement | head -n 1 > ${name}.bed12.bed_tmp
 			echo "Checking best transcript with $name"
 			tx_len=$(awk -v OFS="\t" '{$13 = $3 - $2; print}' ${name}_predtobed.bed | \
                         sort -rnk13 | awk '{print $13}' | head -n 1)
@@ -51,12 +51,12 @@ while IFS='' read -r line; do
                 		rgb="0,0,0"
                 		block_start=0
                 		awk -v OFS="\t" -v thick=$start -v rgb=$rgb -v count=$block_count -v start=$block_start -v size=$block_size \
-                		'{print $0, thick, thick, rgb, count, size, start}' ${name}.bed > ${name}_bed12.bed
-				rm ${name}_bed12.bed_tmp
+                		'{print $0, thick, thick, rgb, count, size, start}' ${name}.bed > ${name}.bed12.bed
+				rm ${name}.bed12.bed_tmp
 			else
 				echo "Transcript is within 200nt of ${name}"
 				echo "Taking best transcript as coordinates"
-				mv ${name}_bed12.bed_tmp ${name}_bed12.bed
+				mv ${name}.bed12.bed_tmp ${name}.bed12.bed
 			fi
 		fi
 	else 
@@ -67,13 +67,13 @@ while IFS='' read -r line; do
                 rgb="0,0,0"
                 block_start=0
                 awk -v OFS="\t" -v thick=$start -v rgb=$rgb -v count=$block_count -v start=$block_start -v size=$block_size \
-                '{print $0, thick, thick, rgb, count, size, start}' ${name}.bed > ${name}_bed12.bed
+                '{print $0, thick, thick, rgb, count, size, start}' ${name}.bed > ${name}.bed12.bed
 	fi
 	
 echo "replacing tx with circRNA in ID field"
-awk -v OFS="\t" -v name=$name '{$4 = name; print}' ${name}_bed12.bed > ${name}_bed12.bed_tmp
-rm ${name}_bed12.bed
-mv ${name}_bed12.bed_tmp ${name}_bed12.bed
+awk -v OFS="\t" -v name=$name '{$4 = name; print}' ${name}.bed12.bed > ${name}.bed12.bed_tmp
+rm ${name}.bed12.bed
+mv ${name}.bed12.bed_tmp ${name}.bed12.bed
 
 echo "cleaning up intermediate files"
 rm -f ${name}.gtf
@@ -81,10 +81,10 @@ rm -f ${name}.genepred
 rm -f ${name}_predtobed.bed
 rm -f ${name}.bed
 
-cp ${name}_bed12.bed BED12/
+cp ${name}.bed12.bed BED12/
 
 done < de_circ.bed
 
-cat BED12/*_bed12.bed > de_circ_exon_annotated.bed
+cat BED12/*.bed12.bed > de_circ_exon_annotated.bed
 
 #rm -f *.bed12.bed
