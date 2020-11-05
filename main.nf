@@ -1301,61 +1301,51 @@ process get_parent_gene{
 
 // Create tuples, merge channels for report. 
 ch_mature_len = mature_len.map{ file -> [file.simpleName, file]}
-ch_mature_len.view()
 ch_parent_genes_tmp = parent_genes.flatten()
 ch_parent_genes = ch_parent_genes_tmp.map{ file -> [file.simpleName, file]}
-ch_parent_genes.view()
-
 ch_targetscan = targetscan_out.map{ file -> [file.simpleName, file]}
-ch_targetscan.view()
 ch_miranda = miranda_out.map{ file -> [file.simpleName, file]}
-ch_miranda.view()
-
 ch_bed_tmp = bed_files.flatten()
 ch_bed = ch_bed_tmp.map{ file -> [file.simpleName, file]}
-ch_bed.view()
 
-circrna_dir_report.view()
-rnaseq_dir_report.view()
-ch_phenotype_report.view()
 
-//ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
+ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
 
-//(test1, test2) = ch_report.into(2)
-//test2.view()
+(test1, test2) = ch_report.into(2)
+test2.view()
 
-//process make_circRNA_plots{
-//	publishDir "$params.outdir/circRNA_Report", mode:'copy'
-//	
-//	input:
-//		file(circRNA) from circrna_dir_report
-//		file(rnaseq) from rnaseq_dir_report
-//		file(phenotype) from ch_phenotype_report
-//		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from test1
-//
-//	output: 
-//		tuple val(base), file("${base}/") into circRNA_report_finished
-//		tuple val(base), file("*_Report.txt") into single_reports
-//		
-//	script:
-//	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
-//	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
-//	circ_counts = "${circRNA}/DESeq2_normalized_counts.txt"
-//	gene_counts = "${rnaseq}/DESeq2_normalized_counts.txt"
-//	"""
-//	// create file for circos plot
-//	bash "$projectDir"/bin/prep_circos.sh $bed
-//	
-//	// merge upreg, downreg info 
-//	cat $up_reg $down_reg > de_circ.txt
-//	
-//	// remove 6mers from TargetScan 
-//	grep -v "6mer" $targetscan > targetscan_filt.txt
-//	
-//	// Make plots and generate circRNA info
-//	Rscript "$projectDir"/bin/circ_report.R de_circ.txt $circ_counts $gene_counts $parent_gene $bed $miranda targetscan_filt.txt $mature_len $phenotype circlize_exons.txt 
-//	"""
-//}
+process make_circRNA_plots{
+	publishDir "$params.outdir/circRNA_Report", mode:'copy'
+	
+	input:
+		file(circRNA) from circrna_dir_report
+		file(rnaseq) from rnaseq_dir_report
+		file(phenotype) from ch_phenotype_report
+		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from test1
+
+	output: 
+		tuple val(base), file("${base}/") into circRNA_report_finished
+		tuple val(base), file("*_Report.txt") into single_reports
+		
+	script:
+	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
+	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
+	circ_counts = "${circRNA}/DESeq2_normalized_counts.txt"
+	gene_counts = "${rnaseq}/DESeq2_normalized_counts.txt"
+	"""
+	// create file for circos plot
+	bash "$projectDir"/bin/prep_circos.sh $bed
+	
+	// merge upreg, downreg info 
+	cat $up_reg $down_reg > de_circ.txt
+	
+	// remove 6mers from TargetScan 
+	grep -v "6mer" $targetscan > targetscan_filt.txt
+	
+	// Make plots and generate circRNA info
+	Rscript "$projectDir"/bin/circ_report.R de_circ.txt $circ_counts $gene_counts $parent_gene $bed $miranda targetscan_filt.txt $mature_len $phenotype circlize_exons.txt 
+	"""
+}
 
 
 // Check parameter existence
