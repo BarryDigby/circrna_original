@@ -172,8 +172,9 @@ miRNAs <- function(inputdata){
 	
 	## Filtering Step:
 	## Removes miRNA <= -20.00Kcal/Mol
-	## Removes duplicate miRNAs sharing the same bind site (these are duplicate miRNA IDs)
+	## Removes duplicate miRNAs sharing the same bind site (duplicate miRNA IDs)
 	## Keeps the miRNA with the higher "Score"
+	mir_df <- subset(mir_df, mir_df$Energy_KcalMol <= -20.00)
 	mir_df <- mir_df[order(mir_df$MSA_start, -abs(mir_df$Score)),]
 	mir_df <- mir_df[!duplicated(mir_df$MSA_start),]
 	miRs <- subset(mir_df, select=c(miRNA, MSA_start, MSA_end))
