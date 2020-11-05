@@ -1316,9 +1316,6 @@ ch_bed = ch_bed_tmp.map{ file -> [file.simpleName, file]}
 
 ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
 
-(test1, test2) = ch_report.into(2)
-test2.view()
-
 process make_circRNA_plots{
 	publishDir "$params.outdir/circRNA_Report", mode:'copy'
 	
@@ -1326,11 +1323,11 @@ process make_circRNA_plots{
 		file(circRNA) from circrna_dir_report
 		file(rnaseq) from rnaseq_dir_report
 		file(phenotype) from ch_phenotype_report
-		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from test1
+		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
 
 	output: 
-		tuple val(base), file("${base}/") into circRNA_report_finished
-		tuple val(base), file("*_Report.txt") into single_reports
+		tuple val(base), file("${base}/") into circRNA_plots_finished
+		tuple val(base), file("${base}/*_Report.txt") into single_reports
 		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
@@ -1352,6 +1349,26 @@ process make_circRNA_plots{
 	"""
 }
 
+
+process master_report{
+	publishDir "$params.outdir/circ_RNA_Report", mode:'copy'
+	
+	input:
+		file(reports) from single_reports.collect()
+		
+	output:
+		file("DE_circRNA_Report.txt") into master_report
+		
+	script:
+	"""
+	# remove header, add manually
+	cat *.txt > merged.txt
+	grep -v "Log2FC" merged.txt > no_headers.txt
+	echo "circRNA_ID Parent_Gene Mature_Length Log2FC pvalue Adjusted_pvalue" | tr ' ' '\t' > headers.txt
+	cat headers.txt no_headers.txt > merged_reports.txt
+	
+	"""
+}
 
 // Check parameter existence
 def checkParameterExistence(it, list) {
