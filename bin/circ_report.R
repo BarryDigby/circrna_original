@@ -139,6 +139,8 @@ singular_report <- function(inputdata){
 
 	de_df <- inputdata$de
 	circ_de_info <- de_df[which(rownames(de_df) %in% file_name),]
+	numcols <- c("log2FoldChange", "pvalue", "padj")
+        circ_de_info[numcols] <- sapply(circ_de_info[numcols],as.numeric)
 	log2fc <- round(circ_de_info$log2FoldChange, digits=3)
 	pval <- signif(circ_de_info$pvalue, digits=3)
 	adj.pval <- signif(circ_de_info$padj, digits=3)
