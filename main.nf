@@ -1326,7 +1326,7 @@ process make_circRNA_plots{
 		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
 
 	output: 
-		tuple val(base), file("*") into circRNA_plots
+		tuple val(base), file("${base}") into circRNA_plots
 		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
@@ -1347,10 +1347,10 @@ process make_circRNA_plots{
 	Rscript "$projectDir"/bin/circ_report.R de_circ.txt $circ_counts $gene_counts $parent_gene $bed $miranda targetscan_filt.txt $mature_len $phenotype circlize_exons.txt 
 	
 	# remove all intermediate files + dirs except dir with results
-	rm *.txt
-	rm *.bed
-	rm -rf circRNA/
-	rm -rf RNA-Seq/
+	#rm *.txt
+	#rm *.bed
+	#rm -rf circRNA/
+	#rm -rf RNA-Seq/
 	"""
 }
 
