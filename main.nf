@@ -1323,10 +1323,10 @@ process make_circRNA_plots{
 		file(circRNA) from circrna_dir_report
 		file(rnaseq) from rnaseq_dir_report
 		file(phenotype) from ch_phenotype_report
-		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
+		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report.flatten()
 
 	output: 
-		file("chr*/") into circRNA_plots
+		file("chr*") into circRNA_plots
 		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
