@@ -1326,7 +1326,7 @@ process make_circRNA_plots{
 		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
 
 	output: 
-		tuple val(base), file("*") into circRNA_plots
+		file("*") into circRNA_plots
 		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
@@ -1348,8 +1348,14 @@ process make_circRNA_plots{
 	"""
 }
 
-(test, test1) = circRNA_plots.into(2)
+// circRNA_plots includes [base, [dir, .txt, .txt, .txt]]
+// remove tuple to make [dir, txt, txt, txt]
+// collect all from previous process
+master_ch = circRNA_plots.collect()
+(test, test1) = master_ch.into(2)
 test.view()
+// delete text files in process script, left with only dirs. 
+
 
 process master_report{
 	publishDir "$params.outdir/circRNA_Report", mode:'copy'
@@ -1361,10 +1367,15 @@ process master_report{
 		file("DE_circRNA_Report.txt") into master_report
 		
 	script:
-	files = "${reports}/**/*_Report.txt"
 	"""
+	## remove text files from previous process
+	rm *.txt
+	
+	## extract reports
+	for dir in '*/'; do cp \$dir/*_Report.txt .; done
+	
 	# remove header, add manually
-	cat $files > merged.txt
+	cat *.txt > merged.txt
 	grep -v "Log2FC" merged.txt > no_headers.txt
 	echo "circRNA_ID Parent_Gene Mature_Length Log2FC pvalue Adjusted_pvalue" | tr ' ' '\t' > headers.txt
 	cat headers.txt no_headers.txt > merged_reports.txt
