@@ -1325,7 +1325,7 @@ process make_circRNA_plots{
 		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len), file(phenotype) from ch_report.combine(ch_phenotype_report)
 
 	output: 
-		file("chr*") into circRNA_plots
+		file("chr*") into circRNA_plots.collect()
 		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
@@ -1348,8 +1348,8 @@ process make_circRNA_plots{
 }
 
 // collect all from previous process
-master_ch = circRNA_plots.collect()
-(test, test1) = master_ch.into(2)
+//master_ch = circRNA_plots.collect()
+(test, test1) = circRNA_plots.into(2)
 test.view()
 // delete text files in process script, left with only dirs. 
 
