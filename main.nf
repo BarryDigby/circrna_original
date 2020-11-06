@@ -1304,7 +1304,7 @@ process get_parent_gene{
 */
 
 
-// Create tuples, merge channels for report. 
+// Create tuples, merge channels by simpleName for report. 
 ch_mature_len = mature_len.map{ file -> [file.simpleName, file]}
 ch_parent_genes_tmp = parent_genes.flatten()
 ch_parent_genes = ch_parent_genes_tmp.map{ file -> [file.simpleName, file]}
@@ -1326,7 +1326,7 @@ process make_circRNA_plots{
 		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report
 
 	output: 
-		file("*") into circRNA_plots
+		tuple val(base), file("*/") into circRNA_plots
 		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
@@ -1361,7 +1361,7 @@ process master_report{
 	publishDir "$params.outdir/circRNA_Report", mode:'copy'
 	
 	input:
-		tuple val(base), file(reports) from test1.collect()
+		file(reports) from test1.collect()
 		
 	output:
 		file("DE_circRNA_Report.txt") into master_report
