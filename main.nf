@@ -1315,8 +1315,6 @@ ch_bed = ch_bed_tmp.map{ file -> [file.simpleName, file]}
 
 
 ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
-(ch_report_a, ch_report1) = ch_report.into(2)
-ch_report_a.view()
 
 process make_circRNA_plots{
 	publishDir "$params.outdir/circRNA_Report", mode:'copy'
@@ -1324,8 +1322,7 @@ process make_circRNA_plots{
 	input:
 		file(circRNA) from circrna_dir_report
 		file(rnaseq) from rnaseq_dir_report
-		file(phenotype) from ch_phenotype_report
-		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len) from ch_report1
+		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len), file(phenotype) from ch_report.combine(ch_phenotype_report)
 
 	output: 
 		file("chr*") into circRNA_plots
