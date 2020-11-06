@@ -1346,7 +1346,7 @@ process make_circRNA_plots{
 	# Make plots and generate circRNA info
 	Rscript "$projectDir"/bin/circ_report.R de_circ.txt $circ_counts $gene_counts $parent_gene $bed $miranda targetscan_filt.txt $mature_len $phenotype circlize_exons.txt 
 	
-	# remove all intermediate files except dir for output
+	# remove all intermediate files + dirs except dir with results
 	rm *.txt
 	rm *.bed
 	rm -rf circRNA/
@@ -1365,7 +1365,7 @@ process master_report{
 		file("DE_circRNA_Report.txt") into master_report
 		
 	script:
-	files = "${reports}/*_Reports.txt"
+	files = "${reports}/*_Report.txt"
 	"""
 	# remove header, add manually
 	cat $files > merged.txt
