@@ -1349,6 +1349,8 @@ process make_circRNA_plots{
 	# remove all intermediate files except dir for output
 	rm *.txt
 	rm *.bed
+	rm -rf circRNA/
+	rm -rf RNA-Seq/
 	"""
 }
 
