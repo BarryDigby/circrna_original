@@ -1314,14 +1314,14 @@ ch_bed = ch_bed_tmp.map{ file -> [file.simpleName, file]}
 
 
 ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
+
+// must combine folders here or else process uses once then exits. 
 ch_DESeq2_dirs = circrna_dir_report.combine(rnaseq_dir_report)
 
 process make_circRNA_plots{
 	publishDir "$params.outdir/circRNA_Report", mode:'copy'
 	
 	input:
-		//file(circRNA) from circrna_dir_report
-		//file(rnaseq) from rnaseq_dir_report
 		file(phenotype) from ch_phenotype
 		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len), file(circRNA), file(rnaseq) from ch_report.combine(ch_DESeq2_dirs)
 
