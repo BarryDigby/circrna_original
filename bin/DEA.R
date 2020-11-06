@@ -446,7 +446,7 @@ volcano_plot <- function(res, contrast, outdir){
 			caption = paste0('Total Genes = ', nrow(res)),
 			xlim=c(min_width, max_width),
 			ylim=c(0, max_height),
-			PointSize = 1.5)
+			pointSize = 1.5)
 	plot(p)
 	dev.off()
 }
