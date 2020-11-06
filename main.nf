@@ -1325,7 +1325,7 @@ process make_circRNA_plots{
 		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len), file(phenotype) from ch_report.combine(ch_phenotype_report)
 
 	output: 
-		file("chr*") into circRNA_plots.collect()
+		file("chr*") into circRNA_plots
 		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
@@ -1358,7 +1358,7 @@ process master_report{
 	publishDir "$params.outdir/circRNA_Report", mode:'copy'
 	
 	input:
-		file(reports) from test1
+		file(reports) from test1.collect()
 		
 	output:
 		file("DE_circRNA_Report.txt") into master_report
