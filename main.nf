@@ -1350,8 +1350,6 @@ process make_circRNA_plots{
 	"""
 }
 
-// circRNA_plots includes [base, [dir, .txt, .txt, .txt]]
-// remove tuple to make [dir, txt, txt, txt]
 // collect all from previous process
 master_ch = circRNA_plots.collect()
 (test, test1) = master_ch.into(2)
@@ -1376,7 +1374,7 @@ process master_report{
 	# remove header, add manually
 	cat *.txt > merged.txt
 	grep -v "Log2FC" merged.txt > no_headers.txt
-	echo "circRNA_ID Parent_Gene Mature_Length Log2FC pvalue Adjusted_pvalue" | tr ' ' '\t' > headers.txt
+	echo "circRNA_ID Parent_Gene Mature_Length Strand Log2FC pvalue Adjusted_pvalue" | tr ' ' '\t' > headers.txt
 	cat headers.txt no_headers.txt > merged_reports.txt
 	
 	Rscript "$projectDir"/bin/annotate_report.R
