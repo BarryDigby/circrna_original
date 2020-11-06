@@ -1125,8 +1125,7 @@ if('combine' in tool){
                         }
 }
 
-ch_phenotype = Channel.fromPath(params.phenotype)
-(ch_phenotype_de, ch_phenotype_report) = ch_phenotype.into(2)
+ch_phenotype = file(params.phenotype)
 
 process diff_exp{
 
@@ -1135,7 +1134,7 @@ process diff_exp{
 	input:
 		file(gtf_dir) from stringtie_dir.collect()
 		file(circ_matrix) from circRNA_counts
-		file(phenotype) from ch_phenotype_de
+		file(phenotype) from ch_phenotype
 		
 	output:
 		file("RNA-Seq") into rnaseq_dir
@@ -1322,7 +1321,8 @@ process make_circRNA_plots{
 	input:
 		file(circRNA) from circrna_dir_report
 		file(rnaseq) from rnaseq_dir_report
-		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len), file(phenotype) from ch_report.combine(ch_phenotype_report)
+		file(phenotype) from ch_phenotype
+		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len), file(phenotype) from ch_report
 
 	output: 
 		file("chr*") into circRNA_plots
