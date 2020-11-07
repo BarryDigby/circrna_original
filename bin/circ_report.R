@@ -181,6 +181,7 @@ miRNAs <- function(inputdata){
 	colnames(miRs) <- c("miRNA", "Start", "End")
 	
 	## Calculate where the miRNAs fall in the context of the exons of the circRNA
+	## Add ifelse to allow for "empty" exons with no miRs. 
 	if(nrow(x)==1){
 		exon_1 <- miRs[which(miRs$Start < x$V3[1]),]
   		exon_1$value = 1
