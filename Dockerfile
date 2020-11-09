@@ -2,10 +2,34 @@ FROM nfcore/base:1.10.2
 LABEL authors="Barry Digby" \
       description="Docker image containing tools for circRNA analysis"
 
-#Conda ENV      
+# install main packages:
+RUN apt-get update; apt-get clean all;
+
+RUN apt-get install --yes build-essential \
+                          gcc-multilib \
+                          apt-utils \
+			  curl \
+                          perl \
+			  zip \
+			  unzip \
+                          expat \
+                          libexpat-dev
+			  
+RUN apt-get install --yes cpanminus
+
+RUN apt-get install --yes libxml-libxml-perl \
+			  libxml-dom-xpath-perl \
+			  libxml-libxml-simple-perl \
+			  libxml-dom-perl
+
+RUN cpanm CPAN::Meta Statistics::Lite Bio::TreeIO
+
+#Conda ENV    
+WORKDIR /  
 COPY environment.yml /
 RUN conda env create -f environment.yml && conda clean -a
 ENV PATH /opt/conda/envs/circrna/bin:$PATH
+
 # comment CIRIquant line that attempts to run os.chmod() 
 RUN sed -i '126s/^/#/' /opt/conda/envs/circrna/lib/python2.7/site-packages/CIRIquant/main.py
 
@@ -36,3 +60,18 @@ RUN tar -xvf v1.2.tar.gz
 WORKDIR /usr/src/app/circRNA_finder-1.2
 RUN cp *.pl /opt/conda/envs/circrna/bin
 RUN chmod 777 filterCirc.awk && cp filterCirc.awk /opt/conda/envs/circrna/bin
+
+RUN R -e "install.packages('DT',dependencies=TRUE, repos='http://cran.rstudio.com/')"
+
+## TargetScan Executables
+RUN curl --output ./targetscan_70.zip http://www.targetscan.org/vert_72/vert_72_data_download/targetscan_70.zip
+RUN unzip targetscan_70.zip
+RUN curl --output ./targetscan_70_BL_PCT.zip http://www.targetscan.org/vert_72/vert_72_data_download/targetscan_70_BL_PCT.zip
+RUN unzip targetscan_70_BL_PCT.zip
+RUN curl --output ./TargetScan7_context_scores.zip http://www.targetscan.org/vert_72/vert_72_data_download/TargetScan7_context_scores.zip
+RUN unzip TargetScan7_context_scores.zip 
+RUN chmod 777 targetscan_70.pl && mv targetscan_70.pl /opt/conda/envs/circrna/bin
+RUN chmod 777 TargetScan7_BL_PCT/targetscan_70_BL_bins.pl && mv TargetScan7_BL_PCT/targetscan_70_BL_bins.pl /opt/conda/envs/circrna/bin
+RUN chmod 777 TargetScan7_BL_PCT/targetscan_70_BL_PCT.pl && mv TargetScan7_BL_PCT/targetscan_70_BL_PCT.pl /opt/conda/envs/circrna/bin
+RUN chmod 777 TargetScan7_context_scores/targetscan_70_context_scores.pl && mv TargetScan7_context_scores/targetscan_70_context_scores.pl /opt/conda/envs/circrna/bin
+RUN chmod 777 TargetScan7_context_scores/targetscan_count_8mers.pl && mv TargetScan7_context_scores/targetscan_count_8mers.pl /opt/conda/envs/circrna/bin
