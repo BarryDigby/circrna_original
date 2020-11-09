@@ -1,6 +1,6 @@
-FROM nfcore/base:1.10.2
+FROM nfcore/base:1.11
 LABEL authors="Barry Digby" \
-      description="Docker image containing tools for circRNA analysis"
+      description="Docker image containing all software requirements for the nf-core/circrna pipeline"
 
 # install main packages:
 RUN apt-get update; apt-get clean all;
@@ -24,10 +24,10 @@ RUN apt-get install --yes libxml-libxml-perl \
 
 RUN cpanm CPAN::Meta Statistics::Lite Bio::TreeIO
 
-#Conda ENV    
-WORKDIR /  
+# CONDA ENV
 COPY environment.yml /
-RUN conda env create -f environment.yml && conda clean -a
+RUN conda env create --quiet -f /environment.yml && conda clean -a
+RUN conda env export --name circrna > circrna.yml
 ENV PATH /opt/conda/envs/circrna/bin:$PATH
 
 # comment CIRIquant line that attempts to run os.chmod() 
@@ -60,8 +60,6 @@ RUN tar -xvf v1.2.tar.gz
 WORKDIR /usr/src/app/circRNA_finder-1.2
 RUN cp *.pl /opt/conda/envs/circrna/bin
 RUN chmod 777 filterCirc.awk && cp filterCirc.awk /opt/conda/envs/circrna/bin
-
-RUN R -e "install.packages('DT',dependencies=TRUE, repos='http://cran.rstudio.com/')"
 
 ## TargetScan Executables
 RUN curl --output ./targetscan_70.zip http://www.targetscan.org/vert_72/vert_72_data_download/targetscan_70.zip
