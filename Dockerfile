@@ -60,8 +60,6 @@ WORKDIR /usr/src/app/circRNA_finder-1.2
 RUN cp *.pl /opt/conda/envs/circrna/bin
 RUN chmod 777 filterCirc.awk && cp filterCirc.awk /opt/conda/envs/circrna/bin
 
-RUN R -e "install.packages('DT',dependencies=TRUE, repos='http://cran.rstudio.com/')"
-
 ## TargetScan Executables
 RUN curl --output ./targetscan_70.zip http://www.targetscan.org/vert_72/vert_72_data_download/targetscan_70.zip
 RUN unzip targetscan_70.zip
