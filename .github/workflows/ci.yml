@@ -39,8 +39,8 @@ jobs:
       - name: Pull docker image
         if: ${{ !env.GIT_DIFF }}
         run: |
-          docker pull nfcore/circrna:dev
-          docker tag nfcore/circrna:dev nfcore/circrna:dev
+          docker pull barryd237/circrna
+          docker tag barryd237/circrna barryd237/circrna
 
       - name: Install Nextflow
         run: |
