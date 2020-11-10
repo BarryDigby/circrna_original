@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     # PRs are only ok if coming from an nf-core `dev` branch or a fork `patch` branch
-      - name: Check PRs
-        if: github.repository == 'nf-core/<circrna>'
-        run: |
-          { [[ ${{github.event.pull_request.head.repo.full_name}} == nf-core/circrna ]] && [[ $GITHUB_HEAD_REF = "dev" ]]; } || [[ $GITHUB_HEAD_REF == "patch" ]]
+     # - name: Check PRs
+      #  if: github.repository == 'nf-core/<circrna>'
+       # run: |
+        #  { [[ ${{github.event.pull_request.head.repo.full_name}} == nf-core/circrna ]] && [[ $GITHUB_HEAD_REF = "dev" ]]; } || [[ $GITHUB_HEAD_REF == "patch" ]]
     
       - name: Check PRs in another repository
         if: github.repository == 'BarryDigby/circrna'
