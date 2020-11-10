@@ -67,7 +67,7 @@ if (params.help) {
             print_cyan('      --tool <str>                 ') + print_green('circRNA tool to use for analysis. \n') +
             print_green('                                   Supported: CIRCexplorer2, CIRIquant, find_circ\n') +
             print_green('                                   UROBORUS, mapsplice, DCC, circRNA_finder\n') +
-            print_cyan('      --version <str>              ') + print_green('Genome version. Supported: GRCh37, GRCh38\n') +
+            print_cyan('      --genome_version <str>              ') + print_green('Genome version. Supported: GRCh37, GRCh38\n') +
             '\n' +
             print_yellow('    Input Files:            if left empty will be generated\n') +
             print_cyan('      --fasta <path>               ') + print_green('Path to genome fasta file\n') +
@@ -103,7 +103,7 @@ params.outdir ='.'
 params.fasta = ''
 params.gencode_gtf = ''
 params.gene_annotation = ''
-params.version = ''
+params.genome_version = ''
 params.tool = ''
 params.fasta_fai = ''
 params.bwa_index = ''
@@ -143,7 +143,7 @@ process download_genome {
         when: !(params.fasta) && !(params.gencode_gtf) && !(params.gene_annotation)
 
         shell:
-        if(params.version == 'GRCh37'){
+        if(params.genome_version == 'GRCh37'){
           $/
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh37_mapping/gencode.v34lift37.annotation.gtf.gz
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh37_mapping/GRCh37.primary_assembly.genome.fa.gz
@@ -156,7 +156,7 @@ process download_genome {
           perl -alne '$"="\t";print "@F[11,0..9]"' GRCh37.genepred > GRCh37.txt
           rm GRCh37.fa.tmp
           /$
-        }else if(params.version == 'GRCh38'){
+        }else if(params.genome_version == 'GRCh38'){
           $/
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/gencode.v34.primary_assembly.annotation.gtf.gz
           wget --no-check-certificate ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh38.primary_assembly.genome.fa.gz
