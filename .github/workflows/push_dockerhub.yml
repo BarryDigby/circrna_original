@@ -28,8 +28,8 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         run: |
           echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-          docker tag barryd237/circrna:latest barryd237/circrna
-          docker push barryd237/circrna
+          docker tag barryd237/circrna:latest barryd237/circrna:dev
+          docker push barryd237/circrna:dev
 
       - name: Push Docker image to DockerHub (release)
         if: ${{ github.event_name == 'release' }}
