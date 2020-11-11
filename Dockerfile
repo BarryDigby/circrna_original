@@ -74,4 +74,3 @@ RUN chmod 777 TargetScan7_BL_PCT/targetscan_70_BL_bins.pl && mv TargetScan7_BL_P
 RUN chmod 777 TargetScan7_BL_PCT/targetscan_70_BL_PCT.pl && mv TargetScan7_BL_PCT/targetscan_70_BL_PCT.pl /opt/conda/envs/circrna/bin
 RUN chmod 777 TargetScan7_context_scores/targetscan_70_context_scores.pl && mv TargetScan7_context_scores/targetscan_70_context_scores.pl /opt/conda/envs/circrna/bin
 RUN chmod 777 TargetScan7_context_scores/targetscan_count_8mers.pl && mv TargetScan7_context_scores/targetscan_count_8mers.pl /opt/conda/envs/circrna/bin
->>>>>>> master
