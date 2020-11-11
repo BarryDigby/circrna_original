@@ -56,7 +56,7 @@ if (params.help) {
     print_purple('------------------------------------------------------------------------')
     log.info ''
     log.info print_yellow('Usage: ') +
-
+    
             print_purple('Nextflow run BarryDigby/circRNA --profile singularity, standard <options> \n') +
 
             print_yellow('      Mandatory arguments:\n') +
@@ -72,8 +72,8 @@ if (params.help) {
             print_yellow('    Input Files:            if left empty will be generated\n') +
             print_cyan('      --fasta <path>               ') + print_green('Path to genome fasta file\n') +
             print_cyan('      --fasta_fai <path>           ') + print_green('Path to genome fasta fai file\n') +
-            print_cyan('      --gencode_gtf <path>         ') + print_green('Path to genocde gtf file\n') +
-            print_cyan('      --gene_annotation <path>     ') + print_green('Path to gene annotation file \n') +
+            print_cyan('      --gencode_gtf <path>         ') + print_green('Path to genocde gtf file\n') + 
+            print_cyan('      --gene_annotation <path>     ') + print_green('Path to gene annotation file \n') + 
             print_cyan('      --star_index <str>           ') + print_green('Path to STAR index\n') +
             print_cyan('      --bwa_index <str>            ') + print_green('Path to BWA index\n') +
             print_cyan('      --bowtie_index <str>         ') + print_green('Path to Bowtie index (must include glob for files)\n') +
@@ -85,7 +85,7 @@ if (params.help) {
 
 
             log.info ('------------------------------------------------------------------------')
-            log.info print_yellow('Contact information: b.digby237@gmail.com')
+            log.info print_yellow('Contact information: b.digby237@gmail.com') 
             log.info print_yellow('O\'Broin Lab, National University of Ireland Galway')
     log.info ('------------------------------------------------------------------------')
     exit 0
@@ -130,18 +130,18 @@ if (!checkParameterList(tool, toolList)) exit 1, 'Unknown tool, see --help for m
                           Download Files
 ================================================================================
 */
-
+ 
 process download_genome {
-
+        
         publishDir "$params.outdir/reference", mode: 'copy'
 
         output:
         file('*.fa') into fasta_downloaded
         file('*.txt') into gene_annotation_created
         file('*.gtf') into gencode_gtf_downloaded
-
+        
         when: !(params.fasta) && !(params.gencode_gtf) && !(params.gene_annotation)
-
+        
         shell:
         if(params.version == 'GRCh37'){
           $/
@@ -180,12 +180,12 @@ ch_gencode_gtf = params.gencode_gtf ? Channel.value(file(params.gencode_gtf)) : 
 process download_mirbase{
 	errorStrategy 'retry'
    	maxRetries 10
-
+	
 	publishDir "$params.outdir/assets", mode:'copy'
-
+	
 	output:
 		file("hsa_mature.fa") into miranda_miRs
-
+		
 	script:
 	"""
 	wget --no-check-certificate ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz
@@ -198,8 +198,8 @@ process download_mirbase{
 
 process download_targetscan{
 	errorStrategy 'retry'
-   	maxRetries 10
-
+   	maxRetries 10	
+	
 	publishDir "$params.outdir/assets", mode:'copy'
 
 	output:
@@ -226,21 +226,21 @@ process download_targetscan{
 process samtools_index{
 
         publishDir "$params.outdir/reference", mode:'copy'
-
+        
         input:
             file(fasta) from ch_fasta
-
+            
         output:
             file("${fasta}.fai") into fasta_fai_built
-
+        
         when: !(params.fasta_fai)
-
+        
         script:
         """
         samtools faidx $fasta
         """
 }
-
+        
 ch_fai = params.fasta_fai ? Channel.value(file(params.fasta_fai)) : fasta_fai_built
 
 
@@ -248,39 +248,39 @@ ch_fai = params.fasta_fai ? Channel.value(file(params.fasta_fai)) : fasta_fai_bu
 process bwa_index{
 
         publishDir "$params.outdir/index/bwa", mode:'copy'
-
+        
         input:
             file(fasta) from ch_fasta
-
+            
         output:
             file("${fasta.baseName}.*") into bwa_built
             val("$launchDir/index/bwa") into bwa_path
-
+        
         when: !(params.bwa_index) && ('ciriquant' in tool || 'combine' in tool)
-
+        
         script:
         """
         bwa index -a bwtsw $fasta -p ${fasta.baseName}
         """
 }
 
-ch_bwa_index = params.bwa_index ? Channel.value(params.bwa_index) : bwa_path
+ch_bwa_index = params.bwa_index ? Channel.value(params.bwa_index) : bwa_path 
 
 ch_bwa_index.view()
 
 process hisat2_index{
 
         publishDir "$params.outdir/index/hisat2", mode: 'copy'
-
+        
         input:
             file(fasta) from ch_fasta
-
+         
         output:
             file("${fasta.baseName}.*.ht2") into hisat2_built
             val("$launchDir/index/hisat2") into hisat2_path
-
+            
         when: !(params.hisat2_index) && ('ciriquant' in tool || 'combine' in tool)
-
+        
         script:
         """
         hisat2-build $fasta ${fasta.baseName}
@@ -293,20 +293,20 @@ ch_hisat2_index.view()
 process star_index{
 
         publishDir "$params.outdir/index", mode:'copy'
-
+          
         input:
             file(fasta) from ch_fasta
             file(gtf) from ch_gencode_gtf
-
+              
         output:
             file("star_index") into star_built
-
+              
         when: !(params.star_index) && ('circexplorer2' in tool || 'circrna_finder' in tool || 'dcc' in tool || 'combine' in tool)
-
+        
         script:
         """
         mkdir star_index
-
+          
         STAR \
         --runMode genomeGenerate \
         --runThreadN 8 \
@@ -322,14 +322,14 @@ ch_star_index.view()
 process bowtie_index{
 
         publishDir "$params.outdir/index/bowtie", mode:'copy'
-
+        
         input:
             file(fasta) from ch_fasta
-
+            
         output:
             file ("${fasta.baseName}.*") into bowtie_built
             val("$launchDir/index/bowtie") into bowtie_path
-
+            
         when: !(params.bowtie_index) && ('mapsplice' in tool || 'uroborus' in tool || 'combine' in tool)
 
         script:
@@ -339,18 +339,18 @@ process bowtie_index{
 }
 
 ch_bowtie_index = params.bowtie_index ? Channel.value(file(params.bowtie_index)) : bowtie_built
-ch_bowtie_index.view()
-
+ch_bowtie_index.view() 
+ 
 process bowtie2_index{
 
         publishDir "$params.outdir/index/bowtie2", mode:'copy'
-
+        
         input:
             file(fasta) from ch_fasta
-
+            
         output:
             file ("${fasta.baseName}.*") into bowtie2_built
-
+            
         when: !(params.bowtie2_index) && ('find_circ' in tool || 'uroborus' in tool || 'combine' in tool)
 
         script:
@@ -368,21 +368,21 @@ ch_bowtie2_index.view()
                        Misc. circRNA requirements
 ================================================================================
 */
-
-
+ 
+ 
 process split_fasta{
 
         publishDir "$params.outdir/index/chromosomes", mode:'copy'
-
+        
         input:
             file(fasta) from ch_fasta
-
+            
         output:
              file("*.fa") into split_fasta
              val("$launchDir/index/chromosomes") into split_fasta_path
-
+             
         when: ('mapsplice' in tool || 'find_circ' in tool || 'combine' in tool)
-
+        
         shell:
         '''
         awk '/^>/ {F=substr($0, 2, length($0))".fa"; print >F;next;} {print >> F;}' < !{fasta}
@@ -394,9 +394,9 @@ ch_fasta_chr = params.fasta_chr ? Channel.value(params.fasta_chr) : split_fasta_
 ch_fasta_chr.view()
 
 process ciriquant_yml{
-
+        
         publishDir "$params.outdir", mode:'copy'
-
+      
         input:
             file(fasta) from ch_fasta
             val(gencode_gtf_path) from ch_gencode_gtf
@@ -433,13 +433,13 @@ process ciriquant_yml{
 }
 
 ch_ciriquant_yml = params.ciriquant_yml ? Channel.value(file(params.ciriquant_yml)) : yml_built
-
+      
 /*
 ================================================================================
                           Process Input Data
 ================================================================================
 */
-
+ 
 // stage bam files
 bam_files = params.inputdir + params.bam_glob
 
@@ -469,22 +469,22 @@ if(params.input_type == 'bam'){
          Channel.fromFilePairs( fastq_build )
                 .set{ fastq_built }
 }
-
+    
 ch_reads = fastq_built
 
-// Test dataset does not like being trimmed, omit for testing.
+// Test dataset does not like being trimmed, omit for testing. 
 
 //process bbduk {
-//
+//    
 //        publishDir "$params.outdir/trimmed_reads", mode:'copy'
-//
+//    
 //        input:
 //            tuple val(base), file(fastq) from ch_reads
 //            path adapters from params.adapters
-//
+//            
 //        output:
 //            tuple val(base), file('*.fastq.gz') into trim_reads_built
-//
+//            
 //        script:
 //        """
 //        bbduk.sh -Xmx4g \
@@ -503,31 +503,31 @@ ch_reads = fastq_built
 
 (circexplorer2_reads, find_circ_reads, ciriquant_reads, mapsplice_reads, uroborus_reads, circrna_finder_reads, dcc_reads, dcc_reads_mate1, dcc_reads_mate2, hisat2_reads) = ch_reads.into(10)
 
-// fastqc , multiqc omitted until I figure out how to incorporate multiQC separately (multiqc is python3, container is python2).
-// perhaps use multiqc container for this.
+// fastqc , multiqc omitted until I figure out how to incorporate multiQC separately (multiqc is python3, container is python2). 
+// perhaps use multiqc container for this. 
 
 /*
 ================================================================================
                              circRNA Discovery
 ================================================================================
 */
-
+ 
 // CIRCexplorer2
 
 process star_align{
 
         publishDir "$params.outdir/star_alignment", mode:'copy', overwrite: true
-
+    
         input:
             tuple val(base), file(fastq) from circexplorer2_reads
             file(gtf) from ch_gencode_gtf
             val(star_idx) from ch_star_index
-
+            
         output:
             tuple val(base), file("${base}.Chimeric.out.junction") into circexplorer2_input
-
+         
         when: ('circexplorer2' in tool || 'combine' in tool)
-
+        
         script:
         """
         STAR    \
@@ -565,24 +565,24 @@ process star_align{
 
 
 process circexplorer2_star{
-
+    
         publishDir "$params.outdir/circrna_discovery/circexplorer2", mode:'copy'
-
+        
         input:
             tuple val(base), file(chimeric_reads) from circexplorer2_input
             file(fasta) from ch_fasta
             file(gene_annotation) from ch_gene_annotation
-
+            
         output:
             tuple val(base), file("${base}_circexplorer2.bed") into circexplorer2_results
-
+        
         when: ('circexplorer2' in tool || 'combine' in tool)
-
+        
         script:
         """
         CIRCexplorer2 parse -t STAR $chimeric_reads -b ${base}.STAR.junction.bed
         CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.STAR.junction.bed -o ${base}.txt
-
+        
         awk '{if(\$13 > 1) print \$0}' ${base}.txt | awk -v OFS="\t" '{print \$1,\$2,\$3,\$6,\$13}' > ${base}_circexplorer2.bed
         """
 }
@@ -596,12 +596,12 @@ process find_anchors{
             tuple val(base), file(fastq) from find_circ_reads
             file(fasta) from ch_fasta
             file(bowtie2_index) from ch_bowtie2_index.collect()
-
+        
         output:
             tuple val(base), file("${base}_anchors.qfa.gz") into ch_anchors
-
+            
         when: ('find_circ' in tool || 'combine' in tool)
-
+        
         script:
         """
         bowtie2 -p 16 --very-sensitive --mm -D 20 --score-min=C,-15,0 \
@@ -618,18 +618,18 @@ process find_anchors{
 process find_circ{
 
         publishDir "$params.outdir/circrna_discovery/find_circ", mode:'copy'
-
+        
         input:
             tuple val(base), file(anchors) from ch_anchors
             file(bowtie2_index) from ch_bowtie2_index.collect()
             file(fasta) from ch_fasta
             val(fasta_chr_path) from ch_fasta_chr
-
+        
         output:
             tuple val(base), file("${base}_find_circ.bed") into find_circ_results
-
+         
         when: ('find_circ' in tool || 'combine' in tool)
-
+        
         script:
         """
         bowtie2 -p 16 --reorder --mm -D 20 --score-min=C,-15,0 -q -x ${fasta.baseName} \
@@ -640,7 +640,7 @@ process find_circ{
         cat tmp.txt | tr ':' '\t' > ${base}.bed
 
         grep circ ${base}.sites.bed | grep -v chrM | python /opt/conda/envs/circrna/bin/sum.py -2,3 | python /opt/conda/envs/circrna/bin/scorethresh.py -16 1 | python /opt/conda/envs/circrna/bin/scorethresh.py -15 2 | python /opt/conda/envs/circrna/bin/scorethresh.py -14 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 7 2 | python /opt/conda/envs/circrna/bin/scorethresh.py 8,9 35 | python /opt/conda/envs/circrna/bin/scorethresh.py -17 100000 >> ${base}.txt
-
+        
 	tail -n +2 ${base}.txt | awk -v OFS="\t" '{print \$1,\$2,\$3,\$6,\$5}' > ${base}_find_circ.bed
 	"""
 }
@@ -653,14 +653,14 @@ process circrna_finder_star{
         input:
             tuple val(base), file(fastq) from circrna_finder_reads
             val(star_index) from ch_star_index
-
+            
         output:
             tuple val(base), file("${base}") into circrna_finder_star
-
+            
         when: ('circrna_finder' in tool || 'combine' in tool)
-
+        
         script:
-        """
+        """      
         STAR \
         --genomeDir $star_index \
         --readFilesIn ${fastq[0]} ${fastq[1]} \
@@ -681,15 +681,15 @@ process circrna_finder_star{
 process circrna_finder{
 
         publishDir "$params.outdir/circrna_discovery/circrna_finder", mode:'copy'
-
+        
         input:
             tuple val(base), file(star_dir) from circrna_finder_star
-
+         
         output:
             tuple val(base), file("${base}_circrna_finder.bed") into circrna_finder_results
-
+            
         when: ('circrna_finder' in tool || 'combine' in tool)
-
+        
         script:
         """
         postProcessStarAlignment.pl --starDir ${star_dir}/ --outDir ./
@@ -708,9 +708,9 @@ process dcc_pair{
 
         output:
             tuple val(base), file("samples") into dcc_samples
-
+            
         when: ('dcc' in tool || 'combine' in tool)
-
+        
         script:
         """
         STAR \
@@ -731,7 +731,7 @@ process dcc_pair{
         --chimSegmentMin 15 \
         --chimScoreMin 15 \
         --chimScoreSeparation 10 \
-        --chimJunctionOverhangMin 15
+        --chimJunctionOverhangMin 15 
         """
 }
 
@@ -743,9 +743,9 @@ process dcc_1{
 
         output:
             tuple val(base), file("mate1") into dcc_mate1
-
+            
        when: ('dcc' in tool || 'combine' in tool)
-
+        
         script:
         """
         STAR \
@@ -779,9 +779,9 @@ process dcc_2{
 
         output:
             tuple val(base), file("mate2") into dcc_mate2
-
+            
         when: ('dcc' in tool || 'combine' in tool)
-
+	
         script:
         """
         STAR \
@@ -823,7 +823,7 @@ process dcc{
             tuple val(base), file("${base}_dcc.bed") into dcc_results
 
        when: ('dcc' in tool || 'combine' in tool)
-
+        
         script:
         COJ="Chimeric.out.junction"
         """
@@ -834,7 +834,7 @@ process dcc{
         printf "mate2/${base}.${COJ}" > mate2file
 
         DCC @samplesheet -mt1 @mate1file -mt2 @mate2file -D -an $gtf -Pi -ss -F -M -Nr 1 1 -fg -A $fasta -N -T 8
-
+        
         awk '{print \$6}' CircCoordinates >> strand
         paste CircRNACount strand | tail -n +2 | awk -v OFS="\t" '{print \$1,\$2,\$3,\$5,\$4}' >> ${base}_dcc.txt
 	bash filter_DCC.sh ${base}_dcc.txt
@@ -847,16 +847,16 @@ process dcc{
 process ciriquant{
 
         publishDir "$params.outdir/circrna_discovery/ciriquant", mode:'copy'
-
+        
         input:
             tuple val(base), file(fastq) from ciriquant_reads
             file(ciriquant_yml) from ch_ciriquant_yml
 
         output:
             tuple val(base), file("${base}_ciriquant.bed") into ciriquant_results
-
+            
         when: ('ciriquant' in tool || 'combine' in tool)
-
+        
         script:
         """
         CIRIquant -t 16 \
@@ -866,20 +866,20 @@ process ciriquant{
         --no-gene \
         -o ${base} \
         -p ${base}
-
+        
         mv ${base}/${base}.gtf ${base}_ciriquant.gtf
-
+	
 	bash filter_CIRIquant.sh ${base}_ciriquant.gtf
         """
 }
-
-
+      
+      
 // mapsplice
 
 process mapsplice_align{
 
         publishDir "$params.outdir/mapsplice", mode:'copy'
-
+        
         input:
             tuple val(base), file(fastq) from mapsplice_reads
             val(mapsplice_ref) from ch_fasta_chr
@@ -896,7 +896,7 @@ process mapsplice_align{
         """
         gzip -d --force ${fastq[0]}
         gzip -d --force ${fastq[1]}
-
+        
         mapsplice.py \
         -c $mapsplice_ref \
         -x $prefix \
@@ -917,23 +917,23 @@ process mapsplice_align{
 process mapsplice_parse{
 
         publishDir "$params.outdir/circrna_discovery/mapsplice", mode:'copy'
-
+        
         input:
             tuple val(base), file(raw_fusion) from mapsplice_fusion
             file(fasta) from ch_fasta
             file(gene_annotation) from ch_gene_annotation
-
+            
         output:
             tuple val(base), file("${base}_mapsplice.bed") into mapsplice_results
-
+        
         when: ('mapsplice' in tool || 'combine' in tool)
-
+        
         script:
         """
         CIRCexplorer2 parse -t MapSplice $raw_fusion -b ${base}.mapsplice.junction.bed
 
         CIRCexplorer2 annotate -r $gene_annotation -g $fasta -b ${base}.mapsplice.junction.bed -o ${base}.txt
-
+	
 	awk '{if(\$13 > 1) print \$0}' ${base}.txt | awk -v OFS="\t" '{print \$1,\$2,\$3,\$6,\$13}' > ${base}_mapsplice.bed
         """
 }
@@ -947,26 +947,26 @@ process tophat_align{
             tuple val(base), file(fastq) from uroborus_reads
             file(bowtie2_index) from ch_bowtie2_index.collect()
             file(fasta) from ch_fasta
-
+            
         output:
             tuple val(base), file("unmapped.bam") into tophat_unmapped_bam
             tuple val(base), file("accepted_hits.bam") into tophat_accepted_hits
-
+        
         when: 'uroborus' in tool
-
+        
         script:
         """
         tophat -p 8 -o ${base} ${fasta.baseName} ${fastq[0]} ${fastq[1]}
-        mv ${base}/unmapped.bam ./
+        mv ${base}/unmapped.bam ./ 
         mv ${base}/accepted_hits.bam ./
         """
 }
-
-
+            
+            
 process uroborus{
 
         publishDir "$params.outdir/circrna_discovery/uroborus", mode:'copy'
-
+        
         input:
             tuple val(base), file(unmapped_bam) from tophat_unmapped_bam
             tuple val(base), file(accepted_hits) from tophat_accepted_hits
@@ -974,22 +974,22 @@ process uroborus{
             file(gtf) from ch_gencode_gtf
             val(uroborus_ref) from ch_fasta_chr
             file(fasta) from ch_fasta
-
+            
         output:
             file("${base}.txt") into uroborus_results
-
+            
         when: 'uroborus' in tool
-
+        
         script:
         """
         samtools view $unmapped_bam > unmapped.sam
-
+        
         perl /opt/conda/envs/circrna/bin/UROBORUS.pl \
         -index ${fasta.baseName} \
         -gtf $gtf \
         -fasta $uroborus_ref \
         unmapped.sam $accepted_hits &> uroborus_logs.txt
-
+        
         mv circRNA_list.txt ${base}.txt
         """
 }
@@ -1038,7 +1038,7 @@ process StringTie{
         stringtie $bam -e -G $gtf -C ${base}/${base}_cov.gtf -p 16 -o ${base}/${base}.gtf -A ${base}/${base}_genes.list
         """
 }
-
+ 
 /*
 ================================================================================
                          circRNA Differential Expression
@@ -1047,8 +1047,8 @@ process StringTie{
 
 
 // need to consolidate circRNA results into single channel.
-// apply filtering steps before this step!
-// simple awk|grep one liners will do after tool generates results.
+// apply filtering steps before this step! 
+// simple awk|grep one liners will do after tool generates results. 
 
 // CONSOLIDATION
 
@@ -1076,20 +1076,20 @@ if('combine' in tool){
 
 			## filters circRNA called by at least 2 algorithms in Rscript
                         Rscript "$projectDir"/bin/consolidate_algorithms.R
-
+			
                         mv combined_counts.bed ${base}.bed
                         """
                         }
-
+			
 	process get_counts_combined{
 			publishDir "$params.outdir/circrna_discovery/matrix", mode:'copy'
-
+			
 			input:
 				file(bed) from sample_counts.collect()
-
+				
 			output:
 				file("circRNA_matrix.txt") into circRNA_counts
-
+				
 			script:
 			"""
 			python "$projectDir"/bin/circRNA_counts_matrix.py > circRNA_matrix.txt
@@ -1114,12 +1114,12 @@ if('combine' in tool){
 
                         script:
                         """
-                        for b in *.bed; do
-				foo=\${b%".bed"};
-				bar=\${foo%"_${tool}"};
+                        for b in *.bed; do 
+				foo=\${b%".bed"}; 
+				bar=\${foo%"_${tool}"}; 
 				mv \$b \${bar}.bed
 			done
-
+			
 			python "$projectDir"/bin/circRNA_counts_matrix.py > circRNA_matrix.txt
                         """
                         }
@@ -1130,22 +1130,22 @@ ch_phenotype = file(params.phenotype)
 process diff_exp{
 
 	publishDir "$params.outdir/Differential_Expression", mode:'copy'
-
+	
 	input:
 		file(gtf_dir) from stringtie_dir.collect()
 		file(circ_matrix) from circRNA_counts
 		file(phenotype) from ch_phenotype
-
+		
 	output:
 		file("RNA-Seq") into rnaseq_dir
 		file("circRNA") into circrna_dir
-
+		
 	script:
 	"""
 	for i in \$(ls -d */); do sample=\${i%"/"}; file=\${sample}.gtf; touch samples.txt; printf "\$sample\t\${i}\${file}\n" >> samples.txt; done
-
+	
 	prepDE.py -i samples.txt
-
+	
 	Rscript "$projectDir"/bin/DEA.R gene_count_matrix.csv $phenotype $circ_matrix
 	"""
 }
@@ -1160,21 +1160,21 @@ process diff_exp{
 */
 
 //Create filtered gtf in its own channel so sym link used,
-// saves space in work dir.
+// saves space in work dir. 
 
 
 process remove_unwanted_biotypes{
 
 	input:
 		file(gtf) from ch_gencode_gtf
-
+	
 	output:
 		file("filt.gtf") into ch_gtf_filtered
-
+		
 	script:
 	"""
 	cp "$projectDir"/bin/unwanted_biotypes.txt ./
-
+	
 	grep -vf unwanted_biotypes.txt $gtf > filt.gtf
 	"""
 }
@@ -1183,42 +1183,42 @@ process remove_unwanted_biotypes{
 process get_mature_seq{
 
 	publishDir "$params.outdir", mode:'copy', pattern: 'bed12/*.bed'
-
+	
 	input:
 		file(fasta) from ch_fasta
 		file(fai) from ch_fai
 		file(gtf) from ch_gtf_filtered
 		file(circRNA) from circrna_dir_mature_seq
-
+		
 	output:
 		file("miranda/*.fa") into miranda_sequences
 		file("targetscan/*.txt") into targetscan_sequences
 		file("bed12/*.bed") into bed_files
-
+		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
 	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
 	"""
-	# Extract circRNA ID's from DESeq2 DECs.
+	# Extract circRNA ID's from DESeq2 DECs. 
 	awk '{print \$1}' $up_reg | tail -n +2 > up_reg_circ.txt
 	awk '{print \$1}' $down_reg | tail -n +2 > down_reg_circ.txt
-
+	
 	# Split ID to BED file
 	bash "$projectDir"/bin/ID_to_BED.sh up_reg_circ.txt
 	bash "$projectDir"/bin/ID_to_BED.sh down_reg_circ.txt
 
 	# Consolidate DEC BED files
 	cat *.bed > de_circ.bed
-
+	
 	# Create BED12 files
-	bash "$projectDir"/bin/get_mature_seq.sh
-
+	bash "$projectDir"/bin/get_mature_seq.sh 
+	
 	# Create miRanda inputs
 	bedtools getfasta -fi $fasta -bed de_circ_exon_annotated.bed -s -split -name > de_circ_sequences.fa_tmp
 	grep -A 1 '>' de_circ_sequences.fa_tmp | cut -d: -f1,2,3 > de_circ_sequences.fa && rm de_circ_sequences.fa_tmp
 	mkdir -p miranda
 	awk -F '>' '/^>/ {F=sprintf("miranda/%s.fa",\$2); print > F;next;} {print >> F;}' < de_circ_sequences.fa
-
+	
 	# Create TargetScan inputs
 	bedtools getfasta -fi $fasta -bed de_circ_exon_annotated.bed -s -split -tab | sed 's/(/:/g' | sed 's/)//g' > de_circ_seq_tab.txt_tmp
 	awk -v OFS="\t" '{print \$1, 9606, \$2}' de_circ_seq_tab.txt_tmp > de_circ_seq_tab.txt && rm de_circ_seq_tab.txt_tmp
@@ -1230,11 +1230,11 @@ process get_mature_seq{
 process miRanda{
 
 	publishDir "$params.outdir/miRanda", mode:'copy'
-
+	
 	input:
 		file(mirbase) from miranda_miRs
 		file(miranda) from miranda_sequences.flatten()
-
+	
 	output:
 		file("*.miRanda.txt") into miranda_out
 		file("*.mature_len.txt") into mature_len
@@ -1251,14 +1251,14 @@ process miRanda{
 process targetscan{
 
 	publishDir "$params.outdir/TargetScan", mode:'copy'
-
+	
 	input:
 		file(miR) from targetscan_miRs
 		file(circ) from targetscan_sequences.flatten()
-
+		
 	output:
-		file("*.targetscan.txt") into targetscan_out
-
+		file("*.targetscan.txt") into targetscan_out 
+		
 	script:
 	prefix = circ.toString() - ~/.txt/
 	"""
@@ -1272,25 +1272,25 @@ process get_parent_gene{
 	input:
 		file(gtf) from ch_gtf_filtered
 		file(circRNA) from circrna_dir_parent_gene
-
+		
 	output:
 		file("parent_genes/*.txt") into parent_genes
-
+		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
 	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
 	"""
-	# Extract circRNA ID's from DESeq2 DECs.
+	# Extract circRNA ID's from DESeq2 DECs. 
 	awk '{print \$1}' $up_reg | tail -n +2 > up_reg_circ.txt
 	awk '{print \$1}' $down_reg | tail -n +2 > down_reg_circ.txt
-
+	
 	# Split ID to BED file
 	bash "$projectDir"/bin/ID_to_BED.sh up_reg_circ.txt
 	bash "$projectDir"/bin/ID_to_BED.sh down_reg_circ.txt
 
 	# Consolidate DEC BED files
 	cat *.bed > de_circ.bed
-
+	
 	bash "$projectDir"/bin/get_parent_genes.sh
 	"""
 }
@@ -1303,7 +1303,7 @@ process get_parent_gene{
 */
 
 
-// Create tuples, merge channels by simpleName for report.
+// Create tuples, merge channels by simpleName for report. 
 ch_mature_len = mature_len.map{ file -> [file.simpleName, file]}
 ch_parent_genes_tmp = parent_genes.flatten()
 ch_parent_genes = ch_parent_genes_tmp.map{ file -> [file.simpleName, file]}
@@ -1315,19 +1315,19 @@ ch_bed = ch_bed_tmp.map{ file -> [file.simpleName, file]}
 
 ch_report = ch_targetscan.join(ch_miranda).join(ch_bed).join(ch_parent_genes).join(ch_mature_len)
 
-// must combine folders here or else process uses once then exits.
+// must combine folders here or else process uses once then exits. 
 ch_DESeq2_dirs = circrna_dir_report.combine(rnaseq_dir_report)
 
 process make_circRNA_plots{
 	publishDir "$params.outdir/circRNA_Report", mode:'copy'
-
+	
 	input:
 		file(phenotype) from ch_phenotype
 		tuple val(base), file(targetscan), file(miranda), file(bed), file(parent_gene), file(mature_len), file(circRNA), file(rnaseq) from ch_report.combine(ch_DESeq2_dirs)
 
-	output:
+	output: 
 		file("chr*") into circRNA_plots
-
+		
 	script:
 	up_reg = "${circRNA}/*up_regulated_differential_expression.txt"
 	down_reg = "${circRNA}/*down_regulated_differential_expression.txt"
@@ -1336,15 +1336,15 @@ process make_circRNA_plots{
 	"""
 	# create file for circos plot
 	bash "$projectDir"/bin/prep_circos.sh $bed
-
-	# merge upreg, downreg info
+	
+	# merge upreg, downreg info 
 	cat $up_reg $down_reg > de_circ.txt
-
-	# remove 6mers from TargetScan
+	
+	# remove 6mers from TargetScan 
 	grep -v "6mer" $targetscan > targetscan_filt.txt
-
+	
 	# Make plots and generate circRNA info
-	Rscript "$projectDir"/bin/circ_report.R de_circ.txt $circ_counts $gene_counts $parent_gene $bed $miranda targetscan_filt.txt $mature_len $phenotype circlize_exons.txt
+	Rscript "$projectDir"/bin/circ_report.R de_circ.txt $circ_counts $gene_counts $parent_gene $bed $miranda targetscan_filt.txt $mature_len $phenotype circlize_exons.txt 
 	"""
 }
 
@@ -1352,29 +1352,29 @@ process make_circRNA_plots{
 //master_ch = circRNA_plots.collect()
 (test, test1) = circRNA_plots.into(2)
 test.view()
-// delete text files in process script, left with only dirs.
+// delete text files in process script, left with only dirs. 
 
 
 process master_report{
 	publishDir "$params.outdir/circRNA_Report", mode:'copy'
-
+	
 	input:
 		file(reports) from test1.collect()
-
+		
 	output:
 		file("DE_circRNA_Report.txt") into master_report
-
+		
 	script:
 	"""
 	## extract reports
 	for dir in '*/'; do cp \$dir/*_Report.txt .; done
-
+	
 	# remove header, add manually
 	cat *.txt > merged.txt
 	grep -v "Log2FC" merged.txt > no_headers.txt
 	echo "circRNA_ID Parent_Gene Mature_Length Strand Log2FC pvalue Adjusted_pvalue" | tr ' ' '\t' > headers.txt
 	cat headers.txt no_headers.txt > merged_reports.txt
-
+	
 	Rscript "$projectDir"/bin/annotate_report.R
 	"""
 }
