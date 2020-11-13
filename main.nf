@@ -99,26 +99,26 @@ if (params.help) {
 */
 
 
-params.outdir ='.'
-params.fasta = ''
-params.gencode_gtf = ''
-params.gene_annotation = ''
-params.version = ''
-params.tool = ''
-params.fasta_fai = ''
-params.bwa_index = ''
-params.star_index = ''
-params.hisat2_index = ''
-params.bowtie_index = ''
-params.bowtie2_index = ''
-params.fasta_chr = ''
-params.ciriquant_yml = ''
-params.inputdir = '/data/bdigby/circTCGA/fastq/small/'
-params.input_type = 'fastq'
-params.fastq_glob = '*_R{1,2}.fastq.gz'
-params.bam_glob = '*.bam'
-params.adapters = '/data/bdigby/grch38/adapters.fa'
-params.phenotype = '/data/bdigby/grch38/phenotype.txt'
+params.outdir = null
+params.fasta = null
+params.gencode_gtf = null
+params.gene_annotation = null
+params.version = null
+params.tool = null
+params.fasta_fai = null
+params.bwa_index = null
+params.star_index = null
+params.hisat2_index = null
+params.bowtie_index = null
+params.bowtie2_index = null
+params.fasta_chr = null
+params.ciriquant_yml = null
+params.inputdir = null
+params.input_type = null
+params.fastq_glob = null
+params.bam_glob = null
+params.adapters = null
+params.phenotype = null
 
 toolList = defineToolList()
 tool = params.tool ? params.tool.split(',').collect{it.trim().toLowerCase()} : []
