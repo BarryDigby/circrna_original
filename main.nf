@@ -1068,14 +1068,18 @@ if('combine' in tool){
 
                         script:
                         """
+			## make tool output csv file
                         files=\$(ls *.bed)
 
                         for i in \$files; do
                                 printf "\$i\n" >> samples.csv
                         done
-			## Add catch for empty results file in sample
-			## filters circRNA called by at least 2 algorithms in Rscript
-                        Rscript "$projectDir"/bin/consolidate_algorithms.R
+			
+			## Add catch for empty file in tool output
+			bash "$projectDir"/bin/check_empty.sh
+			
+			## Bring forward circRNAs called by at least 2 tools
+                        Rscript "$projectDir"/bin/consolidate_algorithms.R samples.csv
 			
                         mv combined_counts.bed ${base}.bed
                         """
