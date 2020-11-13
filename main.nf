@@ -378,7 +378,7 @@ process split_fasta{
             file(fasta) from ch_fasta
             
         output:
-             file("*.fa") into split_fasta
+             file("*.fa"), includeInputs:true into split_fasta
              val("$launchDir/index/chromosomes") into split_fasta_path
              
         when: ('mapsplice' in tool || 'find_circ' in tool || 'combine' in tool)
@@ -392,7 +392,9 @@ process split_fasta{
         	awk '/^>/ {F=substr($0, 2, length($0))".fa"; print >F;next;} {print >> F;}' < !{fasta}
 		rm !{fasta}
 	else
-		cp !{fasta} Chr1.fa
+		:
+		##link=$(readline !{fasta})
+		##unlink !{fasta} && cp $link .
 	fi
         '''
 }
