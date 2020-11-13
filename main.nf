@@ -393,8 +393,7 @@ process split_fasta{
 		rm !{fasta}
 	else
 		:
-		##link=$(readline !{fasta})
-		##unlink !{fasta} && cp $link .
+
 	fi
         '''
 }
