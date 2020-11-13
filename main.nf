@@ -378,7 +378,7 @@ process split_fasta{
             file(fasta) from ch_fasta
             
         output:
-             file("*.fa"), includeInputs:true into split_fasta
+             file("*.fa", includeInputs:true) into split_fasta
              val("$launchDir/index/chromosomes") into split_fasta_path
              
         when: ('mapsplice' in tool || 'find_circ' in tool || 'combine' in tool)
