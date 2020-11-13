@@ -1073,7 +1073,7 @@ if('combine' in tool){
                         for i in \$files; do
                                 printf "\$i\n" >> samples.csv
                         done
-
+			## Add catch for empty results file in sample
 			## filters circRNA called by at least 2 algorithms in Rscript
                         Rscript "$projectDir"/bin/consolidate_algorithms.R
 			
