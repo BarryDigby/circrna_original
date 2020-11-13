@@ -1,5 +1,8 @@
-# nf-circ
+# nf-circrna
 Nextflow pipeline to scan high throughput sequencing data for circRNAs, perform differential expression and generate circRNA-miRNA targets.
+
+pipeline currently undergoing linting at https://github.com/BarryDigby/test. Test dataset currently being tested. 
+Once `BarryDigby/test` passes `nf-core` specifications, it will be pushed to this repo (or renamed `circrna`). 
 
 # Notes
 The pipeline uses RNA-Seq data to scan for the presence of circRNAs using a combination of `CIRCexplorer2`, `CIRIquant`, `DCC`, `find_circ`, `circrna_finder`, `mapsplice`. There is an option to use all 6 tools `--tool combine` or to use a tool on its own `--tool CIRIquant`. Currently developing the tool using a small test dataset, which works for the combine flag however using just one tool on the toy dataset can result in very few circRNAs being called which is an issue for DESeq2.
