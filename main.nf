@@ -392,7 +392,8 @@ process split_fasta{
         	awk '/^>/ {F=substr($0, 2, length($0))".fa"; print >F;next;} {print >> F;}' < !{fasta}
 		rm !{fasta}
 	else
-		:
+		link=$(readlink !{fasta})
+		unlink !{fasta} && cp $link .
 	fi
         '''
 }
