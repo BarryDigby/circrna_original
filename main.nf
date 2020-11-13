@@ -385,8 +385,9 @@ process split_fasta{
         
         shell:
         '''
-        awk '/^>/ {F=substr($0, 2, length($0))".fa"; print >F;next;} {print >> F;}' < !{fasta}
-        ## remove full genome fasta file
+        ##awk '/^>/ {F=substr($0, 2, length($0))".fa"; print >F;next;} {print >> F;}' < !{fasta}
+        awk '$0 ~ "^>" { match($1, /^>([^:]+)/, id); filename=id[1]} {print >> filename".fa"}' !{fasta}
+	## remove full genome fasta file
 	rm -f GRCh38.fa
 	rm -f GRCh37.fa
         '''
