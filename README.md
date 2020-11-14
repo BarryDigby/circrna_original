@@ -8,7 +8,9 @@ Completed tests:
 
 - [ ] nextflow_schema.json. Added pipeline parameters but need to add all relevant information for each flag. 
 - [x] environment.yml file pinned version numbers. 
+- [ ] test dataset
 
+**Test Data:** circRNA data for Chromosome 1 in fastq files. map the fastq files, split chromosome 'in half' and use for DE (must have 3 replicates). Fastq files are suitably small ~2Mb. Figure out how to store the data on github + bwa + hisat2 index files for minimal test run. use ciriquant for the analysis. do not use all 6 tools for test dataset.
 ***
 
 # Notes
