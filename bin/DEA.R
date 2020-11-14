@@ -60,6 +60,10 @@ stage_data <- function(gene_counts, phenotype, circRNA){
 	gene_mat <- read.csv(gene_counts, row.names="gene_id", check.names=F)
 	circ <- read.table(circRNA, sep ="\t", header = T)
 
+	## add pseudocount of 1
+	gene_mat <- gene_mat + 1
+	circ <- circ + 1
+	
 	# Merge circRNA genomic loci to ID
 	circ$circ <- with(circ, paste0(Chr, sep=":", Start, sep="-", Stop, sep=":", Strand))
 	rownames(circ) <- circ$circ
