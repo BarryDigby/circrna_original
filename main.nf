@@ -1017,7 +1017,7 @@ process uroborus{
 
 // re-jig the above to check for params.hisat2_index if it exists, otherwise use built files. 
 hisat2_files = params.hisat2_index + "/*"
-ch_hisat2_index = hisat2_files ? Channel.value(file(hisat2_files)) : hisat2_built
+ch_hisat2_index_files = hisat2_files ? Channel.value(file(hisat2_files)) : hisat2_built
 
 
 process Hisat2_align{
