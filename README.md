@@ -21,23 +21,35 @@ list=("normal_rep1" "normal_rep2" "normal_rep3")
 
 for i in ${list[@]}; do 
 
-	perl CIRI_simulator.pl -O ${i} -G arm2.gtf -C 10 -LC 10 -R 2 -LR 2 -L 100 -E 1 -D ./ -CHR1 1 -M 320 -M2 550 -PM 15 -S 70 -S2 70 -SE 0 -PSI 0
+	perl CIRI_simulator.pl -O ${i} -G arm2.gtf -C 5 -LC 5 -R 1 -LR 1 -L 100 -E 1 -D ./ -CHR1 1 -M 320 -M2 550 -PM 15 -S 70 -S2 70 -SE 0 -PSI 0
 done
 
 list1=("tumor_rep1" "tumor_rep2" "tumor_rep3")
 
 for i in ${list1[@]}; do
 
-	perl CIRI_simulator.pl -O ${i} -G arm1.gtf -C 10 -LC 10 -R 2 -LR 2 -L 100 -E 1 -D ./ -CHR1 1 -M 320 -M2 550 -PM 15 -S 70 -S2 70 -SE 0 -PSI 0
+	perl CIRI_simulator.pl -O ${i} -G arm1.gtf -C 5 -LC 5 -R 1 -LR 1 -L 100 -E 1 -D ./ -CHR1 1 -M 320 -M2 550 -PM 15 -S 70 -S2 70 -SE 0 -PSI 0
 
 done
 
 mv *.fq fastq/
 
 gzip fastq/*.*
-```
 
-After running the script, rep2 for each sample was deleted and duplicated using rep1. This was to satisfy DESeq2 which complains about too many zeros if each replicate is completely randomn and share no circRNAs / RNA. 
+rm fastq/*rep2*
+
+cp fastq/normal_rep1_1.fq.gz fastq/normal_rep2_1.fq.gz
+cp fastq/normal_rep1_2.fq.gz fastq/normal_rep2_2.fq.gz
+
+cp fastq/tumor_rep1_1.fq.gz fastq/tumor_rep2_1.fq.gz
+cp fastq/tumor_rep1_2.fq.gz fastq/tumor_rep2_2.fq.gz
+
+```
+Rep2 for each sample was deleted and duplicated using rep1. This was to satisfy DESeq2 which complains about too many zeros if each replicate is completely randomn and share no circRNAs / RNA. 
+
+Given the nature of the simulated data, the final plots of circRNA - parent Gene expression + ratio plots are not generated. This is because the parent gene of the circRNA did not have reads simulated for it. I dont think there is any way to correct this given it is a circRNA simulation tool first and foremost!
+
+Work on uploading this minimal dataset to github and intergrating it within `BarryDigby/test` via the test configuration file. You will have to figure out how to download the reads, create a reads directory, and download the hisat2 and bwa indices files. Need to figure out how to unzip them and pass them to the pipeline without distrupting the flow of processes i.e DO NOT specify `--test` flags in parameters. 
 
 
 ***
