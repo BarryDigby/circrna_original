@@ -11,6 +11,35 @@ Completed tests:
 - [ ] test dataset
 
 **Test Data:** circRNA data for Chromosome 1 in fastq files (1 set of fastq pairs). map the fastq files, split chromosome 'in half' and use for DE (must have 3 replicates). Fastq files are suitably small ~2Mb. Figure out how to store the data on github + bwa + hisat2 index files for minimal test run. use ciriquant for the analysis. do not use all 6 tools for test dataset.
+
+Simulated reads generated using: 
+
+```
+#!/usr/bin/bash
+
+list=("normal_rep1" "normal_rep2" "normal_rep3")
+
+for i in ${list[@]}; do 
+
+	perl CIRI_simulator.pl -O ${i} -G arm2.gtf -C 10 -LC 10 -R 2 -LR 2 -L 100 -E 1 -D ./ -CHR1 1 -M 320 -M2 550 -PM 15 -S 70 -S2 70 -SE 0 -PSI 0
+done
+
+list1=("tumor_rep1" "tumor_rep2" "tumor_rep3")
+
+for i in ${list1[@]}; do
+
+	perl CIRI_simulator.pl -O ${i} -G arm1.gtf -C 10 -LC 10 -R 2 -LR 2 -L 100 -E 1 -D ./ -CHR1 1 -M 320 -M2 550 -PM 15 -S 70 -S2 70 -SE 0 -PSI 0
+
+done
+
+mv *.fq fastq/
+
+gzip fastq/*.*
+```
+
+After running the script, rep2 for each sample was deleted and duplicated using rep1. This was to satisfy DESeq2 which complains about too many zeros if each replicate is completely randomn and share no circRNAs / RNA. 
+
+
 ***
 
 # Notes
