@@ -1380,7 +1380,7 @@ process master_report{
 		file(reports) from test1.collect()
 		
 	output:
-		file("*.txt") into master_report
+		file("*circRNAs.txt") into final_out
 		
 	script:
 	"""
