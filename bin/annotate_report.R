@@ -18,6 +18,6 @@ down <- subset(x, x$Log2FC < 0)
 up <- up[sort(abs(up$Log2FC)),]
 down <- down[sort(-abs(down$Log2FC), decreasing=T),]
 
-write.table("Up_Regulated_circRNAs.txt", sep="\t", quote=F, row.names=F)
-write.table("Down_Regulated_circRNAs.txt", sep="\t", quote=F, row.names=F)
-write.table("DE_circRNAs.txt", sep="\t", quote=F, row.names=F)
+write.table(up, "Up_Regulated_circRNAs.txt", sep="\t", quote=F, row.names=F)
+write.table(down, "Down_Regulated_circRNAs.txt", sep="\t", quote=F, row.names=F)
+write.table(x, "DE_circRNAs.txt", sep="\t", quote=F, row.names=F)
