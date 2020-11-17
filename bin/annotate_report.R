@@ -12,4 +12,12 @@ colnames(results) <- c("Description", "Parent_Gene")
 x <- merge(x, results, by="Parent_Gene", all.x=T)
 x <- subset(x, select=c(circRNA_ID, Parent_Gene, Description, Strand, Log2FC, pvalue, Adjusted_pvalue))
 
-write.table(x, "DE_circRNA_Report.txt", quote=F, sep="\t", row.names=F)
+up <- subset(x, x$Log2FC > 0)
+down <- subset(x, x$Log2FC < 0)
+
+up <- up[sort(abs(up$Log2FC)),]
+down <- down[sort(-abs(down$Log2FC), decreasing=T),]
+
+write.table("Up_Regulated_circRNAs.txt", sep="\t", quote=F, row.names=F)
+write.table("Down_Regulated_circRNAs.txt", sep="\t", quote=F, row.names=F)
+write.table("DE_circRNAs.txt", sep="\t", quote=F, row.names=F)
