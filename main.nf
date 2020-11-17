@@ -1368,8 +1368,8 @@ process make_circRNA_plots{
 
 // collect all from previous process
 //master_ch = circRNA_plots.collect()
-(test, test1) = circRNA_plots.into(2)
-test.view()
+//(test, test1) = circRNA_plots.into(2)
+//test.view()
 // delete text files in process script, left with only dirs. 
 
 
@@ -1377,7 +1377,7 @@ process master_report{
 	publishDir "$params.outdir/circRNA_Report", mode:'copy'
 	
 	input:
-		file(reports) from test1.collect()
+		file(reports) from circRNA_plots.collect()
 		
 	output:
 		file("*circRNAs.txt") into final_out
