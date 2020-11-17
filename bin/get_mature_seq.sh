@@ -33,7 +33,7 @@ while IFS='' read -r line; do
 			echo "The circRNA imperfectly overlaps an exon"
 			echo "Investigating if EIciRNA or acceptable to take longest transcript"
 			echo "Retrying with longest transcript"
-			awk -v OFS="\t" '{$13 = $3 - $2; print}' ${name}.predtobed.bed | \
+			awk -v OFS="\t" '{$13 = $3 - $2; print}' ${name}_predtobed.bed | \
 			sort -rnk13 | cut -f13 --complement | head -n 1 > ${name}.bed12.bed_tmp
 			echo "Checking best transcript with $name"
 			tx_len=$(awk -v OFS="\t" '{$13 = $3 - $2; print}' ${name}_predtobed.bed | \
