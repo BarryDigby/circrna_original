@@ -15,8 +15,8 @@ x <- subset(x, select=c(circRNA_ID, Parent_Gene, Description, Strand, Log2FC, pv
 up <- subset(x, x$Log2FC > 0)
 down <- subset(x, x$Log2FC < 0)
 
-up <- up[sort(abs(up$Log2FC)),]
-down <- down[sort(-abs(down$Log2FC), decreasing=T),]
+up <- up[order(abs(up$Log2FC), decreasing=T),]
+down <- down[order(abs(down$Log2FC), decreasing=T),]
 
 write.table(up, "Up_Regulated_circRNAs.txt", sep="\t", quote=F, row.names=F)
 write.table(down, "Down_Regulated_circRNAs.txt", sep="\t", quote=F, row.names=F)
