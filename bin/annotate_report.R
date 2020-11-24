@@ -10,7 +10,7 @@ colnames(results) <- c("Description", "Parent_Gene")
 
 # allow for missing descriptions! Crucial to capture lncRNAs
 x <- merge(x, results, by="Parent_Gene", all.x=T)
-x <- subset(x, select=c(circRNA_ID, Parent_Gene, Description, Strand, Log2FC, pvalue, Adjusted_pvalue))
+x <- subset(x, select=c(circRNA_ID, Type, Mature_Length, Parent_Gene, Strand, Log2FC, pvalue, Adjusted_pvalue, Description))
 
 up <- subset(x, x$Log2FC > 0)
 down <- subset(x, x$Log2FC < 0)
