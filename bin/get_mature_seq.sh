@@ -2,6 +2,8 @@
 
 mkdir -p bed12
 
+type
+
 while IFS='' read -r line; do
         name=$(echo $line | awk '{print $4}')
         touch ${name}.bed
@@ -28,7 +30,7 @@ while IFS='' read -r line; do
 		sort -rnk10 | head -n 1 > ${name}.bed12.bed
 		if [[ -s ${name}.bed12.bed ]];
 		then
-			:
+			type="circRNA"
 		else
 			echo "The circRNA imperfectly overlaps an exon"
 			echo "Investigating if EIciRNA or acceptable to take longest transcript"
@@ -46,6 +48,7 @@ while IFS='' read -r line; do
 			then
 				echo "Transcript is more than 200nt off $name"
 				echo "Treating as EIciRNA"
+				type="EIciRNA"
 				block_count=1
                 		block_size=$(($stop-$start))
                 		rgb="0,0,0"
@@ -56,12 +59,14 @@ while IFS='' read -r line; do
 			else
 				echo "Transcript is within 200nt of ${name}"
 				echo "Taking best transcript as coordinates"
+				type="circRNA"
 				mv ${name}.bed12.bed_tmp ${name}.bed12.bed
 			fi
 		fi
 	else 
                 echo "$name returned empty GTF file in bedtools query."
 		echo "Most likely an intronic circRNA"
+		type="ciRNA"
                 block_count=1
                 block_size=$(($stop-$start))
                 rgb="0,0,0"
@@ -70,8 +75,9 @@ while IFS='' read -r line; do
                 '{print $0, thick, thick, rgb, count, size, start}' ${name}.bed > ${name}.bed12.bed
 	fi
 	
-echo "replacing tx with circRNA in ID field"
-awk -v OFS="\t" -v name=$name '{$4 = name; print}' ${name}.bed12.bed > ${name}.bed12.bed_tmp
+echo "replacing tx with circRNA type field"
+awk -v type="$type" 'BEGIN{FS=OFS="\t"}{$4=type}1' ${name}.bed12.bed > ${name}.bed12.bed_tmp
+#awk -v OFS="\t" -v name=$name '{$4 = name; print}' ${name}.bed12.bed > ${name}.bed12.bed_tmp
 rm ${name}.bed12.bed
 mv ${name}.bed12.bed_tmp ${name}.bed12.bed
 
