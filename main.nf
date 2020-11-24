@@ -1390,7 +1390,7 @@ process master_report{
 	# remove header, add manually
 	cat *.txt > merged.txt
 	grep -v "Log2FC" merged.txt > no_headers.txt
-	echo "circRNA_ID Parent_Gene Mature_Length Strand Log2FC pvalue Adjusted_pvalue" | tr ' ' '\t' > headers.txt
+	echo "circRNA_ID Type Mature_Length Parent_Gene Strand Log2FC pvalue Adjusted_pvalue" | tr ' ' '\t' > headers.txt
 	cat headers.txt no_headers.txt > merged_reports.txt
 	
 	Rscript "$projectDir"/bin/annotate_report.R
