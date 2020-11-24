@@ -147,11 +147,11 @@ singular_report <- function(inputdata){
 	pval <- signif(circ_de_info$pvalue, digits=3)
 	adj.pval <- signif(circ_de_info$padj, digits=3)
 
-	vec <- c(circ_id, type, gene, mature_len, strand, log2fc, pval, adj.pval)
+	vec <- c(circ_id, type, mature_len, gene, strand, log2fc, pval, adj.pval)
 	mat <- matrix(vec, ncol=8)
 	out_df <- as.data.frame(mat, stringsAsFactors=FALSE)
 	
-	colnames(out_df) <- c("circRNA_ID", "Type", "Parent_Gene", "Mature_Length", "Strand", "Log2FC", "pvalue", "Adjusted_pvalue")
+	colnames(out_df) <- c("circRNA_ID", "Type", "Mature_Length", "Parent_Gene", "Strand", "Log2FC", "pvalue", "Adjusted_pvalue")
 
 	write.table(out_df, file.path(file_name, paste(file_name, "Report.txt", sep="_")), quote=F, sep="\t", row.names=F)
 } 
