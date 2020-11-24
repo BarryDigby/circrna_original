@@ -79,7 +79,7 @@ echo "replacing tx with circRNA & RGB with circRNA type"
 awk -v type="$type" 'BEGIN{FS=OFS="\t"}{$9=type}1' ${name}.bed12.bed > ${name}.bed12.bed_tmp
 awk -v OFS="\t" -v name=$name '{$4 = name; print}' ${name}.bed12.bed_tmp > ${name}.bed12.bed_tmp1
 rm ${name}.bed12.bed
-rm ${name.bed12.bed_tmp
+rm ${name}.bed12.bed_tmp
 mv ${name}.bed12.bed_tmp1 ${name}.bed12.bed
 
 echo "cleaning up intermediate files"
