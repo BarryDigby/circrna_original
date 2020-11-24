@@ -76,7 +76,7 @@ while IFS='' read -r line; do
 	fi
 	
 echo "replacing tx with circRNA type field"
-awk -v type="$type" 'BEGIN{FS=OFS="\t"}{$4=type}1' ${name}.bed12.bed > ${name}.bed12.bed_tmp
+awk -v type="$type" 'BEGIN{FS=OFS="\t"}{$9=type}1' ${name}.bed12.bed > ${name}.bed12.bed_tmp
 #awk -v OFS="\t" -v name=$name '{$4 = name; print}' ${name}.bed12.bed > ${name}.bed12.bed_tmp
 rm ${name}.bed12.bed
 mv ${name}.bed12.bed_tmp ${name}.bed12.bed
