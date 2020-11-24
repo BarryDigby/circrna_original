@@ -75,11 +75,12 @@ while IFS='' read -r line; do
                 '{print $0, thick, thick, rgb, count, size, start}' ${name}.bed > ${name}.bed12.bed
 	fi
 	
-echo "replacing tx with circRNA type field"
+echo "replacing tx with circRNA & RGB with circRNA type"
 awk -v type="$type" 'BEGIN{FS=OFS="\t"}{$9=type}1' ${name}.bed12.bed > ${name}.bed12.bed_tmp
-#awk -v OFS="\t" -v name=$name '{$4 = name; print}' ${name}.bed12.bed > ${name}.bed12.bed_tmp
+awk -v OFS="\t" -v name=$name '{$4 = name; print}' ${name}.bed12.bed_tmp > ${name}.bed12.bed_tmp1
 rm ${name}.bed12.bed
-mv ${name}.bed12.bed_tmp ${name}.bed12.bed
+rm ${name.bed12.bed_tmp
+mv ${name}.bed12.bed_tmp1 ${name}.bed12.bed
 
 echo "cleaning up intermediate files"
 rm -f ${name}.gtf
