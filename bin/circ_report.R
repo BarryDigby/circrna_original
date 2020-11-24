@@ -91,7 +91,8 @@ stage_data <- function(de_circ, circ_counts, gene_counts, parent_gene, bed, mira
 	colnames(parent_tmp) <- "gene"
 	parent <- parent_tmp$gene
 	bed <- read.table(bed, sep="\t", header=F, stringsAsFactors=F)
-	colnames(bed) <- c("chr", "start", "end", "name", "score", "strand", "thickStart", "thickEnd", "itemRGB", "ExonCount", "ExonSizes", "ExonStart")
+	colnames(bed) <- c("chr", "start", "end", "type", "score", "strand", "thickStart", "thickEnd", "itemRGB", "ExonCount", "ExonSizes", "ExonStart")
+	bed$name <- with(bed, paste0(chr, sep=":", start, sep="-", end, sep=":", strand))
 	miranda <- read.table(miranda, sep="\t", header=T, stringsAsFactors=F)
 	targetscan <- read.table(targetscan, sep="\t", header=T, stringsAsFactors=F)
 	mature_tmp <- read.table(mature_len)
@@ -136,6 +137,7 @@ singular_report <- function(inputdata){
 	gene <- inputdata$parent
 	mature_len <- inputdata$mature
 	file_name <- inputdata$bed$name
+	type <- inputdata$bed$type
 
 	de_df <- inputdata$de
 	circ_de_info <- de_df[which(rownames(de_df) %in% file_name),]
@@ -145,11 +147,11 @@ singular_report <- function(inputdata){
 	pval <- signif(circ_de_info$pvalue, digits=3)
 	adj.pval <- signif(circ_de_info$padj, digits=3)
 
-	vec <- c(circ_id, gene, mature_len, strand, log2fc, pval, adj.pval)
-	mat <- matrix(vec, ncol=7)
+	vec <- c(circ_id, type, gene, mature_len, strand, log2fc, pval, adj.pval)
+	mat <- matrix(vec, ncol=8)
 	out_df <- as.data.frame(mat, stringsAsFactors=FALSE)
 	
-	colnames(out_df) <- c("circRNA_ID", "Parent_Gene", "Mature_Length", "Strand", "Log2FC", "pvalue", "Adjusted_pvalue")
+	colnames(out_df) <- c("circRNA_ID", "Type", "Parent_Gene", "Mature_Length", "Strand", "Log2FC", "pvalue", "Adjusted_pvalue")
 
 	write.table(out_df, file.path(file_name, paste(file_name, "Report.txt", sep="_")), quote=F, sep="\t", row.names=F)
 } 
