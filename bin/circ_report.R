@@ -91,8 +91,7 @@ stage_data <- function(de_circ, circ_counts, gene_counts, parent_gene, bed, mira
 	colnames(parent_tmp) <- "gene"
 	parent <- parent_tmp$gene
 	bed <- read.table(bed, sep="\t", header=F, stringsAsFactors=F)
-	colnames(bed) <- c("chr", "start", "end", "type", "score", "strand", "thickStart", "thickEnd", "itemRGB", "ExonCount", "ExonSizes", "ExonStart")
-	bed$name <- with(bed, paste0(chr, sep=":", start, sep="-", end, sep=":", strand))
+	colnames(bed) <- c("chr", "start", "end", "name", "score", "strand", "thickStart", "thickEnd", "type", "ExonCount", "ExonSizes", "ExonStart")
 	miranda <- read.table(miranda, sep="\t", header=T, stringsAsFactors=F)
 	targetscan <- read.table(targetscan, sep="\t", header=T, stringsAsFactors=F)
 	mature_tmp <- read.table(mature_len)
