@@ -1,8 +1,7 @@
 # nf-circrna
 Nextflow pipeline to scan high throughput sequencing data for circRNAs, perform differential expression and generate circRNA-miRNA targets.
 
-pipeline currently undergoing linting at https://github.com/BarryDigby/test. Test dataset currently being tested. 
-Once `BarryDigby/test` passes `nf-core` specifications, it will be pushed to this repo (or renamed `circrna`). 
+**pipeline is currently undergoing further developments and linting at `BarryDigby/test`. I will push the contents of the repository here when it is suitable to do so** 
 
 Completed tests:
 
