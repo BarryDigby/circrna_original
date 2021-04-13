@@ -1,4 +1,4 @@
-⛔ **Note** ⛔
+# ⛔ **Please Read** ⛔
 
 Original repository where work on [nf-core/circrna](https://github.com/nf-core/circrna) began. 
 
